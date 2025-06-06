@@ -1,14 +1,54 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Search, TriangleAlert, CircleCheck, Droplets, Home as HomeIcon } from "lucide-react"
+import { Search, TriangleAlert, CircleCheck, Droplets, Home as HomeIcon, Upload, X } from "lucide-react"
 import Image from "next/image"
+import { useState, useRef } from "react"
 
 export default function Home() {
+  const [dragActive, setDragActive] = useState(false)
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true)
+    } else if (e.type === "dragleave") {
+      setDragActive(false)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setDragActive(false)
+    
+    const files = Array.from(e.dataTransfer.files)
+    const pdfFiles = files.filter(file => file.type === "application/pdf")
+    setUploadedFiles(prev => [...prev, ...pdfFiles])
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    const pdfFiles = files.filter(file => file.type === "application/pdf")
+    setUploadedFiles(prev => [...prev, ...pdfFiles])
+  }
+
+  const removeFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const openFileDialog = () => {
+    fileInputRef.current?.click()
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
-      {/* Header */}
+      {/* HEADER */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -23,7 +63,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* HERO SECTION */}
       <main className="container mx-auto px-4 py-16">
         <div className="text-center max-w-4xl mx-auto">
           <Badge variant="outline" className="mb-6 text-purple-600 border-purple-200">
@@ -40,7 +80,7 @@ export default function Home() {
             AI analysis of properties that reveals hidden risks and questions you should ask during viewings.
           </p>
 
-          {/* Search Section */}
+          {/* SEARCH SECTION */}
           <div className="max-w-2xl mx-auto mb-8">
             <div className="relative flex gap-2">
               <div className="relative flex-1">
@@ -67,7 +107,122 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Recently Analyzed Properties */}
+        {/* PDF UPLOAD SECTION */}
+        <section className="mt-24">
+          <div className="text-center max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Upload Property Documents</h2>
+            <p className="text-lg text-gray-600 mb-8">
+              Drag and drop your property PDF documents for AI analysis
+            </p>
+            
+            <Card className={`max-w-2xl mx-auto border-2 border-dashed transition-colors ${
+              dragActive ? 'border-purple-400 bg-purple-50' : 'border-purple-200 hover:border-purple-400'
+            }`}>
+              <CardContent 
+                className="p-12"
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Upload className="w-8 h-8 text-purple-600" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Drop your PDF here</h3>
+                  <p className="text-gray-500 mb-4">
+                    or <span 
+                      className="text-purple-600 font-medium cursor-pointer hover:text-purple-700"
+                      onClick={openFileDialog}
+                    >browse files</span>
+                  </p>
+                  <div className="text-sm text-gray-400">
+                    Supports PDF files up to 10MB
+                  </div>
+                  
+                  {/* Hidden file input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    className="hidden"
+                    multiple
+                    onChange={handleFileSelect}
+                  />
+                  
+                  {/* Upload button */}
+                  <Button 
+                    variant="outline" 
+                    className="mt-6 border-purple-200 text-purple-600 hover:bg-purple-50"
+                    onClick={openFileDialog}
+                  >
+                    Select PDF Files
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Uploaded files display */}
+            {uploadedFiles.length > 0 && (
+              <div className="max-w-2xl mx-auto mt-6">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">Uploaded Files</h4>
+                <div className="space-y-3">
+                  {uploadedFiles.map((file, index) => (
+                    <Card key={index} className="border border-gray-200">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                              <svg
+                                className="w-6 h-6 text-red-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">{file.name}</p>
+                              <p className="text-sm text-gray-500">
+                                {(file.size / 1024 / 1024).toFixed(2)} MB
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFile(index)}
+                            className="text-gray-500 hover:text-red-600"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+                
+                <div className="mt-6 text-center">
+                  <Button 
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-8"
+                  >
+                    Analyze Documents
+                    <Search className="ml-2 w-5 h-5" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* RECENTLY ANALYZED PROPERTIES */}
         <section className="mt-24">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Recently Analyzed Properties</h2>
 
