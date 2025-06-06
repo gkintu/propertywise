@@ -11,7 +11,7 @@ const openai = new OpenAI({
 });
 
 async function main() {
-  const userWord = 'banana'; // Try changing this to anything
+  const userWord = 'tesla'; // Try changing this to anything
 
   const completion = await openai.chat.completions.create({
     model: 'google/gemma-3-27b-it:free',
@@ -22,7 +22,7 @@ async function main() {
       },
       {
         role: 'user',
-        content: 'tesla',
+        content: userWord
       },
     ],
   });
