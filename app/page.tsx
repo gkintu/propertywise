@@ -1,103 +1,215 @@
-import Image from "next/image";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Search, TriangleAlert, CircleCheck, Droplets, Home as HomeIcon } from "lucide-react"
+import Image from "next/image"
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+      {/* Header */}
+      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <HomeIcon className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-xl font-bold text-gray-900">PropertyAI</span>
+          </div>
+          <Badge variant="secondary" className="bg-purple-100 text-purple-700 hover:bg-purple-200">
+            🏠 Sell property? Get quotes from agents →
+          </Badge>
         </div>
+      </header>
+
+      {/* Hero Section */}
+      <main className="container mx-auto px-4 py-16">
+        <div className="text-center max-w-4xl mx-auto">
+          <Badge variant="outline" className="mb-6 text-purple-600 border-purple-200">
+            AI for property buyers
+          </Badge>
+
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Avoid surprises
+            <br />
+            when buying property
+          </h1>
+
+          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+            AI analysis of properties that reveals hidden risks and questions you should ask during viewings.
+          </p>
+
+          {/* Search Section */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="relative flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  type="text"
+                  placeholder="Property listing URL or address..."
+                  className="pl-4 pr-4 py-6 text-lg border-2 border-purple-200 rounded-full focus:border-purple-400 focus:ring-purple-400"
+                />
+              </div>
+              <Button
+                size="lg"
+                className="px-8 py-6 bg-purple-600 hover:bg-purple-700 rounded-full text-lg font-medium"
+              >
+                Analyze Property
+                <Search className="ml-2 w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-500 max-w-2xl mx-auto">
+            PropertyAI is a government-approved service for property buyers, but does not replace professional advice.
+            All decisions are based on your own research and assessment - we are not responsible for any errors in
+            analyses.
+          </p>
+        </div>
+
+        {/* Recently Analyzed Properties */}
+        <section className="mt-24">
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Recently Analyzed Properties</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Property 1 */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="relative">
+                <Image
+                  src="/placeholder.svg?height=200&width=300"
+                  alt="Modern house with mountain view"
+                  width={300}
+                  height={200}
+                  className="w-full h-48 object-cover"
+                />
+                <Badge className="absolute top-3 left-3 bg-black/70 text-white">3 min ago</Badge>
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Mountain View Drive 60, 5563 Fjordtown</h3>
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-lg font-bold">$634,840</span>
+                  <span className="text-gray-500">365 m²</span>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-gray-700 mb-2">RISKS</div>
+                  <div className="flex items-center gap-2 text-sm text-amber-600">
+                    <TriangleAlert className="w-4 h-4" />
+                    <span>Moisture on doors and windows</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-green-600">
+                    <CircleCheck className="w-4 h-4" />
+                    <span>No mechanical ventilation in bathroom</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Property 2 */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="relative">
+                <Image
+                  src="/placeholder.svg?height=200&width=300"
+                  alt="Modern wooden house"
+                  width={300}
+                  height={200}
+                  className="w-full h-48 object-cover"
+                />
+                <Badge className="absolute top-3 left-3 bg-black/70 text-white">16 min ago</Badge>
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Oak Street 4, 2165 Riverside</h3>
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-lg font-bold">$673,500</span>
+                  <span className="text-gray-500">304 m²</span>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-gray-700 mb-2">RISKS</div>
+                  <div className="flex items-center gap-2 text-sm text-amber-600">
+                    <TriangleAlert className="w-4 h-4" />
+                    <span>Unclear roof leak safety on balcony</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-amber-600">
+                    <Droplets className="w-4 h-4" />
+                    <span>Defects in gutters and downspouts</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Property 3 */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="relative">
+                <Image
+                  src="/placeholder.svg?height=200&width=300"
+                  alt="House with large garden"
+                  width={300}
+                  height={200}
+                  className="w-full h-48 object-cover"
+                />
+                <Badge className="absolute top-3 left-3 bg-black/70 text-white">35 min ago</Badge>
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Garden Lane 382, 4934 Greenville</h3>
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-lg font-bold">$445,740</span>
+                  <span className="text-gray-500">184 m²</span>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-gray-700 mb-2">RISKS</div>
+                  <div className="flex items-center gap-2 text-sm text-amber-600">
+                    <TriangleAlert className="w-4 h-4" />
+                    <span>Outdated electrical/heating system</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-green-600">
+                    <CircleCheck className="w-4 h-4" />
+                    <span>Bathroom with poor ventilation</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Property 4 */}
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+              <div className="relative">
+                <Image
+                  src="/placeholder.svg?height=200&width=300"
+                  alt="Modern townhouses"
+                  width={300}
+                  height={200}
+                  className="w-full h-48 object-cover"
+                />
+                <Badge className="absolute top-3 left-3 bg-black/70 text-white">41 min ago</Badge>
+              </div>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 mb-2">Sunset Avenue 37, 1476 Hillside</h3>
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-lg font-bold">$703,340</span>
+                  <span className="text-gray-500">207 m²</span>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-gray-700 mb-2">RISKS</div>
+                  <div className="flex items-center gap-2 text-sm text-green-600">
+                    <CircleCheck className="w-4 h-4" />
+                    <span>Older windows</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-green-600">
+                    <CircleCheck className="w-4 h-4" />
+                    <span>Defects in staircase railings</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-blue-600">
+                    <Droplets className="w-4 h-4" />
+                    <span>Inadequate water drainage</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
