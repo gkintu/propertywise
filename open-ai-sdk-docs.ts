@@ -1,3 +1,4 @@
+// npx tsx open-ai-sdk-docs.ts to test the file
 import 'dotenv/config';
 import OpenAI from 'openai';
 

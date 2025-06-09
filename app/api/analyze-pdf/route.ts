@@ -1,8 +1,6 @@
-\
 import { NextRequest, NextResponse } from 'next/server';
 import pdfParse from 'pdf-parse';
 import OpenAI from 'openai';
-import 'dotenv/config'; // Ensure environment variables are loaded
 
 // Initialize OpenAI client for OpenRouter
 const openai = new OpenAI({
@@ -14,8 +12,31 @@ const openai = new OpenAI({
   },
 });
 
+export async function GET() {
+  // Simple test endpoint to check if API is working
+  if (!process.env.OPENROUTER_API_KEY) {
+    return NextResponse.json({ 
+      error: 'OpenRouter API key is not configured. Please set OPENROUTER_API_KEY in your .env.local file.',
+      status: 'API key missing'
+    }, { status: 500 });
+  }
+
+  return NextResponse.json({ 
+    message: 'PDF Analysis API is working',
+    status: 'OK',
+    timestamp: new Date().toISOString()
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Check if OpenRouter API key is configured
+    if (!process.env.OPENROUTER_API_KEY) {
+      return NextResponse.json({ 
+        error: 'OpenRouter API key is not configured. Please set OPENROUTER_API_KEY in your .env.local file.' 
+      }, { status: 500 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
 
