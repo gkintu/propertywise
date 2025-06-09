@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import PDFParser from 'pdf2json'; // Changed to default import
+import PDFParser from 'pdf2json'; 
 import fs from 'fs';
 import path from 'path';
 import os from 'os';

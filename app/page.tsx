@@ -7,14 +7,14 @@ import { Badge } from "@/components/ui/badge"
 import { Search, TriangleAlert, CircleCheck, Droplets, Home as HomeIcon, Upload, X } from "lucide-react"
 import Image from "next/image"
 import { useState, useRef } from "react"
+import { useRouter } from 'next/navigation'; // Add this import
 
 export default function Home() {
   const [dragActive, setDragActive] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [analysisResult, setAnalysisResult] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [apiStatus, setApiStatus] = useState<string | null>(null)
+  const router = useRouter(); // Add this line
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -57,7 +57,6 @@ export default function Home() {
     }
 
     setIsLoading(true)
-    setAnalysisResult(null)
     const formData = new FormData()
     // For simplicity, we'll send the first file.
     // You might want to handle multiple files or allow the user to select which one to analyze.
@@ -75,24 +74,14 @@ export default function Home() {
       }
 
       const data = await response.json()
-      setAnalysisResult(data.summary)
+      localStorage.setItem('analysisResult', data.summary); // Store result in localStorage
+      router.push('/analysis-result'); // Redirect to the new page
     } catch (error) {
       console.error("Error analyzing document:", error)
-      setAnalysisResult(`Error: ${error instanceof Error ? error.message : "Unknown error"}`)
+      localStorage.setItem('analysisError', error instanceof Error ? error.message : "Unknown error");
+      router.push('/analysis-result');
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const testApiEndpoint = async () => {
-    try {
-      const response = await fetch('/api/analyze-pdf')
-      const data = await response.json()
-      console.log('API Test Response:', data)
-      setApiStatus(JSON.stringify(data, null, 2))
-    } catch (error) {
-      console.error('API Test Error:', error)
-      setApiStatus(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
@@ -273,7 +262,7 @@ export default function Home() {
             )}
 
             {/* Analysis Result Display */}
-            {analysisResult && (
+            {/* {analysisResult && ( // Remove this section
               <div className="max-w-2xl mx-auto mt-6">
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">Analysis Result</h4>
                 <Card className="border border-gray-200">
@@ -282,27 +271,7 @@ export default function Home() {
                   </CardContent>
                 </Card>
               </div>
-            )}
-
-            {/* API Status Display */}
-            <div className="max-w-2xl mx-auto mt-6">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">API Status</h4>
-              <Card className="border border-gray-200">
-                <CardContent className="p-4">
-                  <pre className="text-gray-700 whitespace-pre-wrap">{apiStatus}</pre>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* API Test Button */}
-            <div className="max-w-2xl mx-auto mt-6 text-center">
-              <Button
-                className="bg-green-600 hover:bg-green-700 text-white px-8"
-                onClick={testApiEndpoint}
-              >
-                Test API Endpoint
-              </Button>
-            </div>
+            )} */} 
           </div>
         </section>
 
