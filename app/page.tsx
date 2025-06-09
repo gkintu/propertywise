@@ -12,6 +12,8 @@ export default function Home() {
   const [dragActive, setDragActive] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [analysisResult, setAnalysisResult] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -46,6 +48,41 @@ export default function Home() {
   const openFileDialog = () => {
     fileInputRef.current?.click()
   }
+
+  const handleAnalyzeDocuments = async () => {
+    if (uploadedFiles.length === 0) {
+      alert("Please upload at least one PDF file.")
+      return
+    }
+
+    setIsLoading(true)
+    setAnalysisResult(null)
+    const formData = new FormData()
+    // For simplicity, we'll send the first file.
+    // You might want to handle multiple files or allow the user to select which one to analyze.
+    formData.append("file", uploadedFiles[0])
+
+    try {
+      const response = await fetch("/api/analyze-pdf", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to analyze document")
+      }
+
+      const data = await response.json()
+      setAnalysisResult(data.summary)
+    } catch (error) {
+      console.error("Error analyzing document:", error)
+      setAnalysisResult(`Error: ${error instanceof Error ? error.message : "Unknown error"}`)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
       {/* HEADER */}
@@ -210,13 +247,27 @@ export default function Home() {
                 </div>
                 
                 <div className="mt-6 text-center">
-                  <Button 
+                  <Button
                     className="bg-purple-600 hover:bg-purple-700 text-white px-8"
+                    onClick={handleAnalyzeDocuments}
+                    disabled={isLoading || uploadedFiles.length === 0}
                   >
-                    Analyze Documents
+                    {isLoading ? "Analyzing..." : "Analyze Documents"}
                     <Search className="ml-2 w-5 h-5" />
                   </Button>
                 </div>
+              </div>
+            )}
+
+            {/* Analysis Result Display */}
+            {analysisResult && (
+              <div className="max-w-2xl mx-auto mt-6">
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">Analysis Result</h4>
+                <Card className="border border-gray-200">
+                  <CardContent className="p-4">
+                    <p className="text-gray-700 whitespace-pre-wrap">{analysisResult}</p>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </div>
