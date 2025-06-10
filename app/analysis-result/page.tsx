@@ -196,6 +196,49 @@ export default function AnalysisResultPage() {
       }
     }
 
+    // Enhanced parsing for JSON-like content
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      
+      // Skip JSON structure lines
+      if (trimmedLine.match(/^"(strongPoints|concerns|address|title|description|bottomLine|summary)":\s*[\[\{"]?$/)) {
+        continue;
+      }
+      
+      // Extract values from JSON key-value pairs
+      const jsonValueMatch = trimmedLine.match(/^"[^"]*":\s*"([^"]+)"[,}]?$/);
+      if (jsonValueMatch) {
+        const value = jsonValueMatch[1];
+        const lowerValue = value.toLowerCase();
+        
+        // Skip summary/overview statements that contain multiple concepts or pricing
+        if (lowerValue.includes('however') || lowerValue.includes('prospective buyers') ||
+            lowerValue.includes('good opportunity') || lowerValue.includes('nok') ||
+            lowerValue.includes('built in') || lowerValue.includes('apartment') ||
+            lowerValue.includes('first-time buyer') || lowerValue.includes('take note') ||
+            value.length > 100 || // Skip very long descriptions that are likely summaries
+            (lowerValue.includes('but') && lowerValue.includes('should'))) {
+          continue;
+        }
+        
+        // Categorize based on specific, focused content
+        if ((lowerValue.includes('upgraded') || lowerValue.includes('modern') || lowerValue.includes('good') || 
+            lowerValue.includes('excellent') || lowerValue.includes('benefit') || lowerValue.includes('advantage') ||
+            lowerValue.includes('storage') || lowerValue.includes('renovated')) &&
+            !lowerValue.includes('however') && !lowerValue.includes('but') && !lowerValue.includes('should') &&
+            value.length < 80) { // Keep only focused, specific points
+          result.strongPoints.push(value);
+        } else if ((lowerValue.includes('cracked') || lowerValue.includes('punctured') || lowerValue.includes('pest') ||
+                   lowerValue.includes('alert') || lowerValue.includes('damage') || 
+                   (lowerValue.includes('window') && lowerValue.includes('replacement'))) &&
+                   !lowerValue.includes('however') && !lowerValue.includes('should budget') &&
+                   value.length < 80) { // Keep only specific issues, not general advice
+          result.concerns.push(value);
+        }
+        continue;
+      }
+    }
+
     // Fallback: if no structured data found, try to extract key information
     if (result.strongPoints.length === 0 && result.concerns.length === 0) {
       const keywords = {
@@ -204,11 +247,44 @@ export default function AnalysisResultPage() {
       };
 
       for (const line of lines) {
-        const lowerLine = line.toLowerCase();
-        if (keywords.positive.some(word => lowerLine.includes(word))) {
-          result.strongPoints.push(line.trim());
-        } else if (keywords.negative.some(word => lowerLine.includes(word))) {
-          result.concerns.push(line.trim());
+        const trimmedLine = line.trim();
+        
+        // Skip JSON structure lines
+        if (trimmedLine.match(/^[\{\}]$/) || 
+            trimmedLine.match(/^"[^"]*":\s*[\[\{"]?$/) ||
+            trimmedLine.match(/^\]?\s*[,}]?$/)) {
+          continue;
+        }
+        
+        // Clean the line from JSON artifacts
+        const cleanedLine = trimmedLine
+          .replace(/^"[^"]*":\s*"?/, '') // Remove "key": "
+          .replace(/"?\s*,?\s*$/, '') // Remove trailing ", 
+          .replace(/^["']|["']$/g, '') // Remove quotes
+          .trim();
+        
+        if (cleanedLine.length < 5) continue;
+        
+        // Skip summary/overview statements
+        const lowerCleaned = cleanedLine.toLowerCase();
+        if (lowerCleaned.includes('however') || lowerCleaned.includes('prospective buyers') ||
+            lowerCleaned.includes('good opportunity') || lowerCleaned.includes('nok') ||
+            lowerCleaned.includes('built in') || lowerCleaned.includes('apartment') ||
+            lowerCleaned.includes('first-time buyer') || lowerCleaned.includes('take note') ||
+            cleanedLine.length > 100 || // Skip very long descriptions
+            (lowerCleaned.includes('but') && lowerCleaned.includes('should'))) {
+          continue;
+        }
+        
+        // Only categorize specific, focused points
+        if (keywords.positive.some(word => lowerCleaned.includes(word)) &&
+            !lowerCleaned.includes('however') && !lowerCleaned.includes('but') &&
+            cleanedLine.length < 80) {
+          result.strongPoints.push(cleanedLine);
+        } else if (keywords.negative.some(word => lowerCleaned.includes(word)) &&
+                   !lowerCleaned.includes('should budget') && !lowerCleaned.includes('however') &&
+                   cleanedLine.length < 80) {
+          result.concerns.push(cleanedLine);
         }
       }
     }
@@ -426,6 +502,24 @@ export default function AnalysisResultPage() {
                 Print Report
               </Button>
             </div>
+
+            {/* Debug Section - Raw Data (TODO: Remove before deployment) */}
+            <Separator className="my-8" />
+            <Card className="border-red-200 bg-red-50">
+              <CardHeader>
+                <CardTitle className="text-red-700 text-lg">🚧 Debug Data (Remove before deployment)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-red-700 mb-2">Structured Analysis Data:</h4>
+                    <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
+                      {JSON.stringify(analysisData, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </main>
         </div>
       );
@@ -590,6 +684,30 @@ export default function AnalysisResultPage() {
                 Print Report
               </Button>
             </div>
+
+            {/* Debug Section - Raw Data (TODO: Remove before deployment) */}
+            <Separator className="my-8" />
+            <Card className="border-red-200 bg-red-50">
+              <CardHeader>
+                <CardTitle className="text-red-700 text-lg">🚧 Debug Data (Remove before deployment)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-red-700 mb-2">Parsed Data:</h4>
+                    <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
+                      {JSON.stringify(parsedData, null, 2)}
+                    </pre>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-red-700 mb-2">Raw Summary:</h4>
+                    <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
+                      {summary}
+                    </pre>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </main>
         </div>
       );
