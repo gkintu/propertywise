@@ -140,7 +140,38 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: 'You are an AI assistant specialized in analyzing property reports. Given the text from a property document, please provide a concise summary highlighting key findings, potential risks (like structural issues, moisture, pests, outdated systems), and any urgent recommendations. Focus on actionable insights for a potential buyer. If the document is not a property report or the text is too garbled, indicate that you cannot provide a meaningful summary.',
+          content: `You are an AI assistant specialized in analyzing property reports. Given the text from a property document, extract key information and return it as a JSON object with the following structure:
+
+{
+  "propertyDetails": {
+    "address": "Full property address",
+    "bedrooms": number_of_bedrooms,
+    "price": price_in_NOK,
+    "size": size_in_square_meters,
+    "yearBuilt": year_built,
+    "propertyType": "apartment|house|condo"
+  },
+  "strongPoints": [
+    {
+      "title": "Brief title",
+      "description": "Detailed description",
+      "category": "kitchen|location|fees|outdoor|storage|condition|other"
+    }
+  ],
+  "concerns": [
+    {
+      "title": "Brief title", 
+      "description": "Detailed description",
+      "severity": "low|medium|high",
+      "estimatedCost": "10-50k NOK (optional)",
+      "category": "electrical|structural|safety|pest|maintenance|age|other"
+    }
+  ],
+  "bottomLine": "Overall recommendation and key points",
+  "summary": "Brief overview of the property analysis"
+}
+
+If you cannot extract structured data from the document, return {"error": "Unable to parse property data from document", "summary": "your analysis"}. Focus on actionable insights for a potential buyer.`,
         },
         {
           role: 'user',
@@ -157,8 +188,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'AI failed to generate a summary.' }, { status: 500 });
     }
 
-    console.log('Returning successful response');
-    return NextResponse.json({ summary: aiSummary });
+    // Try to parse as JSON first
+    try {
+      const parsedAnalysis = JSON.parse(aiSummary);
+      console.log('Returning structured analysis response');
+      return NextResponse.json({ analysis: parsedAnalysis });
+    } catch (parseError) {
+      console.log('Failed to parse as JSON, returning as summary');
+      // Fallback to original behavior if not valid JSON
+      return NextResponse.json({ summary: aiSummary });
+    }
   } catch (error) {
     console.error('Error in /api/analyze-pdf:', error);
     console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
