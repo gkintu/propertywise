@@ -16,11 +16,7 @@ import {
   MapPin,
   Eye,
   TrendingUp,
-  AlertCircle,
-  Bed,
-  Square,
-  Calendar,
-  DollarSign
+  AlertCircle
 } from 'lucide-react';
 import { PropertyAnalysis, AnalysisResponse } from '@/lib/types';
 
@@ -43,15 +39,15 @@ export default function AnalysisResultPage() {
         } else if (parsed.summary) {
           setSummary(parsed.summary);
         }
-        localStorage.removeItem('analysisResult');
+        // Keep the analysis result in localStorage for page refreshes
+        // Only remove it when user explicitly goes back to upload or uploads new document
       } catch {
         // Fallback to treating it as plain text summary
         setSummary(storedAnalysis);
-        localStorage.removeItem('analysisResult');
       }
     } else if (storedError) {
       setError(storedError);
-      localStorage.removeItem('analysisError');
+      // Keep error in localStorage as well for consistency
     }
     setIsLoading(false);
   }, []);
@@ -119,7 +115,12 @@ export default function AnalysisResultPage() {
                 {error || 'No analysis result was found. This might happen if you navigated to this page directly or if there was an issue retrieving the result.'}
               </p>
               <Button 
-                onClick={() => router.push('/')} 
+                onClick={() => {
+                  // Clear analysis results when user explicitly chooses to analyze another document
+                  localStorage.removeItem('analysisResult');
+                  localStorage.removeItem('analysisError');
+                  router.push('/');
+                }} 
                 className="bg-yellow-500 hover:bg-yellow-600 text-white"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -145,12 +146,38 @@ export default function AnalysisResultPage() {
 
     let currentSection = '';
     
+    // Try to extract property title from the first few meaningful lines
+    for (let i = 0; i < Math.min(lines.length, 10); i++) {
+      const trimmedLine = lines[i].trim();
+      if (trimmedLine && !result.propertyTitle) {
+        // Look for JSON-like address pattern first
+        const addressMatch = trimmedLine.match(/"address":\s*"([^"]+)"/);
+        if (addressMatch) {
+          result.propertyTitle = addressMatch[1];
+          break;
+        }
+        
+        // Look for address patterns, property titles, or meaningful headers
+        if (trimmedLine.includes('Property Report Summary:') || 
+            trimmedLine.includes('Property:') ||
+            trimmedLine.includes('Address:') ||
+            trimmedLine.includes('Property Analysis') ||
+            (trimmedLine.length > 10 && trimmedLine.length < 100 && 
+             (trimmedLine.includes('gate') || trimmedLine.includes('vei') || 
+              trimmedLine.includes('street') || trimmedLine.includes('Avenue') ||
+              /\d+/.test(trimmedLine)))) {
+          result.propertyTitle = trimmedLine
+            .replace(/Property Report Summary:|Property:|Address:|Property Analysis|#/g, '')
+            .trim();
+          break;
+        }
+      }
+    }
+    
     for (const line of lines) {
       const trimmedLine = line.trim();
       
-      if (trimmedLine.includes('Property Report Summary:') || trimmedLine.includes('Property:')) {
-        result.propertyTitle = trimmedLine.replace(/Property Report Summary:|Property:|#/g, '').trim();
-      } else if (trimmedLine.includes('Market Position:')) {
+      if (trimmedLine.includes('Market Position:')) {
         result.marketPosition = trimmedLine.replace('Market Position:', '').trim();
       } else if (trimmedLine.includes('Strong Selling Points') || trimmedLine.includes('Strengths')) {
         currentSection = 'strengths';
@@ -186,6 +213,35 @@ export default function AnalysisResultPage() {
       }
     }
 
+    // If still no property title found, use the first meaningful line as fallback
+    if (!result.propertyTitle) {
+      const firstMeaningfulLine = lines.find(line => {
+        const trimmed = line.trim();
+        return trimmed.length > 5 && 
+               !trimmed.toLowerCase().includes('summary') &&
+               !trimmed.toLowerCase().includes('analysis') &&
+               !trimmed.toLowerCase().includes('report') &&
+               !trimmed.toLowerCase().includes('property') &&
+               !trimmed.startsWith('{') &&
+               !trimmed.startsWith('"');
+      });
+      if (firstMeaningfulLine) {
+        let cleaned = firstMeaningfulLine.trim();
+        // Remove any JSON-like formatting
+        cleaned = cleaned.replace(/^"[^"]*":\s*"?/, '').replace(/"?\s*,?\s*$/, '');
+        result.propertyTitle = cleaned.substring(0, 80); // Limit length
+      }
+    }
+
+    // Final cleanup of property title to remove any remaining JSON artifacts
+    if (result.propertyTitle) {
+      result.propertyTitle = result.propertyTitle
+        .replace(/^"[^"]*":\s*"?/, '') // Remove "key": " at start
+        .replace(/"?\s*,?\s*$/, '') // Remove ", at end
+        .replace(/^["']|["']$/g, '') // Remove quotes
+        .trim();
+    }
+
     return result;
   };
 
@@ -212,53 +268,29 @@ export default function AnalysisResultPage() {
 
           {/* Main Content */}
           <main className="container mx-auto max-w-6xl py-8 px-4">
-            {/* Header Section */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                  <HomeIcon className="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Analysis Results</h1>
-                  <p className="text-gray-600">Based on your uploaded property documents</p>
+            {/* Property Report Header */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <MapPin className="w-6 h-6 text-orange-600" />
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Property Report Summary: {analysisData.propertyDetails.address}
+                </h1>
+              </div>
+              
+              {/* Market Position Bar */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm font-medium text-blue-900 mb-2">Market Position:</p>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-blue-800">
+                  <span className="font-medium">
+                    {analysisData.propertyDetails.bedrooms}-room {analysisData.propertyDetails.propertyType} priced at {analysisData.propertyDetails.price.toLocaleString()} NOK
+                  </span>
+                  <span>•</span>
+                  <span>{analysisData.propertyDetails.size} sqm total</span>
+                  <span>•</span>
+                  <span>Built {analysisData.propertyDetails.yearBuilt}</span>
                 </div>
               </div>
             </div>
-
-            {/* Property Summary */}
-            <Card className="mb-6 border-l-4 border-l-blue-500">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-blue-600" />
-                  <CardTitle className="text-xl">
-                    Property Report Summary: {analysisData.propertyDetails.address}
-                  </CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <p className="text-sm font-medium text-blue-900 mb-3">Market Position:</p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-blue-600" />
-                      <span className="text-blue-800">{analysisData.propertyDetails.price.toLocaleString()} NOK</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Bed className="w-4 h-4 text-blue-600" />
-                      <span className="text-blue-800">{analysisData.propertyDetails.bedrooms} bedrooms</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Square className="w-4 h-4 text-blue-600" />
-                      <span className="text-blue-800">{analysisData.propertyDetails.size} sqm</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-blue-600" />
-                      <span className="text-blue-800">Built {analysisData.propertyDetails.yearBuilt}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Broker's Key Findings */}
             <Card className="mb-6">
@@ -277,12 +309,16 @@ export default function AnalysisResultPage() {
                       <h3 className="text-lg font-semibold text-green-700">Strong Selling Points</h3>
                     </div>
                     <div className="space-y-3">
-                      {analysisData.strongPoints.length > 0 ? (
+                      {analysisData.strongPoints && analysisData.strongPoints.length > 0 ? (
                         analysisData.strongPoints.map((point, index) => (
                           <Alert key={index} className="border-green-200 bg-green-50">
                             <CheckCircle className="w-4 h-4 text-green-600" />
                             <AlertDescription className="text-green-800">
-                              <strong>{point.title}:</strong> {point.description}
+                              {typeof point === 'string' ? point : (
+                                <>
+                                  {point.title && <strong>{point.title}:</strong>} {point.description || point.title}
+                                </>
+                              )}
                             </AlertDescription>
                           </Alert>
                         ))
@@ -290,7 +326,7 @@ export default function AnalysisResultPage() {
                         <Alert className="border-green-200 bg-green-50">
                           <CheckCircle className="w-4 h-4 text-green-600" />
                           <AlertDescription className="text-green-800">
-                            Property analysis completed successfully
+                            No specific strong points identified
                           </AlertDescription>
                         </Alert>
                       )}
@@ -304,16 +340,20 @@ export default function AnalysisResultPage() {
                       <h3 className="text-lg font-semibold text-red-700">Areas of Concern</h3>
                     </div>
                     <div className="space-y-3">
-                      {analysisData.concerns.length > 0 ? (
+                      {analysisData.concerns && analysisData.concerns.length > 0 ? (
                         analysisData.concerns.map((concern, index) => (
                           <Alert key={index} className="border-red-200 bg-red-50">
                             <AlertCircle className="w-4 h-4 text-red-600" />
                             <AlertDescription className="text-red-800">
-                              <strong>{concern.title}:</strong> {concern.description}
-                              {concern.estimatedCost && (
-                                <div className="text-sm mt-1">
-                                  <strong>Estimated cost:</strong> {concern.estimatedCost}
-                                </div>
+                              {typeof concern === 'string' ? concern : (
+                                <>
+                                  {concern.title && <strong>{concern.title}:</strong>} {concern.description || concern.title}
+                                  {concern.estimatedCost && (
+                                    <div className="text-sm mt-1">
+                                      <strong>Estimated cost:</strong> {concern.estimatedCost}
+                                    </div>
+                                  )}
+                                </>
                               )}
                             </AlertDescription>
                           </Alert>
@@ -322,7 +362,7 @@ export default function AnalysisResultPage() {
                         <Alert className="border-gray-200 bg-gray-50">
                           <AlertCircle className="w-4 h-4 text-gray-600" />
                           <AlertDescription className="text-gray-800">
-                            No major concerns identified in the analysis
+                            No major concerns identified
                           </AlertDescription>
                         </Alert>
                       )}
@@ -331,6 +371,25 @@ export default function AnalysisResultPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Summary Section */}
+            {analysisData.summary && (
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Analysis Summary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="prose prose-gray max-w-none">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {analysisData.summary}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Broker's Bottom Line */}
             {analysisData.bottomLine && (
@@ -347,7 +406,12 @@ export default function AnalysisResultPage() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-                onClick={() => router.push('/')} 
+                onClick={() => {
+                  // Clear analysis results when user explicitly chooses to analyze another document
+                  localStorage.removeItem('analysisResult');
+                  localStorage.removeItem('analysisError');
+                  router.push('/');
+                }} 
                 className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
@@ -387,38 +451,23 @@ export default function AnalysisResultPage() {
 
           {/* Main Content */}
           <main className="container mx-auto max-w-6xl py-8 px-4">
-            {/* Header Section */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                  <HomeIcon className="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">Analysis Results</h1>
-                  <p className="text-gray-600">Based on your uploaded property documents</p>
-                </div>
+            {/* Property Report Header */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <MapPin className="w-6 h-6 text-orange-600" />
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {parsedData.propertyTitle || 'Property Report Summary'}
+                </h1>
               </div>
-            </div>
-
-            {/* Property Summary */}
-            <Card className="mb-6 border-l-4 border-l-blue-500">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-blue-600" />
-                  <CardTitle className="text-xl">
-                    {parsedData.propertyTitle || 'Property Report Summary'}
-                  </CardTitle>
+              
+              {/* Market Position Bar */}
+              {parsedData.marketPosition && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm font-medium text-blue-900 mb-2">Market Position:</p>
+                  <p className="text-sm text-blue-800">{parsedData.marketPosition}</p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                {parsedData.marketPosition && (
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <p className="text-sm font-medium text-blue-900 mb-1">Market Position:</p>
-                    <p className="text-blue-800">{parsedData.marketPosition}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+              )}
+            </div>
 
             {/* Broker's Key Findings */}
             <Card className="mb-6">
@@ -521,7 +570,12 @@ export default function AnalysisResultPage() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-                onClick={() => router.push('/')} 
+                onClick={() => {
+                  // Clear analysis results when user explicitly chooses to analyze another document
+                  localStorage.removeItem('analysisResult');
+                  localStorage.removeItem('analysisError');
+                  router.push('/');
+                }} 
                 className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />

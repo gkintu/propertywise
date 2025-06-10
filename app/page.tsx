@@ -56,6 +56,10 @@ export default function Home() {
       return
     }
 
+    // Clear any previous analysis results when starting a new analysis
+    localStorage.removeItem('analysisResult')
+    localStorage.removeItem('analysisError')
+
     setIsLoading(true)
     const formData = new FormData()
     formData.append("file", uploadedFiles[0])
@@ -72,7 +76,7 @@ export default function Home() {
       }
 
       const data = await response.json()
-      localStorage.setItem('analysisResult', data.summary)
+      localStorage.setItem('analysisResult', JSON.stringify(data))
       router.push('/analysis-result')
     } catch (error) {
       console.error("Error analyzing document:", error)
