@@ -3,9 +3,21 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Separator } from "@/components/ui/separator";
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Home as HomeIcon, ArrowLeft, FileText } from 'lucide-react';
+import { 
+  Home as HomeIcon, 
+  ArrowLeft, 
+  FileText, 
+  CheckCircle, 
+  AlertTriangle,
+  MapPin,
+  Eye,
+  TrendingUp,
+  AlertCircle
+} from 'lucide-react';
 
 export default function AnalysisResultPage() {
   const [summary, setSummary] = useState<string | null>(null);
@@ -103,6 +115,65 @@ export default function AnalysisResultPage() {
     );
   }
 
+  // Parse the summary to extract structured data
+  const parseAnalysisResult = (summary: string) => {
+    const lines = summary.split('\n');
+    const result = {
+      propertyTitle: '',
+      marketPosition: '',
+      strongPoints: [] as string[],
+      concerns: [] as string[],
+      bottomLine: ''
+    };
+
+    let currentSection = '';
+    
+    for (const line of lines) {
+      const trimmedLine = line.trim();
+      
+      if (trimmedLine.includes('Property Report Summary:') || trimmedLine.includes('Property:')) {
+        result.propertyTitle = trimmedLine.replace(/Property Report Summary:|Property:|#/g, '').trim();
+      } else if (trimmedLine.includes('Market Position:')) {
+        result.marketPosition = trimmedLine.replace('Market Position:', '').trim();
+      } else if (trimmedLine.includes('Strong Selling Points') || trimmedLine.includes('Strengths')) {
+        currentSection = 'strengths';
+      } else if (trimmedLine.includes('Areas of Concern') || trimmedLine.includes('Concerns')) {
+        currentSection = 'concerns';
+      } else if (trimmedLine.includes('Bottom Line') || trimmedLine.includes('Conclusion')) {
+        currentSection = 'bottomLine';
+      } else if (trimmedLine.includes('Broker') && trimmedLine.includes('Bottom Line')) {
+        currentSection = 'bottomLine';
+      } else if (trimmedLine && currentSection === 'strengths' && (trimmedLine.startsWith('-') || trimmedLine.startsWith('•') || trimmedLine.includes('✓'))) {
+        result.strongPoints.push(trimmedLine.replace(/^[-•✓]\s*/, ''));
+      } else if (trimmedLine && currentSection === 'concerns' && (trimmedLine.startsWith('-') || trimmedLine.startsWith('•') || trimmedLine.includes('⚠'))) {
+        result.concerns.push(trimmedLine.replace(/^[-•⚠]\s*/, ''));
+      } else if (trimmedLine && currentSection === 'bottomLine') {
+        result.bottomLine += trimmedLine + ' ';
+      }
+    }
+
+    // Fallback: if no structured data found, try to extract key information
+    if (result.strongPoints.length === 0 && result.concerns.length === 0) {
+      const keywords = {
+        positive: ['good', 'excellent', 'strong', 'advantage', 'benefit', 'positive', 'upgraded', 'renovated', 'modern'],
+        negative: ['concern', 'issue', 'problem', 'damage', 'repair', 'replace', 'old', 'outdated', 'alert']
+      };
+
+      for (const line of lines) {
+        const lowerLine = line.toLowerCase();
+        if (keywords.positive.some(word => lowerLine.includes(word))) {
+          result.strongPoints.push(line.trim());
+        } else if (keywords.negative.some(word => lowerLine.includes(word))) {
+          result.concerns.push(line.trim());
+        }
+      }
+    }
+
+    return result;
+  };
+
+  const analysisData = parseAnalysisResult(summary);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
       {/* Header */}
@@ -121,39 +192,140 @@ export default function AnalysisResultPage() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto max-w-4xl py-12 px-4">
-        <div className="text-center mb-8">
-          <Badge variant="outline" className="mb-4 text-yellow-600 border-yellow-200">
-            Analysis Complete
-          </Badge>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Property Analysis Report</h1>
-          <p className="text-lg text-gray-600">
-            Here's your comprehensive property analysis powered by AI
-          </p>
+      <main className="container mx-auto max-w-6xl py-8 px-4">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+              <HomeIcon className="w-6 h-6 text-orange-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Analysis Results</h1>
+              <p className="text-gray-600">Based on your uploaded property documents</p>
+            </div>
+          </div>
         </div>
 
-        <Card className="border-2 border-yellow-200 shadow-lg">
-          <CardHeader className="bg-yellow-50 border-b border-yellow-200">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                <FileText className="w-6 h-6 text-yellow-600" />
-              </div>
-              <div>
-                <CardTitle className="text-2xl font-bold text-gray-900">Analysis Results</CardTitle>
-                <p className="text-gray-600">Based on your uploaded property documents</p>
-              </div>
+        {/* Property Summary */}
+        <Card className="mb-6 border-l-4 border-l-blue-500">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-blue-600" />
+              <CardTitle className="text-xl">
+                {analysisData.propertyTitle || 'Property Report Summary'}
+              </CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="p-8">
-            <div className="prose prose-lg max-w-none">
-              <div className="whitespace-pre-wrap text-gray-800 leading-relaxed">
-                {summary}
+          <CardContent>
+            {analysisData.marketPosition && (
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="text-sm font-medium text-blue-900 mb-1">Market Position:</p>
+                <p className="text-blue-800">{analysisData.marketPosition}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Broker's Key Findings */}
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Eye className="w-5 h-5 text-gray-600" />
+              <CardTitle className="text-xl">Broker&apos;s Key Findings</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Strong Selling Points */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <TrendingUp className="w-5 h-5 text-green-600" />
+                  <h3 className="text-lg font-semibold text-green-700">Strong Selling Points</h3>
+                </div>
+                <div className="space-y-3">
+                  {analysisData.strongPoints.length > 0 ? (
+                    analysisData.strongPoints.map((point, index) => (
+                      <Alert key={index} className="border-green-200 bg-green-50">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <AlertDescription className="text-green-800">
+                          {point}
+                        </AlertDescription>
+                      </Alert>
+                    ))
+                  ) : (
+                    <Alert className="border-green-200 bg-green-50">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <AlertDescription className="text-green-800">
+                        Property analysis completed successfully
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              </div>
+
+              {/* Areas of Concern */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                  <h3 className="text-lg font-semibold text-red-700">Areas of Concern</h3>
+                </div>
+                <div className="space-y-3">
+                  {analysisData.concerns.length > 0 ? (
+                    analysisData.concerns.map((concern, index) => (
+                      <Alert key={index} className="border-red-200 bg-red-50">
+                        <AlertCircle className="w-4 h-4 text-red-600" />
+                        <AlertDescription className="text-red-800">
+                          {concern}
+                        </AlertDescription>
+                      </Alert>
+                    ))
+                  ) : (
+                    <Alert className="border-gray-200 bg-gray-50">
+                      <AlertCircle className="w-4 h-4 text-gray-600" />
+                      <AlertDescription className="text-gray-800">
+                        No major concerns identified in the analysis
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+        {/* Broker's Bottom Line */}
+        {analysisData.bottomLine && (
+          <Alert className="mb-6 border-yellow-200 bg-yellow-50">
+            <AlertTriangle className="w-4 h-4 text-yellow-600" />
+            <AlertDescription className="text-yellow-800">
+              <strong>Broker&apos;s Bottom Line:</strong> {analysisData.bottomLine.trim()}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Full Analysis (Fallback) */}
+        {(!analysisData.strongPoints.length && !analysisData.concerns.length) && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Complete Analysis Report
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="prose prose-gray max-w-none">
+                <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                  {summary}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <Separator className="my-8" />
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button 
             onClick={() => router.push('/')} 
             className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
