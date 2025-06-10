@@ -512,9 +512,9 @@ export default function AnalysisResultPage() {
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-semibold text-red-700 mb-2">Raw Summary:</h4>
+                    <h4 className="font-semibold text-red-700 mb-2">Raw Analysis Data:</h4>
                     <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
-                      {summary}
+                      {analysisData ? JSON.stringify(analysisData, null, 2) : summary}
                     </pre>
                   </div>
                 </div>
@@ -694,9 +694,9 @@ export default function AnalysisResultPage() {
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-semibold text-red-700 mb-2">Raw Summary:</h4>
+                    <h4 className="font-semibold text-red-700 mb-2">Raw Analysis Data:</h4>
                     <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
-                      {summary}
+                      {analysisData ? JSON.stringify(analysisData, null, 2) : summary}
                     </pre>
                   </div>
                 </div>

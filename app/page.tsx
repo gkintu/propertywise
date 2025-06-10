@@ -8,6 +8,7 @@ import { Search, Home as HomeIcon, AlertTriangle, CheckCircle, Clock, MapPin, Be
 import Image from "next/image"
 import { useState, useRef } from "react"
 import { useRouter } from 'next/navigation'
+import SwirlingEffectSpinner from "@/components/customized/spinner/spinner-06";
 
 export default function Home() {
   const [dragActive, setDragActive] = useState(false)
@@ -271,11 +272,20 @@ export default function Home() {
                 
                 <div className="mt-6 text-center">
                   <Button
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 relative flex items-center justify-center"
                     onClick={handleAnalyzeDocuments}
                     disabled={isLoading || uploadedFiles.length === 0}
                   >
-                    {isLoading ? "Analyzing..." : "Analyze Documents"}
+                    {isLoading ? (
+                      <span className="flex items-center gap-2">
+                        <span className="inline-block align-middle" style={{ width: 16, height: 16 }}>
+                          <SwirlingEffectSpinner />
+                        </span>
+                        Analyzing...
+                      </span>
+                    ) : (
+                      <>Analyze Documents</>
+                    )}
                     <Search className="ml-2 w-5 h-5" />
                   </Button>
                 </div>
