@@ -73,7 +73,7 @@ export default function AnalysisResultPage() {
         <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
           <div className="text-center">
             <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-              <FileText className="w-8 h-8 text-yellow-600" />
+              <FileText className="w-12 h-12 text-yellow-600" />
             </div>
             <p className="text-xl text-gray-600">Loading analysis results...</p>
           </div>
@@ -512,9 +512,9 @@ export default function AnalysisResultPage() {
               <CardContent>
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-semibold text-red-700 mb-2">Structured Analysis Data:</h4>
+                    <h4 className="font-semibold text-red-700 mb-2">Raw Summary:</h4>
                     <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
-                      {JSON.stringify(analysisData, null, 2)}
+                      {summary}
                     </pre>
                   </div>
                 </div>
@@ -693,12 +693,6 @@ export default function AnalysisResultPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-red-700 mb-2">Parsed Data:</h4>
-                    <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
-                      {JSON.stringify(parsedData, null, 2)}
-                    </pre>
-                  </div>
                   <div>
                     <h4 className="font-semibold text-red-700 mb-2">Raw Summary:</h4>
                     <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
