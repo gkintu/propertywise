@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Search, TriangleAlert, CircleCheck, Droplets, Home as HomeIcon, Upload, X } from "lucide-react"
+import { Search, Home as HomeIcon, AlertTriangle, CheckCircle, Clock, MapPin, Bed, Bath, Car, Upload, X } from "lucide-react"
 import Image from "next/image"
 import { useState, useRef } from "react"
-import { useRouter } from 'next/navigation'; // Add this import
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
   const [dragActive, setDragActive] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter(); // Add this line
+  const router = useRouter()
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -58,8 +58,6 @@ export default function Home() {
 
     setIsLoading(true)
     const formData = new FormData()
-    // For simplicity, we'll send the first file.
-    // You might want to handle multiple files or allow the user to select which one to analyze.
     formData.append("file", uploadedFiles[0])
 
     try {
@@ -74,80 +72,99 @@ export default function Home() {
       }
 
       const data = await response.json()
-      localStorage.setItem('analysisResult', data.summary); // Store result in localStorage
-      router.push('/analysis-result'); // Redirect to the new page
+      localStorage.setItem('analysisResult', data.summary)
+      router.push('/analysis-result')
     } catch (error) {
       console.error("Error analyzing document:", error)
-      localStorage.setItem('analysisError', error instanceof Error ? error.message : "Unknown error");
-      router.push('/analysis-result');
+      localStorage.setItem('analysisError', error instanceof Error ? error.message : "Unknown error")
+      router.push('/analysis-result')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
-      {/* HEADER */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
+      {/* Header */}
+      <header className="border-b border-gray-100 px-4 py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
               <HomeIcon className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900">PropertyAI</span>
+            <span className="text-xl font-bold text-gray-900">PropertyWise</span>
           </div>
-          <Badge variant="secondary" className="bg-purple-100 text-purple-700 hover:bg-purple-200">
-            🏠 Sell property? Get quotes from agents →
+          <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+            🏡 List your property? Get instant valuation →
           </Badge>
         </div>
       </header>
 
-      {/* HERO SECTION */}
-      <main className="container mx-auto px-4 py-16">
-        <div className="text-center max-w-4xl mx-auto">
-          <Badge variant="outline" className="mb-6 text-purple-600 border-purple-200">
-            AI for property buyers
+      {/* Hero Section */}
+      <main className="max-w-5xl mx-auto px-4 py-16 text-center">
+        <div className="mb-12">
+          <Badge variant="outline" className="mb-6 text-yellow-600 border-yellow-200">
+            AI-powered property analysis
           </Badge>
-
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Avoid surprises
+          <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
+            Smart property insights
             <br />
-            when buying property
+            before you buy
           </h1>
-
-          <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
-            AI analysis of properties that reveals hidden risks and questions you should ask during viewings.
-          </p>
-
-          {/* SEARCH SECTION */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <div className="relative flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  type="text"
-                  placeholder="Property listing URL or address..."
-                  className="pl-4 pr-4 py-6 text-lg border-2 border-purple-200 rounded-full focus:border-purple-400 focus:ring-purple-400"
-                />
-              </div>
-              <Button
-                size="lg"
-                className="px-8 py-6 bg-purple-600 hover:bg-purple-700 rounded-full text-lg font-medium"
-              >
-                Analyze Property
-                <Search className="ml-2 w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-
-          <p className="text-sm text-gray-500 max-w-2xl mx-auto">
-            PropertyAI is a government-approved service for property buyers, but does not replace professional advice.
-            All decisions are based on your own research and assessment - we are not responsible for any errors in
-            analyses.
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Get comprehensive property analysis with AI that uncovers potential issues, market trends, and investment
+            opportunities in minutes.
           </p>
         </div>
 
-        {/* PDF UPLOAD SECTION */}
-        <section className="mt-24">
+        {/* Search Section */}
+        <div className="max-w-2xl mx-auto mb-16">
+          <div className="relative flex items-center bg-white border-2 border-yellow-200 rounded-full p-2 shadow-lg">
+            <div className="flex-1 px-4">
+              <Input
+                type="text"
+                placeholder="Enter property address or listing URL..."
+                className="border-0 text-lg placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+            </div>
+            <Button className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-full">
+              Get Analysis
+              <Search className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
+          <p className="text-sm text-gray-500 mt-4 max-w-lg mx-auto">
+            PropertyWise provides detailed insights but should complement professional advice. All analyses are based on
+            available data - we&apos;re not liable for any decisions made.
+          </p>
+        </div>
+
+        {/* Features Grid */}
+        <div className="grid md:grid-cols-3 gap-8 mb-20">
+          <div className="text-center">
+            <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-8 h-8 text-yellow-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Risk Detection</h3>
+            <p className="text-gray-600">Identify structural, legal, and financial risks before making an offer</p>
+          </div>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-green-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Market Analysis</h3>
+            <p className="text-gray-600">Compare prices and trends with similar properties in the area</p>
+          </div>
+          <div className="text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <HomeIcon className="w-8 h-8 text-blue-600" />
+            </div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Investment Insights</h3>
+            <p className="text-gray-600">Understand potential returns and long-term value appreciation</p>
+          </div>
+        </div>
+
+        {/* PDF Upload Section */}
+        <section className="text-left">
           <div className="text-center max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Upload Property Documents</h2>
             <p className="text-lg text-gray-600 mb-8">
@@ -155,7 +172,7 @@ export default function Home() {
             </p>
             
             <Card className={`max-w-2xl mx-auto border-2 border-dashed transition-colors ${
-              dragActive ? 'border-purple-400 bg-purple-50' : 'border-purple-200 hover:border-purple-400'
+              dragActive ? 'border-yellow-400 bg-yellow-50' : 'border-yellow-200 hover:border-yellow-400'
             }`}>
               <CardContent 
                 className="p-12"
@@ -165,13 +182,13 @@ export default function Home() {
                 onDrop={handleDrop}
               >
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Upload className="w-8 h-8 text-purple-600" />
+                  <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Upload className="w-8 h-8 text-yellow-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">Drop your PDF here</h3>
                   <p className="text-gray-500 mb-4">
                     or <span 
-                      className="text-purple-600 font-medium cursor-pointer hover:text-purple-700"
+                      className="text-yellow-600 font-medium cursor-pointer hover:text-yellow-700"
                       onClick={openFileDialog}
                     >browse files</span>
                   </p>
@@ -192,7 +209,7 @@ export default function Home() {
                   {/* Upload button */}
                   <Button 
                     variant="outline" 
-                    className="mt-6 border-purple-200 text-purple-600 hover:bg-purple-50"
+                    className="mt-6 border-yellow-200 text-yellow-600 hover:bg-yellow-50"
                     onClick={openFileDialog}
                   >
                     Select PDF Files
@@ -250,7 +267,7 @@ export default function Home() {
                 
                 <div className="mt-6 text-center">
                   <Button
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-8"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
                     onClick={handleAnalyzeDocuments}
                     disabled={isLoading || uploadedFiles.length === 0}
                   >
@@ -260,24 +277,12 @@ export default function Home() {
                 </div>
               </div>
             )}
-
-            {/* Analysis Result Display */}
-            {/* {analysisResult && ( // Remove this section
-              <div className="max-w-2xl mx-auto mt-6">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Analysis Result</h4>
-                <Card className="border border-gray-200">
-                  <CardContent className="p-4">
-                    <p className="text-gray-700 whitespace-pre-wrap">{analysisResult}</p>
-                  </CardContent>
-                </Card>
-              </div>
-            )} */} 
           </div>
         </section>
 
-        {/* RECENTLY ANALYZED PROPERTIES */}
-        <section className="mt-24">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Recently Analyzed Properties</h2>
+        {/* Recent Analysis Section */}
+        <section className="text-left">
+          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Recent Property Analysis</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Property 1 */}
@@ -285,30 +290,50 @@ export default function Home() {
               <div className="relative">
                 <Image
                   src="/placeholder.svg?height=200&width=300"
-                  alt="Modern house with mountain view"
+                  alt="Modern family home"
                   width={300}
                   height={200}
                   className="w-full h-48 object-cover"
                 />
-                <Badge className="absolute top-3 left-3 bg-black/70 text-white">3 min ago</Badge>
+                <Badge className="absolute top-3 left-3 bg-gray-900/80 text-white">
+                  <Clock className="w-3 h-3 mr-1" />3 hours ago
+                </Badge>
               </div>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Mountain View Drive 60, 5563 Fjordtown</h3>
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-lg font-bold">$634,840</span>
-                  <span className="text-gray-500">365 m²</span>
+                <h3 className="font-semibold text-gray-900 mb-1">Oakwood Drive 15</h3>
+                <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
+                  <MapPin className="w-3 h-3" />
+                  Portland, OR 97201
+                </div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-lg font-bold text-gray-900">$425,000</span>
+                  <span className="text-sm text-gray-500">1,850 sq ft</span>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-gray-700 mb-2">RISKS</div>
-                  <div className="flex items-center gap-2 text-sm text-amber-600">
-                    <TriangleAlert className="w-4 h-4" />
-                    <span>Moisture on doors and windows</span>
+                  <div className="text-xs font-medium text-gray-500 mb-2">KEY FINDINGS</div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span className="text-gray-700">Well-maintained HVAC system</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-green-600">
-                    <CircleCheck className="w-4 h-4" />
-                    <span>No mechanical ventilation in bathroom</span>
+                  <div className="flex items-center gap-2 text-sm">
+                    <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                    <span className="text-gray-700">Roof replacement needed soon</span>
                   </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1">
+                      <Bed className="w-3 h-3" />3
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Bath className="w-3 h-3" />2
+                    </span>
+                  </div>
+                  <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs">
+                    Good Buy
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
@@ -318,30 +343,50 @@ export default function Home() {
               <div className="relative">
                 <Image
                   src="/placeholder.svg?height=200&width=300"
-                  alt="Modern wooden house"
+                  alt="Downtown condo"
                   width={300}
                   height={200}
                   className="w-full h-48 object-cover"
                 />
-                <Badge className="absolute top-3 left-3 bg-black/70 text-white">16 min ago</Badge>
+                <Badge className="absolute top-3 left-3 bg-gray-900/80 text-white">
+                  <Clock className="w-3 h-3 mr-1" />5 hours ago
+                </Badge>
               </div>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Oak Street 4, 2165 Riverside</h3>
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-lg font-bold">$673,500</span>
-                  <span className="text-gray-500">304 m²</span>
+                <h3 className="font-semibold text-gray-900 mb-1">Broadway Street 42</h3>
+                <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
+                  <MapPin className="w-3 h-3" />
+                  Seattle, WA 98102
+                </div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-lg font-bold text-gray-900">$680,000</span>
+                  <span className="text-sm text-gray-500">1,200 sq ft</span>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-gray-700 mb-2">RISKS</div>
-                  <div className="flex items-center gap-2 text-sm text-amber-600">
-                    <TriangleAlert className="w-4 h-4" />
-                    <span>Unclear roof leak safety on balcony</span>
+                  <div className="text-xs font-medium text-gray-500 mb-2">KEY FINDINGS</div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                    <span className="text-gray-700">High HOA fees</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-amber-600">
-                    <Droplets className="w-4 h-4" />
-                    <span>Defects in gutters and downspouts</span>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span className="text-gray-700">Excellent location score</span>
                   </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1">
+                      <Bed className="w-3 h-3" />2
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Bath className="w-3 h-3" />2
+                    </span>
+                  </div>
+                  <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 text-xs">
+                    Consider
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
@@ -351,30 +396,50 @@ export default function Home() {
               <div className="relative">
                 <Image
                   src="/placeholder.svg?height=200&width=300"
-                  alt="House with large garden"
+                  alt="Suburban house"
                   width={300}
                   height={200}
                   className="w-full h-48 object-cover"
                 />
-                <Badge className="absolute top-3 left-3 bg-black/70 text-white">35 min ago</Badge>
+                <Badge className="absolute top-3 left-3 bg-gray-900/80 text-white">
+                  <Clock className="w-3 h-3 mr-1" />1 day ago
+                </Badge>
               </div>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Garden Lane 382, 4934 Greenville</h3>
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-lg font-bold">$445,740</span>
-                  <span className="text-gray-500">184 m²</span>
+                <h3 className="font-semibold text-gray-900 mb-1">Maple Avenue 128</h3>
+                <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
+                  <MapPin className="w-3 h-3" />
+                  Austin, TX 78704
+                </div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-lg font-bold text-gray-900">$520,000</span>
+                  <span className="text-sm text-gray-500">2,100 sq ft</span>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-gray-700 mb-2">RISKS</div>
-                  <div className="flex items-center gap-2 text-sm text-amber-600">
-                    <TriangleAlert className="w-4 h-4" />
-                    <span>Outdated electrical/heating system</span>
+                  <div className="text-xs font-medium text-gray-500 mb-2">KEY FINDINGS</div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span className="text-gray-700">Recently renovated kitchen</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-green-600">
-                    <CircleCheck className="w-4 h-4" />
-                    <span>Bathroom with poor ventilation</span>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Car className="w-4 h-4 text-blue-500" />
+                    <span className="text-gray-700">Large garage and driveway</span>
                   </div>
+                </div>
+
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1">
+                      <Bed className="w-3 h-3" />4
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Bath className="w-3 h-3" />3
+                    </span>
+                  </div>
+                  <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs">
+                    Great Deal
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
@@ -384,40 +449,74 @@ export default function Home() {
               <div className="relative">
                 <Image
                   src="/placeholder.svg?height=200&width=300"
-                  alt="Modern townhouses"
+                  alt="Townhouse"
                   width={300}
                   height={200}
                   className="w-full h-48 object-cover"
                 />
-                <Badge className="absolute top-3 left-3 bg-black/70 text-white">41 min ago</Badge>
+                <Badge className="absolute top-3 left-3 bg-gray-900/80 text-white">
+                  <Clock className="w-3 h-3 mr-1" />2 days ago
+                </Badge>
               </div>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Sunset Avenue 37, 1476 Hillside</h3>
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-lg font-bold">$703,340</span>
-                  <span className="text-gray-500">207 m²</span>
+                <h3 className="font-semibold text-gray-900 mb-1">Pine Street 67</h3>
+                <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
+                  <MapPin className="w-3 h-3" />
+                  Denver, CO 80202
+                </div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-lg font-bold text-gray-900">$395,000</span>
+                  <span className="text-sm text-gray-500">1,650 sq ft</span>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-sm font-medium text-gray-700 mb-2">RISKS</div>
-                  <div className="flex items-center gap-2 text-sm text-green-600">
-                    <CircleCheck className="w-4 h-4" />
-                    <span>Older windows</span>
+                  <div className="text-xs font-medium text-gray-500 mb-2">KEY FINDINGS</div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <AlertTriangle className="w-4 h-4 text-red-500" />
+                    <span className="text-gray-700">Foundation issues detected</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-green-600">
-                    <CircleCheck className="w-4 h-4" />
-                    <span>Defects in staircase railings</span>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span className="text-gray-700">Good school district</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-blue-600">
-                    <Droplets className="w-4 h-4" />
-                    <span>Inadequate water drainage</span>
+                </div>
+
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1">
+                      <Bed className="w-3 h-3" />3
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Bath className="w-3 h-3" />2
+                    </span>
                   </div>
+                  <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
+                    Caution
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
           </div>
         </section>
+
+        {/* CTA Section */}
+        <section className="py-16 text-center">
+          <div className="bg-yellow-50 rounded-2xl p-12 max-w-4xl mx-auto border border-yellow-100">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to make informed property decisions?</h2>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              Join thousands of smart buyers who use PropertyWise to avoid costly mistakes and find great deals.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 px-8">
+                Start Free Analysis
+              </Button>
+              <Button size="lg" variant="outline" className="px-8 border-yellow-200 text-yellow-700 hover:bg-yellow-50">
+                See Sample Report
+              </Button>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
-  );
+  )
 }
