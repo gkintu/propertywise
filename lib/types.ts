@@ -23,8 +23,8 @@ export interface Concern {
 
 export interface PropertyAnalysis {
   propertyDetails: PropertyDetails;
-  strongPoints: StrongPoint[];
-  concerns: Concern[];
+  strongPoints: (StrongPoint | string)[];
+  concerns: (Concern | string)[];
   bottomLine: string;
   summary: string;
 }

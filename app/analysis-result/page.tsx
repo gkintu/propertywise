@@ -18,7 +18,7 @@ import {
   TrendingUp,
   AlertCircle
 } from 'lucide-react';
-import { PropertyAnalysis, AnalysisResponse } from '@/lib/types';
+import { PropertyAnalysis, AnalysisResponse, StrongPoint, Concern } from '@/lib/types';
 
 export default function AnalysisResultPage() {
   const [analysisData, setAnalysisData] = useState<PropertyAnalysis | null>(null);
@@ -343,28 +343,26 @@ export default function AnalysisResultPage() {
           </header>
 
           {/* Main Content */}
-          <main className="container mx-auto max-w-6xl py-8 px-4">
-            {/* Property Report Header */}
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <MapPin className="w-6 h-6 text-orange-600" />
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Property Report Summary: {analysisData.propertyDetails.address}
-                </h1>
-              </div>
-              
-              {/* Market Position Bar */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm font-medium text-blue-900 mb-2">Market Position:</p>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-blue-800">
-                  <span className="font-medium">
-                    {analysisData.propertyDetails.bedrooms}-room {analysisData.propertyDetails.propertyType} priced at {analysisData.propertyDetails.price.toLocaleString()} NOK
-                  </span>
-                  <span>•</span>
-                  <span>{analysisData.propertyDetails.size} sqm total</span>
-                  <span>•</span>
-                  <span>Built {analysisData.propertyDetails.yearBuilt}</span>
-                </div>
+          <main className="max-w-5xl mx-auto px-4 py-8">
+            {/* Property Title and Address */}
+            <div className="mb-8 pt-4"> {/* Added pt-4 for padding-top */}
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                <MapPin className="w-7 h-7 mr-3 text-yellow-600" />
+                {analysisData?.propertyDetails?.address || 'Property Analysis'}
+              </h1>
+            </div>
+
+            {/* Market Position Bar */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+              <p className="text-sm font-medium text-blue-900 mb-2">Market Position:</p>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-blue-800">
+                <span className="font-medium">
+                  {analysisData.propertyDetails.bedrooms}-room {analysisData.propertyDetails.propertyType} priced at {analysisData.propertyDetails.price.toLocaleString()} NOK
+                </span>
+                <span>•</span>
+                <span>{analysisData.propertyDetails.size} sqm total</span>
+                <span>•</span>
+                <span>Built {analysisData.propertyDetails.yearBuilt}</span>
               </div>
             </div>
 
@@ -390,10 +388,19 @@ export default function AnalysisResultPage() {
                           <Alert key={index} className="border-green-200 bg-green-50">
                             <CheckCircle className="w-4 h-4 text-green-600" />
                             <AlertDescription className="text-green-800">
-                              {typeof point === 'string' ? point : (
-                                <>
-                                  {point.title && <strong>{point.title}:</strong>} {point.description || point.title}
-                                </>
+                              {typeof point === 'string' ? (
+                                <div className="space-y-1">
+                                  <div className="font-semibold text-green-900">{point}</div>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  {(point as StrongPoint).title && (
+                                    <div className="font-semibold text-green-900">{(point as StrongPoint).title}</div>
+                                  )}
+                                  {(point as StrongPoint).description && (point as StrongPoint).description !== (point as StrongPoint).title && (
+                                    <div className="text-green-800">{(point as StrongPoint).description}</div>
+                                  )}
+                                </div>
                               )}
                             </AlertDescription>
                           </Alert>
@@ -422,14 +429,24 @@ export default function AnalysisResultPage() {
                             <AlertCircle className="w-4 h-4 text-red-600" />
                             <AlertDescription className="text-red-800">
                               {typeof concern === 'string' ? concern : (
-                                <>
-                                  {concern.title && <strong>{concern.title}:</strong>} {concern.description || concern.title}
-                                  {concern.estimatedCost && (
-                                    <div className="text-sm mt-1">
-                                      <strong>Estimated cost:</strong> {concern.estimatedCost}
+                                <div className="space-y-1">
+                                  {(concern as Concern).title && (
+                                    <div className="font-semibold text-red-900">{(concern as Concern).title}</div>
+                                  )}
+                                  {(concern as Concern).description && (
+                                    <div className="text-red-800">{(concern as Concern).description}</div>
+                                  )}
+                                  {(concern as Concern).severity && (
+                                    <div className="text-sm text-red-700">
+                                      <span className="font-medium">Severity:</span> {(concern as Concern).severity}
                                     </div>
                                   )}
-                                </>
+                                  {(concern as Concern).estimatedCost && (
+                                    <div className="text-sm text-red-700">
+                                      <span className="font-medium">Estimated cost:</span> {(concern as Concern).estimatedCost}
+                                    </div>
+                                  )}
+                                </div>
                               )}
                             </AlertDescription>
                           </Alert>
@@ -544,24 +561,22 @@ export default function AnalysisResultPage() {
           </header>
 
           {/* Main Content */}
-          <main className="container mx-auto max-w-6xl py-8 px-4">
-            {/* Property Report Header */}
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-4">
-                <MapPin className="w-6 h-6 text-orange-600" />
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {parsedData.propertyTitle || 'Property Report Summary'}
-                </h1>
-              </div>
-              
-              {/* Market Position Bar */}
-              {parsedData.marketPosition && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm font-medium text-blue-900 mb-2">Market Position:</p>
-                  <p className="text-sm text-blue-800">{parsedData.marketPosition}</p>
-                </div>
-              )}
+          <main className="max-w-5xl mx-auto px-4 py-6">
+            {/* Property Title and Address */}
+            <div className="mb-8 pt-4"> {/* Added pt-4 for padding-top */}
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                <MapPin className="w-7 h-7 mr-3 text-yellow-600" />
+                {parsedData.propertyTitle || 'Property Report Summary'}
+              </h1>
             </div>
+
+            {/* Market Position Bar */}
+            {parsedData.marketPosition && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+                <p className="text-sm font-medium text-blue-900 mb-2">Market Position:</p>
+                <p className="text-sm text-blue-800">{parsedData.marketPosition}</p>
+              </div>
+            )}
 
             {/* Broker's Key Findings */}
             <Card className="mb-6">

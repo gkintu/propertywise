@@ -8,7 +8,7 @@ import { Search, Home as HomeIcon, AlertTriangle, CheckCircle, Clock, MapPin, Be
 import Image from "next/image"
 import { useState, useRef } from "react"
 import { useRouter } from 'next/navigation'
-import SwirlingEffectSpinner from "@/components/customized/spinner/spinner-06";
+import Spinner from "@/components/customized/spinner/spinner-05";
 
 export default function Home() {
   const [dragActive, setDragActive] = useState(false)
@@ -278,9 +278,7 @@ export default function Home() {
                   >
                     {isLoading ? (
                       <span className="flex items-center gap-2">
-                        <span className="inline-block align-middle" style={{ width: 16, height: 16 }}>
-                          <SwirlingEffectSpinner />
-                        </span>
+                        <Spinner size="sm" />
                         Analyzing...
                       </span>
                     ) : (
