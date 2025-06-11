@@ -72,16 +72,31 @@ export default function Home() {
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to analyze document")
+        const errorText = await response.text()
+        let errorMessage = "Failed to analyze document"
+        try {
+          const errorData = JSON.parse(errorText)
+          errorMessage = errorData.error || errorMessage
+        } catch {
+          // If response is not JSON, use the text as error message
+          errorMessage = errorText || errorMessage
+        }
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
-      localStorage.setItem('analysisResult', JSON.stringify(data))
-      router.push('/analysis-result')
+      
+      // Validate that we have actual data before storing
+      if (data && (data.analysis || data.summary)) {
+        localStorage.setItem('analysisResult', JSON.stringify(data))
+        router.push('/analysis-result')
+      } else {
+        throw new Error("No analysis data received from server")
+      }
     } catch (error) {
       console.error("Error analyzing document:", error)
-      localStorage.setItem('analysisError', error instanceof Error ? error.message : "Unknown error")
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+      localStorage.setItem('analysisError', errorMessage)
       router.push('/analysis-result')
     } finally {
       setIsLoading(false)

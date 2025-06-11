@@ -31,7 +31,7 @@ export default function AnalysisResultPage() {
     const storedAnalysis = localStorage.getItem('analysisResult');
     const storedError = localStorage.getItem('analysisError');
     
-    if (storedAnalysis) {
+    if (storedAnalysis && storedAnalysis !== 'undefined' && storedAnalysis !== 'null') {
       try {
         const parsed: AnalysisResponse = JSON.parse(storedAnalysis);
         if (parsed.analysis) {
@@ -41,13 +41,21 @@ export default function AnalysisResultPage() {
         }
         // Keep the analysis result in localStorage for page refreshes
         // Only remove it when user explicitly goes back to upload or uploads new document
-      } catch {
-        // Fallback to treating it as plain text summary
-        setSummary(storedAnalysis);
+      } catch (parseError) {
+        console.error('Error parsing analysis result:', parseError);
+        // Fallback to treating it as plain text summary if it's not empty
+        if (storedAnalysis.trim()) {
+          setSummary(storedAnalysis);
+        } else {
+          setError('Invalid analysis result format');
+        }
       }
-    } else if (storedError) {
+    } else if (storedError && storedError !== 'undefined' && storedError !== 'null') {
       setError(storedError);
       // Keep error in localStorage as well for consistency
+    } else {
+      // No valid data found
+      setError('No analysis result found. Please upload and analyze a document first.');
     }
     setIsLoading(false);
   }, []);
