@@ -18,13 +18,53 @@ import {
   CheckCircle,
   Info
 } from 'lucide-react';
-import { PropertyAnalysis, AnalysisResponse } from '@/lib/types';
+import { PropertyAnalysis } from '@/lib/types';
+
+// Helper function to extract JSON from text that might be wrapped in markdown or have extra formatting
+function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
+  try {
+    // First try parsing directly
+    const parsed = JSON.parse(text);
+    if (parsed && typeof parsed === 'object' && (parsed.propertyDetails || parsed.strongPoints || parsed.concerns)) {
+      return parsed as PropertyAnalysis;
+    }
+  } catch {
+    // If direct parsing fails, try to extract JSON from markdown code blocks or other formatting
+  }
+
+  // Remove common markdown formatting
+  let cleanedText = text;
+  
+  // Remove markdown code blocks
+  cleanedText = cleanedText.replace(/```json\s*/gi, '').replace(/```\s*$/g, '');
+  cleanedText = cleanedText.replace(/```\s*/g, '');
+  
+  // Remove leading/trailing quotes and other formatting
+  cleanedText = cleanedText.replace(/^["'`]+|["'`]+$/g, '');
+  cleanedText = cleanedText.trim();
+  
+  // Try to find JSON-like structure in the text
+  const jsonMatch = cleanedText.match(/\{[\s\S]*\}/);
+  if (jsonMatch) {
+    try {
+      const parsed = JSON.parse(jsonMatch[0]);
+      if (parsed && typeof parsed === 'object' && (parsed.propertyDetails || parsed.strongPoints || parsed.concerns)) {
+        return parsed as PropertyAnalysis;
+      }
+    } catch (e) {
+      console.log('Failed to parse extracted JSON:', e);
+    }
+  }
+  
+  return null;
+}
 
 export default function AnalysisResultPage() {
   const [analysisData, setAnalysisData] = useState<PropertyAnalysis | null>(null);
-  const [summary, setSummary] = useState<string | null>(null);
+  const [summaryData, setSummaryData] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dataSource, setDataSource] = useState<string>('');
   const router = useRouter();
 
   useEffect(() => {
@@ -33,29 +73,77 @@ export default function AnalysisResultPage() {
     
     if (storedAnalysis && storedAnalysis !== 'undefined' && storedAnalysis !== 'null') {
       try {
-        const parsed: AnalysisResponse = JSON.parse(storedAnalysis);
-        if (parsed.analysis) {
+        const parsed = JSON.parse(storedAnalysis);
+        console.log('📊 Parsed data structure:', parsed);
+        
+        // Check if it's an AnalysisResponse wrapper or direct PropertyAnalysis
+        if (parsed.analysis && typeof parsed.analysis === 'object') {
+          // It's wrapped in AnalysisResponse from API - PREFERRED FORMAT
+          console.log('✅ Loading wrapped AnalysisResponse data', {
+            strongPoints: parsed.analysis.strongPoints?.length || 0,
+            concerns: parsed.analysis.concerns?.length || 0,
+            hasPropertyDetails: !!parsed.analysis.propertyDetails
+          });
           setAnalysisData(parsed.analysis);
-        } else if (parsed.summary) {
-          setSummary(parsed.summary);
+          setDataSource('API Response (structured JSON)');
+        } else if (parsed.propertyDetails && (parsed.strongPoints || parsed.concerns)) {
+          // It's a direct PropertyAnalysis object - PREFERRED FORMAT
+          console.log('✅ Loading direct PropertyAnalysis data', {
+            strongPoints: parsed.strongPoints?.length || 0,
+            concerns: parsed.concerns?.length || 0,
+            hasPropertyDetails: !!parsed.propertyDetails
+          });
+          setAnalysisData(parsed);
+          setDataSource('Direct PropertyAnalysis (structured JSON)');
+        } else if (parsed.summary && typeof parsed.summary === 'string') {
+          // It's a summary fallback from API when AI didn't return JSON - FALLBACK FORMAT
+          console.log('⚠️ Loading summary fallback data (AI did not return structured JSON)');
+          
+          // Try to extract JSON from the summary if it contains structured data
+          const cleanedSummary = tryExtractJsonFromText(parsed.summary);
+          if (cleanedSummary) {
+            console.log('✅ Successfully extracted structured data from summary text');
+            setAnalysisData(cleanedSummary);
+            setDataSource('Extracted from summary text (structured JSON)');
+          } else {
+            setSummaryData(parsed.summary);
+            setDataSource('Summary fallback (AI returned text instead of JSON)');
+          }
+        } else {
+          // Try to parse the raw stored analysis as JSON if it looks like structured data
+          const directParsed = tryExtractJsonFromText(storedAnalysis);
+          if (directParsed) {
+            console.log('✅ Successfully extracted structured data from raw stored analysis');
+            setAnalysisData(directParsed);
+            setDataSource('Extracted from raw analysis (structured JSON)');
+          } else {
+            // No valid data found
+            console.log('❌ No structured data found in:', parsed);
+            setError('No valid analysis data found. The API may have returned an unexpected format.');
+            setDataSource('Unknown format');
+          }
         }
-        // Keep the analysis result in localStorage for page refreshes
-        // Only remove it when user explicitly goes back to upload or uploads new document
       } catch (parseError) {
-        console.error('Error parsing analysis result:', parseError);
-        // Fallback to treating it as plain text summary if it's not empty
-        if (storedAnalysis.trim()) {
-          setSummary(storedAnalysis);
+        console.error('❌ Error parsing analysis result:', parseError);
+        
+        // If parsing fails, try to extract JSON directly from the stored analysis
+        const directParsed = tryExtractJsonFromText(storedAnalysis);
+        if (directParsed) {
+          console.log('✅ Successfully extracted structured data from unparseable stored analysis');
+          setAnalysisData(directParsed);
+          setDataSource('Extracted from raw text (structured JSON)');
         } else {
           setError('Invalid analysis result format');
+          setDataSource('Parse Error');
         }
       }
     } else if (storedError && storedError !== 'undefined' && storedError !== 'null') {
       setError(storedError);
-      // Keep error in localStorage as well for consistency
+      setDataSource('Stored Error');
     } else {
       // No valid data found
       setError('No analysis result found. Please upload and analyze a document first.');
+      setDataSource('No Data');
     }
     setIsLoading(false);
   }, []);
@@ -63,7 +151,6 @@ export default function AnalysisResultPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
-        {/* Header */}
         <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <button 
@@ -93,10 +180,9 @@ export default function AnalysisResultPage() {
     );
   }
 
-  if (error || (!summary && !analysisData)) {
+  if (error || (!analysisData && !summaryData)) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
-        {/* Header */}
         <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <button 
@@ -118,7 +204,7 @@ export default function AnalysisResultPage() {
           <Card className="w-full max-w-2xl border-2 border-yellow-200">
             <CardHeader className="text-center">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-8 h-8 text-red-600" />
+                <AlertTriangle className="w-8 h-8 text-red-600" />
               </div>
               <CardTitle className="text-2xl text-red-600">
                 {error ? 'Analysis Failed' : 'Analysis Not Found'}
@@ -128,9 +214,15 @@ export default function AnalysisResultPage() {
               <p className="text-gray-700 mb-6">
                 {error || 'No analysis result was found. This might happen if you navigated to this page directly or if there was an issue retrieving the result.'}
               </p>
+              
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 text-left">
+                <h4 className="font-semibold text-gray-700 mb-2">Debug Information:</h4>
+                <p className="text-sm text-gray-600">Data Source: {dataSource}</p>
+                <p className="text-sm text-gray-600">Expected: Structured JSON with PropertyAnalysis format</p>
+              </div>
+
               <Button 
                 onClick={() => {
-                  // Clear analysis results when user explicitly chooses to analyze another document
                   localStorage.removeItem('analysisResult');
                   localStorage.removeItem('analysisError');
                   router.push('/');
@@ -147,229 +239,47 @@ export default function AnalysisResultPage() {
     );
   }
 
-  // Parse the summary to extract structured data for fallback rendering
-  const parseAnalysisResult = (summary: string) => {
-    const lines = summary.split('\n');
-    const result = {
-      propertyTitle: '',
-      marketPosition: '',
-      strongPoints: [] as string[],
-      concerns: [] as string[],
-      bottomLine: ''
-    };
+  // Render structured data (preferred)
+  if (analysisData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
+        <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <button 
+              onClick={() => router.push('/')} 
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                <HomeIcon className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold text-gray-900">PropertyWise</span>
+            </button>
+            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+              🏡 List your property? Get instant valuation →
+            </Badge>
+          </div>
+        </header>
 
-    let currentSection = '';
-    
-    // Try to extract property title from the first few meaningful lines
-    for (let i = 0; i < Math.min(lines.length, 10); i++) {
-      const trimmedLine = lines[i].trim();
-      if (trimmedLine && !result.propertyTitle) {
-        // Look for JSON-like address pattern first
-        const addressMatch = trimmedLine.match(/"address":\s*"([^"]+)"/);
-        if (addressMatch) {
-          result.propertyTitle = addressMatch[1];
-          break;
-        }
-        
-        // Look for address patterns, property titles, or meaningful headers
-        if (trimmedLine.includes('Property Report Summary:') || 
-            trimmedLine.includes('Property:') ||
-            trimmedLine.includes('Address:') ||
-            trimmedLine.includes('Property Analysis') ||
-            (trimmedLine.length > 10 && trimmedLine.length < 100 && 
-             (trimmedLine.includes('gate') || trimmedLine.includes('vei') || 
-              trimmedLine.includes('street') || trimmedLine.includes('Avenue') ||
-              /\d+/.test(trimmedLine)))) {
-          result.propertyTitle = trimmedLine
-            .replace(/Property Report Summary:|Property:|Address:|Property Analysis|#/g, '')
-            .trim();
-          break;
-        }
-      }
-    }
-    
-    for (const line of lines) {
-      const trimmedLine = line.trim();
-      
-      if (trimmedLine.includes('Market Position:')) {
-        result.marketPosition = trimmedLine.replace('Market Position:', '').trim();
-      } else if (trimmedLine.includes('Strong Selling Points') || trimmedLine.includes('Strengths')) {
-        currentSection = 'strengths';
-      } else if (trimmedLine.includes('Areas of Concern') || trimmedLine.includes('Concerns')) {
-        currentSection = 'concerns';
-      } else if (trimmedLine.includes('Bottom Line') || trimmedLine.includes('Conclusion')) {
-        currentSection = 'bottomLine';
-      } else if (trimmedLine.includes('Broker') && trimmedLine.includes('Bottom Line')) {
-        currentSection = 'bottomLine';
-      } else if (trimmedLine && currentSection === 'strengths' && (trimmedLine.startsWith('-') || trimmedLine.startsWith('•') || trimmedLine.includes('✓'))) {
-        result.strongPoints.push(trimmedLine.replace(/^[-•✓]\s*/, ''));
-      } else if (trimmedLine && currentSection === 'concerns' && (trimmedLine.startsWith('-') || trimmedLine.startsWith('•') || trimmedLine.includes('⚠'))) {
-        result.concerns.push(trimmedLine.replace(/^[-•⚠]\s*/, ''));
-      } else if (trimmedLine && currentSection === 'bottomLine') {
-        result.bottomLine += trimmedLine + ' ';
-      }
-    }
+        <main className="max-w-5xl mx-auto px-4 py-8">
+          <div className="mb-8 pt-4">
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+              <MapPin className="w-7 h-7 mr-3 text-yellow-600" />
+              {analysisData?.propertyDetails?.address || 'Property Analysis'}
+            </h1>
+          </div>
 
-    // Enhanced parsing for JSON-like content
-    for (const line of lines) {
-      const trimmedLine = line.trim();
-      
-      // Skip JSON structure lines
-      if (trimmedLine.match(/^"(strongPoints|concerns|address|title|description|bottomLine|summary)":\s*[\[\{"]?$/)) {
-        continue;
-      }
-      
-      // Extract values from JSON key-value pairs
-      const jsonValueMatch = trimmedLine.match(/^"[^"]*":\s*"([^"]+)"[,}]?$/);
-      if (jsonValueMatch) {
-        const value = jsonValueMatch[1];
-        const lowerValue = value.toLowerCase();
-        
-        // Skip summary/overview statements that contain multiple concepts or pricing
-        if (lowerValue.includes('however') || lowerValue.includes('prospective buyers') ||
-            lowerValue.includes('good opportunity') || lowerValue.includes('nok') ||
-            lowerValue.includes('built in') || lowerValue.includes('apartment') ||
-            lowerValue.includes('first-time buyer') || lowerValue.includes('take note') ||
-            value.length > 100 || // Skip very long descriptions that are likely summaries
-            (lowerValue.includes('but') && lowerValue.includes('should'))) {
-          continue;
-        }
-        
-        // Categorize based on specific, focused content
-        if ((lowerValue.includes('upgraded') || lowerValue.includes('modern') || lowerValue.includes('good') || 
-            lowerValue.includes('excellent') || lowerValue.includes('benefit') || lowerValue.includes('advantage') ||
-            lowerValue.includes('storage') || lowerValue.includes('renovated')) &&
-            !lowerValue.includes('however') && !lowerValue.includes('but') && !lowerValue.includes('should') &&
-            value.length < 80) { // Keep only focused, specific points
-          result.strongPoints.push(value);
-        } else if ((lowerValue.includes('cracked') || lowerValue.includes('punctured') || lowerValue.includes('pest') ||
-                   lowerValue.includes('alert') || lowerValue.includes('damage') || 
-                   (lowerValue.includes('window') && lowerValue.includes('replacement'))) &&
-                   !lowerValue.includes('however') && !lowerValue.includes('should budget') &&
-                   value.length < 80) { // Keep only specific issues, not general advice
-          result.concerns.push(value);
-        }
-        continue;
-      }
-    }
-
-    // Fallback: if no structured data found, try to extract key information
-    if (result.strongPoints.length === 0 && result.concerns.length === 0) {
-      const keywords = {
-        positive: ['good', 'excellent', 'strong', 'advantage', 'benefit', 'positive', 'upgraded', 'renovated', 'modern'],
-        negative: ['concern', 'issue', 'problem', 'damage', 'repair', 'replace', 'old', 'outdated', 'alert']
-      };
-
-      for (const line of lines) {
-        const trimmedLine = line.trim();
-        
-        // Skip JSON structure lines
-        if (trimmedLine.match(/^[\{\}]$/) || 
-            trimmedLine.match(/^"[^"]*":\s*[\[\{"]?$/) ||
-            trimmedLine.match(/^\]?\s*[,}]?$/)) {
-          continue;
-        }
-        
-        // Clean the line from JSON artifacts
-        const cleanedLine = trimmedLine
-          .replace(/^"[^"]*":\s*"?/, '') // Remove "key": "
-          .replace(/"?\s*,?\s*$/, '') // Remove trailing ", 
-          .replace(/^["']|["']$/g, '') // Remove quotes
-          .trim();
-        
-        if (cleanedLine.length < 5) continue;
-        
-        // Skip summary/overview statements
-        const lowerCleaned = cleanedLine.toLowerCase();
-        if (lowerCleaned.includes('however') || lowerCleaned.includes('prospective buyers') ||
-            lowerCleaned.includes('good opportunity') || lowerCleaned.includes('nok') ||
-            lowerCleaned.includes('built in') || lowerCleaned.includes('apartment') ||
-            lowerCleaned.includes('first-time buyer') || lowerCleaned.includes('take note') ||
-            cleanedLine.length > 100 || // Skip very long descriptions
-            (lowerCleaned.includes('but') && lowerCleaned.includes('should'))) {
-          continue;
-        }
-        
-        // Only categorize specific, focused points
-        if (keywords.positive.some(word => lowerCleaned.includes(word)) &&
-            !lowerCleaned.includes('however') && !lowerCleaned.includes('but') &&
-            cleanedLine.length < 80) {
-          result.strongPoints.push(cleanedLine);
-        } else if (keywords.negative.some(word => lowerCleaned.includes(word)) &&
-                   !lowerCleaned.includes('should budget') && !lowerCleaned.includes('however') &&
-                   cleanedLine.length < 80) {
-          result.concerns.push(cleanedLine);
-        }
-      }
-    }
-
-    // If still no property title found, use the first meaningful line as fallback
-    if (!result.propertyTitle) {
-      const firstMeaningfulLine = lines.find(line => {
-        const trimmed = line.trim();
-        return trimmed.length > 5 && 
-               !trimmed.toLowerCase().includes('summary') &&
-               !trimmed.toLowerCase().includes('analysis') &&
-               !trimmed.toLowerCase().includes('report') &&
-               !trimmed.toLowerCase().includes('property') &&
-               !trimmed.startsWith('{') &&
-               !trimmed.startsWith('"');
-      });
-      if (firstMeaningfulLine) {
-        let cleaned = firstMeaningfulLine.trim();
-        // Remove any JSON-like formatting
-        cleaned = cleaned.replace(/^"[^"]*":\s*"?/, '').replace(/"?\s*,?\s*$/, '');
-        result.propertyTitle = cleaned.substring(0, 80); // Limit length
-      }
-    }
-
-    // Final cleanup of property title to remove any remaining JSON artifacts
-    if (result.propertyTitle) {
-      result.propertyTitle = result.propertyTitle
-        .replace(/^"[^"]*":\s*"?/, '') // Remove "key": " at start
-        .replace(/"?\s*,?\s*$/, '') // Remove ", at end
-        .replace(/^["']|["']$/g, '') // Remove quotes
-        .trim();
-    }
-
-    return result;
-  };
-
-  // Render with structured data if available, otherwise parse from summary
-  const renderContent = () => {
-    if (analysisData) {
-      // Render structured data
-      return (
-        <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
-          {/* Header */}
-          <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
-            <div className="max-w-7xl mx-auto flex items-center justify-between">
-              <button 
-                onClick={() => router.push('/')} 
-                className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
-              >
-                <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
-                  <HomeIcon className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-gray-900">PropertyWise</span>
-              </button>
-              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-                🏡 List your property? Get instant valuation →
-              </Badge>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-2 text-blue-800">
+              <Info className="w-5 h-5" />
+              <span className="font-medium">Data Source: {dataSource}</span>
             </div>
-          </header>
-
-          {/* Main Content */}
-          <main className="max-w-5xl mx-auto px-4 py-8">
-            {/* Property Title and Address */}
-            <div className="mb-8 pt-4"> {/* Added pt-4 for padding-top */}
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                <MapPin className="w-7 h-7 mr-3 text-yellow-600" />
-                {analysisData?.propertyDetails?.address || 'Property Analysis'}
-              </h1>
+            <div className="text-sm text-blue-700 mt-1">
+              Strong Points: {analysisData?.strongPoints?.length || 0} | 
+              Concerns: {analysisData?.concerns?.length || 0}
             </div>
+          </div>
 
-            {/* Market Position Bar */}
+          {analysisData?.propertyDetails && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
               <p className="text-sm font-medium text-blue-900 mb-2">Market Position:</p>
               <div className="flex flex-wrap items-center gap-4 text-sm text-blue-800">
@@ -382,312 +292,248 @@ export default function AnalysisResultPage() {
                 <span>Built {analysisData.propertyDetails.yearBuilt}</span>
               </div>
             </div>
+          )}
 
-
-
-            {/* Summary Section */}
-            {analysisData.summary && (
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5" />
-                    Analysis Summary
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose prose-gray max-w-none">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {analysisData.summary}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Broker's Bottom Line */}
-            {analysisData.bottomLine && (
-              <Alert className="mb-6 border-yellow-200 bg-yellow-50">
-                <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                <AlertDescription className="text-yellow-800">
-                  <strong>Broker&apos;s Bottom Line:</strong> {analysisData.bottomLine}
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {/* Broker’s Key Findings */}
-            <Card className="mb-6 border-gray-200 bg-white">
+          {analysisData?.summary && (
+            <Card className="mb-6">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-gray-600 flex-shrink-0" />
-                  {"Broker's Key Findings"}
+                  <FileText className="w-5 h-5" />
+                  Analysis Summary
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Strong Selling Points */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0" />
-                      <span className="text-green-700 text-lg font-semibold">Strong Selling Points</span>
-                    </div>
-                    <div className="space-y-2">
-                      {analysisData.strongPoints.map((point, idx) => {
-                        const title = typeof point === 'string' ? point : point.title;
-                        const desc = typeof point === 'string' ? '' : point.description;
-                        return (
-                          <div key={idx} className="bg-green-50 p-3 rounded border border-green-200">
-                            <div className="flex items-center gap-2 text-green-800 font-semibold mb-1">
-                              <CheckCircle className="w-5 h-5 text-green-800 flex-shrink-0" />
-                              <span>{title}</span>
-                            </div>
-                            {desc && <p className="text-green-700 text-sm">{desc}</p>}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  {/* Areas of Concern */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                      <span className="text-red-700 text-lg font-semibold">Areas of Concern</span>
-                    </div>
-                    <div className="space-y-2">
-                      {analysisData.concerns.map((concern, idx) => {
-                        const title = typeof concern === 'string' ? concern : concern.title;
-                        const desc = typeof concern === 'string' ? '' : concern.description;
-                        return (
-                          <div key={idx} className="bg-red-50 p-3 rounded border border-red-200">
-                            <div className="flex items-center gap-2 text-red-800 font-semibold mb-1">
-                              <Info className="w-5 h-5 text-red-800 flex-shrink-0" />
-                              <span>{title}</span>
-                            </div>
-                            {desc && <p className="text-red-700 text-sm">{desc}</p>}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                <div className="prose prose-gray max-w-none">
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {analysisData.summary}
+                  </p>
                 </div>
               </CardContent>
             </Card>
+          )}
 
-            <Separator className="my-8" />
+          {analysisData?.bottomLine && (
+            <Alert className="mb-6 border-yellow-200 bg-yellow-50">
+              <AlertTriangle className="w-4 h-4 text-yellow-600" />
+              <AlertDescription className="text-yellow-800">
+                <strong>Broker&apos;s Bottom Line:</strong> {analysisData.bottomLine}
+              </AlertDescription>
+            </Alert>
+          )}
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={() => {
-                  // Clear analysis results when user explicitly chooses to analyze another document
-                  localStorage.removeItem('analysisResult');
-                  localStorage.removeItem('analysisError');
-                  router.push('/');
-                }} 
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Analyze Another Document
-              </Button>
-              <Button 
-                variant="outline" 
-                className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
-                onClick={() => window.print()}
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Print Report
-              </Button>
-            </div>
-
-            {/* Debug Section - Raw Data (TODO: Remove before deployment) */}
-            <Separator className="my-8" />
-            <Card className="border-red-200 bg-red-50">
-              <CardHeader>
-                <CardTitle className="text-red-700 text-lg">🚧 Debug Data (Remove before deployment)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-red-700 mb-2">Raw Analysis Data:</h4>
-                    <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
-                      {analysisData ? JSON.stringify(analysisData, null, 2) : summary}
-                    </pre>
+          <Card className="mb-6 border-gray-200 bg-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                {"Broker's Key Findings"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-green-700 text-lg font-semibold">Strong Selling Points</span>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </main>
-        </div>
-      );
-    } else if (summary) {
-      // Fallback to parsed summary data
-      const parsedData = parseAnalysisResult(summary);
-      return (
-        <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
-          {/* Header */}
-          <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
-            <div className="max-w-7xl mx-auto flex items-center justify-between">
-              <button 
-                onClick={() => router.push('/')} 
-                className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
-              >
-                <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
-                  <HomeIcon className="w-5 h-5 text-white" />
-                </div>
-                <span className="text-xl font-bold text-gray-900">PropertyWise</span>
-              </button>
-              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-                🏡 List your property? Get instant valuation →
-              </Badge>
-            </div>
-          </header>
-
-          {/* Main Content */}
-          <main className="max-w-5xl mx-auto px-4 py-6">
-            {/* Property Title and Address */}
-            <div className="mb-8 pt-4"> {/* Added pt-4 for padding-top */}
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                <MapPin className="w-7 h-7 mr-3 text-yellow-600" />
-                {parsedData.propertyTitle || 'Property Report Summary'}
-              </h1>
-            </div>
-
-            {/* Market Position Bar */}
-            {parsedData.marketPosition && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-                <p className="text-sm font-medium text-blue-900 mb-2">Market Position:</p>
-                <p className="text-sm text-blue-800">{parsedData.marketPosition}</p>
-              </div>
-            )}
-
-
-
-            {/* Broker's Bottom Line */}
-            {parsedData.bottomLine && (
-              <Alert className="mb-6 border-yellow-200 bg-yellow-50">
-                <AlertTriangle className="w-4 h-4 text-yellow-600" />
-                <AlertDescription className="text-yellow-800">
-                  <strong>Broker&apos;s Bottom Line:</strong> {parsedData.bottomLine.trim()}
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {/* Broker's Key Findings */}
-            <Card className="mb-6 border-gray-200 bg-white">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-gray-600 flex-shrink-0" />
-                  {"Broker's Key Findings"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Strong Selling Points */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0" />
-                      <span className="text-green-700 text-lg font-semibold">Strong Selling Points</span>
-                    </div>
-                    <div className="space-y-2">
-                      {parsedData.strongPoints.map((pt, idx) => (
+                  <div className="space-y-2">
+                    {analysisData?.strongPoints?.map((point, idx) => {
+                      const description = typeof point === 'string' ? point : point.description;
+                      return (
                         <div key={idx} className="bg-green-50 p-3 rounded border border-green-200">
-                          <div className="flex items-center gap-2 text-green-800 font-semibold mb-1">
+                          <div className="flex items-center gap-2 text-green-800 font-medium">
                             <CheckCircle className="w-5 h-5 text-green-800 flex-shrink-0" />
-                            <span>{pt}</span>
+                            <span>{description}</span>
                           </div>
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })}
                   </div>
-                  {/* Areas of Concern */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                      <span className="text-red-700 text-lg font-semibold">Areas of Concern</span>
-                    </div>
-                    <div className="space-y-2">
-                      {parsedData.concerns.map((cn, idx) => (
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                    <span className="text-red-700 text-lg font-semibold">Areas of Concern</span>
+                  </div>
+                  <div className="space-y-2">
+                    {analysisData?.concerns?.map((concern, idx) => {
+                      const description = typeof concern === 'string' ? concern : concern.description;
+                      return (
                         <div key={idx} className="bg-red-50 p-3 rounded border border-red-200">
-                          <div className="flex items-center gap-2 text-red-800 font-semibold mb-1">
+                          <div className="flex items-center gap-2 text-red-800 font-medium">
                             <Info className="w-5 h-5 text-red-800 flex-shrink-0" />
-                            <span>{cn}</span>
+                            <span>{description}</span>
                           </div>
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Full Analysis (Fallback) */}
-            {(!parsedData.strongPoints.length && !parsedData.concerns.length) && (
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5" />
-                    Complete Analysis Report
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose prose-gray max-w-none">
-                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-                      {summary}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+          <Separator className="my-8" />
 
-            <Separator className="my-8" />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              onClick={() => {
+                localStorage.removeItem('analysisResult');
+                localStorage.removeItem('analysisError');
+                router.push('/');
+              }} 
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Analyze Another Document
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
+              onClick={() => window.print()}
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Print Report
+            </Button>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={() => {
-                  // Clear analysis results when user explicitly chooses to analyze another document
-                  localStorage.removeItem('analysisResult');
-                  localStorage.removeItem('analysisError');
-                  router.push('/');
-                }} 
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Analyze Another Document
-              </Button>
-              <Button 
-                variant="outline" 
-                className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
-                onClick={() => window.print()}
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                Print Report
-              </Button>
+          <Separator className="my-8" />
+          <Card className="border-red-200 bg-red-50">
+            <CardHeader>
+              <CardTitle className="text-red-700 text-lg">🚧 Debug Data (Remove before deployment)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-red-700 mb-2">Raw Analysis Data:</h4>
+                  <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
+                    {JSON.stringify(analysisData, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
+
+  // Render summary fallback (when AI didn't return structured JSON)
+  if (summaryData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
+        <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <button 
+              onClick={() => router.push('/')} 
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+            >
+              <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                <HomeIcon className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold text-gray-900">PropertyWise</span>
+            </button>
+            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+              🏡 List your property? Get instant valuation →
+            </Badge>
+          </div>
+        </header>
+
+        <main className="max-w-5xl mx-auto px-4 py-8">
+          <div className="mb-8 pt-4">
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+              <MapPin className="w-7 h-7 mr-3 text-yellow-600" />
+              Property Analysis Report
+            </h1>
+          </div>
+
+          <Alert className="mb-6 border-orange-200 bg-orange-50">
+            <AlertTriangle className="w-4 h-4 text-orange-600" />
+            <AlertDescription className="text-orange-800">
+              <strong>Limited Analysis Format:</strong> The AI returned a text summary instead of structured data. 
+              For the best experience with specific strong points and concerns, please try uploading your document again.
+            </AlertDescription>
+          </Alert>
+
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-2 text-orange-800">
+              <Info className="w-5 h-5" />
+              <span className="font-medium">Data Source: {dataSource}</span>
             </div>
+            <div className="text-sm text-orange-700 mt-1">
+              Format: Text summary (AI did not return structured JSON)
+            </div>
+          </div>
 
-            {/* Debug Section - Raw Data (TODO: Remove before deployment) */}
-            <Separator className="my-8" />
-            <Card className="border-red-200 bg-red-50">
-              <CardHeader>
-                <CardTitle className="text-red-700 text-lg">🚧 Debug Data (Remove before deployment)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-red-700 mb-2">Raw Analysis Data:</h4>
-                    <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
-                      {analysisData ? JSON.stringify(analysisData, null, 2) : summary}
-                    </pre>
-                  </div>
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Property Analysis Summary
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="prose prose-gray max-w-none">
+                <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {summaryData}
                 </div>
-              </CardContent>
-            </Card>
-          </main>
-        </div>
-      );
-    }
-    
-    return null;
-  };
+              </div>
+            </CardContent>
+          </Card>
 
-  return renderContent();
+          <Alert className="mb-6 border-blue-200 bg-blue-50">
+            <Info className="w-4 h-4 text-blue-600" />
+            <AlertDescription className="text-blue-800">
+              <strong>Tip:</strong> For a more detailed analysis with specific strong points and areas of concern, 
+              try uploading your document again. Our AI will attempt to provide a more structured analysis.
+            </AlertDescription>
+          </Alert>
+
+          <Separator className="my-8" />
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              onClick={() => {
+                localStorage.removeItem('analysisResult');
+                localStorage.removeItem('analysisError');
+                router.push('/');
+              }} 
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Try Analysis Again
+            </Button>
+            <Button 
+              variant="outline" 
+              className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
+              onClick={() => window.print()}
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Print Report
+            </Button>
+          </div>
+
+          <Separator className="my-8" />
+          <Card className="border-red-200 bg-red-50">
+            <CardHeader>
+              <CardTitle className="text-red-700 text-lg">🚧 Debug Data (Remove before deployment)</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold text-red-700 mb-2">Raw Summary Data:</h4>
+                  <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
+                    {summaryData}
+                  </pre>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
+
+  // Fallback (should never reach here)
+  return null;
 }

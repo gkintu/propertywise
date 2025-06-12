@@ -171,7 +171,11 @@ export async function POST(request: NextRequest) {
   "summary": "Brief overview of the property analysis"
 }
 
-If you cannot extract structured data from the document, return {"error": "Unable to parse property data from document", "summary": "your analysis"}. Focus on actionable insights for a potential buyer.`,
+IMPORTANT: 
+- Return ONLY the JSON object, no markdown formatting, no code blocks, no extra text
+- If you cannot extract structured data from the document, return {"error": "Unable to parse property data from document", "summary": "your analysis"}
+- Focus on actionable insights for a potential buyer
+- Ensure all JSON is valid and properly formatted`,
         },
         {
           role: 'user',
@@ -190,10 +194,25 @@ If you cannot extract structured data from the document, return {"error": "Unabl
 
     // Try to parse as JSON first
     try {
-      const parsedAnalysis = JSON.parse(aiSummary);
+      // Clean the AI response to handle common formatting issues
+      let cleanedResponse = aiSummary.trim();
+      
+      // Remove markdown code blocks
+      cleanedResponse = cleanedResponse.replace(/```json\s*/gi, '').replace(/```\s*$/g, '');
+      cleanedResponse = cleanedResponse.replace(/```\s*/g, '');
+      
+      // Remove leading/trailing quotes
+      cleanedResponse = cleanedResponse.replace(/^["'`]+|["'`]+$/g, '');
+      cleanedResponse = cleanedResponse.trim();
+      
+      // Try to find JSON in the response
+      const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+      const jsonString = jsonMatch ? jsonMatch[0] : cleanedResponse;
+      
+      const parsedAnalysis = JSON.parse(jsonString);
       console.log('Returning structured analysis response');
       return NextResponse.json({ analysis: parsedAnalysis });
-    } catch (parseError) {
+    } catch {
       console.log('Failed to parse as JSON, returning as summary');
       // Fallback to original behavior if not valid JSON
       return NextResponse.json({ summary: aiSummary });

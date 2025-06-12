@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Data Setup</title>
+</head>
+<body>
+    <h1>Setting up test data...</h1>
+    <script>
+        // Clear any existing data
+        localStorage.removeItem('analysisResult');
+        localStorage.removeItem('analysisError');
+        
+        // Your exact JSON structure wrapped as it comes from the API
+        const apiResponse = {
+            "analysis": {
+                "propertyDetails": {
+                    "address": "Grønlundveien 20B, 1809 Askim, Indre Østfold",
+                    "bedrooms": 2,
+                    "price": 1950000,
+                    "size": 51,
+                    "yearBuilt": 1971,
+                    "propertyType": "apartment"
+                },
+                "strongPoints": [
+                    {
+                        "title": "Updated Kitchen & Bathroom",
+                        "description": "Kitchen and bathroom were upgraded in 2020 and are modern.",
+                        "category": "kitchen"
+                    },
+                    {
+                        "title": "No Common Expenses",
+                        "description": "The property has no common expenses (fellesutgifter).",
+                        "category": "fees"
+                    },
+                    {
+                        "title": "Good Storage Space",
+                        "description": "The apartment has good storage space and includes 2 outdoor sheds.",
+                        "category": "storage"
+                    },
+                    {
+                        "title": "West-facing Balcony",
+                        "description": "The property has a balconly facing west with good sun exposure",
+                        "category": "outdoor"
+                    }
+                ],
+                "concerns": [
+                    {
+                        "title": "Window Condition",
+                        "description": "Several windows have cracked or punctured glass. Some older windows are damaged.",
+                        "severity": "medium",
+                        "estimatedCost": "10 000 - 50 000 NOK",
+                        "category": "structural"
+                    },
+                    {
+                        "title": "Electrical System",
+                        "description": "The electrical system has a 'Tilstandsgrad 2' rating, indicating a need for review.",
+                        "severity": "medium",
+                        "category": "electrical"
+                    },
+                    {
+                        "title": "Potential Pest Issue",
+                        "description": "Neighbor reported a rat on the loft, although the seller hasn't personally experienced any issues.",
+                        "severity": "low",
+                        "category": "pest"
+                    },
+                    {
+                        "title": "Old Electrical Installations",
+                        "description": "Some electrical installations are from the building year.",
+                        "severity": "low",
+                        "category": "electrical"
+                    }
+                ],
+                "bottomLine": "This property presents a good opportunity, especially for first-time buyers, due to the lack of common expenses and recently updated kitchen and bathroom. However, potential buyers should budget for window repairs/replacements. A thorough review of the electrical system is also recommended.",
+                "summary": "This is a 3-room apartment in Askim built in 1971, offered at 1,950,000 NOK. It boasts a modern kitchen and bathroom, no common expenses, and good storage. There are some concerns regarding the windows and electrical system that should be investigated further."
+            }
+        };
+        
+        // Store the data as the API would
+        localStorage.setItem('analysisResult', JSON.stringify(apiResponse));
+        
+        console.log('Test data stored!');
+        console.log('Data structure:', apiResponse);
+        console.log('Strong points:', apiResponse.analysis.strongPoints.length);
+        console.log('Concerns:', apiResponse.analysis.concerns.length);
+        
+        // Navigate to analysis result page after a short delay
+        setTimeout(() => {
+            window.location.href = '/analysis-result';
+        }, 1000);
+    </script>
+</body>
+</html>
