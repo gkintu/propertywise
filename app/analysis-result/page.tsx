@@ -11,14 +11,14 @@ import {
   Home as HomeIcon, 
   ArrowLeft, 
   FileText, 
-  CheckCircle, 
   AlertTriangle,
   MapPin,
   Eye,
   TrendingUp,
-  AlertCircle
+  CheckCircle,
+  Info
 } from 'lucide-react';
-import { PropertyAnalysis, AnalysisResponse, StrongPoint, Concern } from '@/lib/types';
+import { PropertyAnalysis, AnalysisResponse } from '@/lib/types';
 
 export default function AnalysisResultPage() {
   const [analysisData, setAnalysisData] = useState<PropertyAnalysis | null>(null);
@@ -66,12 +66,15 @@ export default function AnalysisResultPage() {
         {/* Header */}
         <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <button 
+              onClick={() => router.push('/')} 
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+            >
               <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
                 <HomeIcon className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
-            </div>
+            </button>
             <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
               🏡 List your property? Get instant valuation →
             </Badge>
@@ -96,12 +99,15 @@ export default function AnalysisResultPage() {
         {/* Header */}
         <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <button 
+              onClick={() => router.push('/')} 
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+            >
               <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
                 <HomeIcon className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
-            </div>
+            </button>
             <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
               🏡 List your property? Get instant valuation →
             </Badge>
@@ -338,12 +344,15 @@ export default function AnalysisResultPage() {
           {/* Header */}
           <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <button 
+                onClick={() => router.push('/')} 
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+              >
                 <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
                   <HomeIcon className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold text-gray-900">PropertyWise</span>
-              </div>
+              </button>
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
                 🏡 List your property? Get instant valuation →
               </Badge>
@@ -374,104 +383,7 @@ export default function AnalysisResultPage() {
               </div>
             </div>
 
-            {/* Broker's Key Findings */}
-            <Card className="mb-6">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-gray-600" />
-                  <CardTitle className="text-xl">Broker&apos;s Key Findings</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Strong Selling Points */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <TrendingUp className="w-5 h-5 text-green-600" />
-                      <h3 className="text-lg font-semibold text-green-700">Strong Selling Points</h3>
-                    </div>
-                    <div className="space-y-3">
-                      {analysisData.strongPoints && analysisData.strongPoints.length > 0 ? (
-                        analysisData.strongPoints.map((point, index) => (
-                          <Alert key={index} className="border-green-200 bg-green-50">
-                            <CheckCircle className="w-4 h-4 text-green-600" />
-                            <AlertDescription className="text-green-800">
-                              {typeof point === 'string' ? (
-                                <div className="space-y-1">
-                                  <div className="font-semibold text-green-900">{point}</div>
-                                </div>
-                              ) : (
-                                <div className="space-y-1">
-                                  {(point as StrongPoint).title && (
-                                    <div className="font-semibold text-green-900">{(point as StrongPoint).title}</div>
-                                  )}
-                                  {(point as StrongPoint).description && (point as StrongPoint).description !== (point as StrongPoint).title && (
-                                    <div className="text-green-800">{(point as StrongPoint).description}</div>
-                                  )}
-                                </div>
-                              )}
-                            </AlertDescription>
-                          </Alert>
-                        ))
-                      ) : (
-                        <Alert className="border-green-200 bg-green-50">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                          <AlertDescription className="text-green-800">
-                            No specific strong points identified
-                          </AlertDescription>
-                        </Alert>
-                      )}
-                    </div>
-                  </div>
 
-                  {/* Areas of Concern */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <AlertTriangle className="w-5 h-5 text-red-600" />
-                      <h3 className="text-lg font-semibold text-red-700">Areas of Concern</h3>
-                    </div>
-                    <div className="space-y-3">
-                      {analysisData.concerns && analysisData.concerns.length > 0 ? (
-                        analysisData.concerns.map((concern, index) => (
-                          <Alert key={index} className="border-red-200 bg-red-50">
-                            <AlertCircle className="w-4 h-4 text-red-600" />
-                            <AlertDescription className="text-red-800">
-                              {typeof concern === 'string' ? concern : (
-                                <div className="space-y-1">
-                                  {(concern as Concern).title && (
-                                    <div className="font-semibold text-red-900">{(concern as Concern).title}</div>
-                                  )}
-                                  {(concern as Concern).description && (
-                                    <div className="text-red-800">{(concern as Concern).description}</div>
-                                  )}
-                                  {(concern as Concern).severity && (
-                                    <div className="text-sm text-red-700">
-                                      <span className="font-medium">Severity:</span> {(concern as Concern).severity}
-                                    </div>
-                                  )}
-                                  {(concern as Concern).estimatedCost && (
-                                    <div className="text-sm text-red-700">
-                                      <span className="font-medium">Estimated cost:</span> {(concern as Concern).estimatedCost}
-                                    </div>
-                                  )}
-                                </div>
-                              )}
-                            </AlertDescription>
-                          </Alert>
-                        ))
-                      ) : (
-                        <Alert className="border-gray-200 bg-gray-50">
-                          <AlertCircle className="w-4 h-4 text-gray-600" />
-                          <AlertDescription className="text-gray-800">
-                            No major concerns identified
-                          </AlertDescription>
-                        </Alert>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Summary Section */}
             {analysisData.summary && (
@@ -501,6 +413,64 @@ export default function AnalysisResultPage() {
                 </AlertDescription>
               </Alert>
             )}
+
+            {/* Broker’s Key Findings */}
+            <Card className="mb-6 border-gray-200 bg-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                  {"Broker's Key Findings"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Strong Selling Points */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <span className="text-green-700 text-lg font-semibold">Strong Selling Points</span>
+                    </div>
+                    <div className="space-y-2">
+                      {analysisData.strongPoints.map((point, idx) => {
+                        const title = typeof point === 'string' ? point : point.title;
+                        const desc = typeof point === 'string' ? '' : point.description;
+                        return (
+                          <div key={idx} className="bg-green-50 p-3 rounded border border-green-200">
+                            <div className="flex items-center gap-2 text-green-800 font-semibold mb-1">
+                              <CheckCircle className="w-5 h-5 text-green-800 flex-shrink-0" />
+                              <span>{title}</span>
+                            </div>
+                            {desc && <p className="text-green-700 text-sm">{desc}</p>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  {/* Areas of Concern */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                      <span className="text-red-700 text-lg font-semibold">Areas of Concern</span>
+                    </div>
+                    <div className="space-y-2">
+                      {analysisData.concerns.map((concern, idx) => {
+                        const title = typeof concern === 'string' ? concern : concern.title;
+                        const desc = typeof concern === 'string' ? '' : concern.description;
+                        return (
+                          <div key={idx} className="bg-red-50 p-3 rounded border border-red-200">
+                            <div className="flex items-center gap-2 text-red-800 font-semibold mb-1">
+                              <Info className="w-5 h-5 text-red-800 flex-shrink-0" />
+                              <span>{title}</span>
+                            </div>
+                            {desc && <p className="text-red-700 text-sm">{desc}</p>}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             <Separator className="my-8" />
 
@@ -556,12 +526,15 @@ export default function AnalysisResultPage() {
           {/* Header */}
           <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <button 
+                onClick={() => router.push('/')} 
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+              >
                 <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
                   <HomeIcon className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xl font-bold text-gray-900">PropertyWise</span>
-              </div>
+              </button>
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
                 🏡 List your property? Get instant valuation →
               </Badge>
@@ -586,72 +559,7 @@ export default function AnalysisResultPage() {
               </div>
             )}
 
-            {/* Broker's Key Findings */}
-            <Card className="mb-6">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-gray-600" />
-                  <CardTitle className="text-xl">Broker&apos;s Key Findings</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Strong Selling Points */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <TrendingUp className="w-5 h-5 text-green-600" />
-                      <h3 className="text-lg font-semibold text-green-700">Strong Selling Points</h3>
-                    </div>
-                    <div className="space-y-3">
-                      {parsedData.strongPoints.length > 0 ? (
-                        parsedData.strongPoints.map((point, index) => (
-                          <Alert key={index} className="border-green-200 bg-green-50">
-                            <CheckCircle className="w-4 h-4 text-green-600" />
-                            <AlertDescription className="text-green-800">
-                              {point}
-                            </AlertDescription>
-                          </Alert>
-                        ))
-                      ) : (
-                        <Alert className="border-green-200 bg-green-50">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                          <AlertDescription className="text-green-800">
-                            Property analysis completed successfully
-                          </AlertDescription>
-                        </Alert>
-                      )}
-                    </div>
-                  </div>
 
-                  {/* Areas of Concern */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <AlertTriangle className="w-5 h-5 text-red-600" />
-                      <h3 className="text-lg font-semibold text-red-700">Areas of Concern</h3>
-                    </div>
-                    <div className="space-y-3">
-                      {parsedData.concerns.length > 0 ? (
-                        parsedData.concerns.map((concern, index) => (
-                          <Alert key={index} className="border-red-200 bg-red-50">
-                            <AlertCircle className="w-4 h-4 text-red-600" />
-                            <AlertDescription className="text-red-800">
-                              {concern}
-                            </AlertDescription>
-                          </Alert>
-                        ))
-                      ) : (
-                        <Alert className="border-gray-200 bg-gray-50">
-                          <AlertCircle className="w-4 h-4 text-gray-600" />
-                          <AlertDescription className="text-gray-800">
-                            No major concerns identified in the analysis
-                          </AlertDescription>
-                        </Alert>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Broker's Bottom Line */}
             {parsedData.bottomLine && (
@@ -662,6 +570,54 @@ export default function AnalysisResultPage() {
                 </AlertDescription>
               </Alert>
             )}
+
+            {/* Broker's Key Findings */}
+            <Card className="mb-6 border-gray-200 bg-white">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-gray-600 flex-shrink-0" />
+                  {"Broker's Key Findings"}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Strong Selling Points */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <span className="text-green-700 text-lg font-semibold">Strong Selling Points</span>
+                    </div>
+                    <div className="space-y-2">
+                      {parsedData.strongPoints.map((pt, idx) => (
+                        <div key={idx} className="bg-green-50 p-3 rounded border border-green-200">
+                          <div className="flex items-center gap-2 text-green-800 font-semibold mb-1">
+                            <CheckCircle className="w-5 h-5 text-green-800 flex-shrink-0" />
+                            <span>{pt}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Areas of Concern */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                      <span className="text-red-700 text-lg font-semibold">Areas of Concern</span>
+                    </div>
+                    <div className="space-y-2">
+                      {parsedData.concerns.map((cn, idx) => (
+                        <div key={idx} className="bg-red-50 p-3 rounded border border-red-200">
+                          <div className="flex items-center gap-2 text-red-800 font-semibold mb-1">
+                            <Info className="w-5 h-5 text-red-800 flex-shrink-0" />
+                            <span>{cn}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Full Analysis (Fallback) */}
             {(!parsedData.strongPoints.length && !parsedData.concerns.length) && (
