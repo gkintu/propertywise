@@ -268,32 +268,6 @@ export default function AnalysisResultPage() {
             </h1>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <div className="flex items-center gap-2 text-blue-800">
-              <Info className="w-5 h-5" />
-              <span className="font-medium">Data Source: {dataSource}</span>
-            </div>
-            <div className="text-sm text-blue-700 mt-1">
-              Strong Points: {analysisData?.strongPoints?.length || 0} | 
-              Concerns: {analysisData?.concerns?.length || 0}
-            </div>
-          </div>
-
-          {analysisData?.propertyDetails && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-              <p className="text-sm font-medium text-blue-900 mb-2">Market Position:</p>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-blue-800">
-                <span className="font-medium">
-                  {analysisData.propertyDetails.bedrooms}-room {analysisData.propertyDetails.propertyType} priced at {analysisData.propertyDetails.price.toLocaleString()} NOK
-                </span>
-                <span>•</span>
-                <span>{analysisData.propertyDetails.size} sqm total</span>
-                <span>•</span>
-                <span>Built {analysisData.propertyDetails.yearBuilt}</span>
-              </div>
-            </div>
-          )}
-
           {analysisData?.summary && (
             <Card className="mb-6">
               <CardHeader>
@@ -312,20 +286,26 @@ export default function AnalysisResultPage() {
             </Card>
           )}
 
-          {analysisData?.bottomLine && (
-            <Alert className="mb-6 border-yellow-200 bg-yellow-50">
-              <AlertTriangle className="w-4 h-4 text-yellow-600" />
-              <AlertDescription className="text-yellow-800">
-                <strong>Broker&apos;s Bottom Line:</strong> {analysisData.bottomLine}
-              </AlertDescription>
-            </Alert>
+          {analysisData?.propertyDetails && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+              <p className="text-sm font-medium text-blue-900 mb-2">Market Position:</p>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-blue-800">
+                <span className="font-medium">
+                  {analysisData.propertyDetails.bedrooms}-room {analysisData.propertyDetails.propertyType} priced at {analysisData.propertyDetails.price.toLocaleString()} NOK
+                </span>
+                <span>•</span>
+                <span>{analysisData.propertyDetails.size} sqm total</span>
+                <span>•</span>
+                <span>Built {analysisData.propertyDetails.yearBuilt}</span>
+              </div>
+            </div>
           )}
 
           <Card className="mb-6 border-gray-200 bg-white">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Eye className="w-5 h-5 text-gray-600 flex-shrink-0" />
-                {"Broker's Key Findings"}
+                {"Key Findings"}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -337,12 +317,18 @@ export default function AnalysisResultPage() {
                   </div>
                   <div className="space-y-2">
                     {analysisData?.strongPoints?.map((point, idx) => {
-                      const description = typeof point === 'string' ? point : point.description;
+                      const title = typeof point === 'string' ? point : point.title;
+                      const description = typeof point === 'string' ? '' : point.description;
                       return (
                         <div key={idx} className="bg-green-50 p-3 rounded border border-green-200">
-                          <div className="flex items-center gap-2 text-green-800 font-medium">
-                            <CheckCircle className="w-5 h-5 text-green-800 flex-shrink-0" />
-                            <span>{description}</span>
+                          <div className="flex items-start gap-2 text-green-800">
+                            <CheckCircle className="w-5 h-5 text-green-800 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1">
+                              <div className="font-bold text-green-900">{title}</div>
+                              {description && (
+                                <div className="text-black mt-1">{description}</div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
@@ -357,12 +343,18 @@ export default function AnalysisResultPage() {
                   </div>
                   <div className="space-y-2">
                     {analysisData?.concerns?.map((concern, idx) => {
-                      const description = typeof concern === 'string' ? concern : concern.description;
+                      const title = typeof concern === 'string' ? concern : concern.title;
+                      const description = typeof concern === 'string' ? '' : concern.description;
                       return (
                         <div key={idx} className="bg-red-50 p-3 rounded border border-red-200">
-                          <div className="flex items-center gap-2 text-red-800 font-medium">
-                            <Info className="w-5 h-5 text-red-800 flex-shrink-0" />
-                            <span>{description}</span>
+                          <div className="flex items-start gap-2 text-red-800">
+                            <Info className="w-5 h-5 text-red-800 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1">
+                              <div className="font-bold text-red-900">{title}</div>
+                              {description && (
+                                <div className="text-black mt-1">{description}</div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
@@ -372,6 +364,15 @@ export default function AnalysisResultPage() {
               </div>
             </CardContent>
           </Card>
+
+          {analysisData?.bottomLine && (
+            <Alert className="mb-6 border-yellow-200 bg-yellow-50">
+              <AlertTriangle className="w-4 h-4 text-yellow-600" />
+              <AlertDescription className="text-yellow-800">
+                <strong>Bottom Line:</strong> {analysisData.bottomLine}
+              </AlertDescription>
+            </Alert>
+          )}
 
           <Separator className="my-8" />
 
