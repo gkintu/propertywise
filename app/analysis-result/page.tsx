@@ -16,8 +16,11 @@ import {
   Eye,
   TrendingUp,
   CheckCircle,
-  Info
+  Info,
+  Download
 } from 'lucide-react';
+import html2canvas from 'html2canvas-pro';
+import jsPDF from 'jspdf';
 import { PropertyAnalysis } from '@/lib/types';
 
 // Helper function to extract JSON from text that might be wrapped in markdown or have extra formatting
@@ -57,6 +60,111 @@ function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
   }
   
   return null;
+}
+
+// PDF download function using html2canvas-pro
+async function downloadAsPDF() {
+  try {
+    // Wait a bit to ensure DOM is fully loaded
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Find the main content area to capture
+    const element = document.querySelector('main') as HTMLElement;
+    if (!element) {
+      console.error('Main element not found');
+      alert('Unable to find content to export. Please try again.');
+      return;
+    }
+
+    console.log('Element found:', element);
+    console.log('Element dimensions:', element.offsetWidth, 'x', element.offsetHeight);
+
+    // Create a wrapper div to capture only the content we want
+    const contentDiv = document.createElement('div');
+    contentDiv.style.position = 'absolute';
+    contentDiv.style.left = '-9999px';
+    contentDiv.style.top = '0';
+    contentDiv.style.width = element.offsetWidth + 'px';
+    contentDiv.style.backgroundColor = 'white';
+    contentDiv.style.padding = '20px';
+    
+    // Clone the main content without excluded elements
+    const clonedMain = element.cloneNode(true) as HTMLElement;
+    
+    // Remove excluded elements
+    const excludedElements = clonedMain.querySelectorAll('[data-pdf-exclude="true"]');
+    excludedElements.forEach(el => el.remove());
+    
+    // Remove buttons that contain specific text
+    const allButtons = clonedMain.querySelectorAll('button');
+    allButtons.forEach(button => {
+      const text = button.textContent || '';
+      if (text.includes('Download PDF') || text.includes('Analyze Another Document')) {
+        button.remove();
+      }
+    });
+    
+    // Remove debug cards
+    const debugCards = clonedMain.querySelectorAll('.border-red-200');
+    debugCards.forEach(card => card.remove());
+    
+    contentDiv.appendChild(clonedMain);
+    document.body.appendChild(contentDiv);
+
+    // Use html2canvas-pro to capture the content
+    const canvas = await html2canvas(contentDiv, {
+      scale: 1.5,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      logging: true,
+      imageTimeout: 15000,
+      width: contentDiv.offsetWidth,
+      height: contentDiv.offsetHeight,
+      foreignObjectRendering: false
+    });
+
+    // Remove the temporary div
+    document.body.removeChild(contentDiv);
+
+    // Create PDF with jsPDF
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgData = canvas.toDataURL('image/png', 0.8);
+    
+    // Calculate dimensions to fit the page
+    const imgWidth = 190; // A4 width in mm with margins
+    const pageHeight = 277; // A4 height in mm with margins
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+    
+    let position = 10; // Start with 10mm margin
+    
+    // Add the image to PDF
+    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+    
+    // Add additional pages if needed
+    while (heightLeft >= 0) {
+      position = heightLeft - imgHeight + 10;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+    
+    // Download the PDF
+    const propertyAddress = document.querySelector('h1')?.textContent
+      ?.replace('Property Analysis', '')
+      ?.replace(/[^a-zA-Z0-9\s]/g, '')
+      ?.trim() || 'Property';
+    
+    const filename = `${propertyAddress}_Analysis_Report.pdf`;
+    pdf.save(filename);
+    
+    console.log('PDF generated successfully:', filename);
+    
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    alert('Failed to generate PDF. Please try again.');
+  }
 }
 
 export default function AnalysisResultPage() {
@@ -376,7 +484,7 @@ export default function AnalysisResultPage() {
 
           <Separator className="my-8" />
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center" data-pdf-exclude="true">
             <Button 
               onClick={() => {
                 localStorage.removeItem('analysisResult');
@@ -391,15 +499,15 @@ export default function AnalysisResultPage() {
             <Button 
               variant="outline" 
               className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
-              onClick={() => window.print()}
+              onClick={downloadAsPDF}
             >
-              <FileText className="w-4 h-4 mr-2" />
-              Print Report
+              <Download className="w-4 h-4 mr-2" />
+              Download PDF
             </Button>
           </div>
 
           <Separator className="my-8" />
-          <Card className="border-red-200 bg-red-50">
+          <Card className="border-red-200 bg-red-50" data-pdf-exclude="true">
             <CardHeader>
               <CardTitle className="text-red-700 text-lg">🚧 Debug Data (Remove before deployment)</CardTitle>
             </CardHeader>
@@ -492,7 +600,7 @@ export default function AnalysisResultPage() {
 
           <Separator className="my-8" />
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center" data-pdf-exclude="true">
             <Button 
               onClick={() => {
                 localStorage.removeItem('analysisResult');
@@ -507,15 +615,15 @@ export default function AnalysisResultPage() {
             <Button 
               variant="outline" 
               className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
-              onClick={() => window.print()}
+              onClick={downloadAsPDF}
             >
-              <FileText className="w-4 h-4 mr-2" />
-              Print Report
+              <Download className="w-4 h-4 mr-2" />
+              Download PDF
             </Button>
           </div>
 
           <Separator className="my-8" />
-          <Card className="border-red-200 bg-red-50">
+          <Card className="border-red-200 bg-red-50" data-pdf-exclude="true">
             <CardHeader>
               <CardTitle className="text-red-700 text-lg">🚧 Debug Data (Remove before deployment)</CardTitle>
             </CardHeader>
