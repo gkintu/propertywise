@@ -17,9 +17,17 @@ export default function LocaleSwitcher() {
           <Button
             variant={locale === loc ? "default" : "outline"}
             size="sm"
-            className="text-xs"
+            className={`text-xs flex items-center gap-2 ${
+              locale === loc 
+                ? "bg-accent text-accent-foreground hover:bg-accent/90" 
+                : ""
+            }`}
           >
-            {loc === 'en' ? '🇬🇧 EN' : '🇳🇴 NO'}
+            <span 
+              className={`fi ${loc === 'en' ? 'fi-gb' : 'fi-no'} w-4 h-3`}
+              title={loc === 'en' ? 'English' : 'Norsk'}
+            />
+            {loc.toUpperCase()}
           </Button>
         </Link>
       ))}

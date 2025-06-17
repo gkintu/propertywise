@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "flag-icons/css/flag-icons.min.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -118,5 +119,63 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Cursor pointer styles for all clickable elements */
+@layer utilities {
+  /* Button elements and components */
+  button,
+  .btn,
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  /* Interactive elements with onClick handlers */
+  [onclick],
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  /* Link elements */
+  a,
+  [role="link"] {
+    cursor: pointer;
+  }
+
+  /* Badge elements with hover effects */
+  .badge:hover,
+  [class*="badge"]:hover {
+    cursor: pointer;
+  }
+
+  /* Card elements with hover effects */
+  .card:hover,
+  [class*="card"]:hover,
+  [class*="hover:shadow"] {
+    cursor: pointer;
+  }
+
+  /* File input triggers */
+  input[type="file"] + label,
+  [data-file-trigger] {
+    cursor: pointer;
+  }
+
+  /* Clickable spans and divs */
+  span[onclick],
+  div[onclick] {
+    cursor: pointer;
+  }
+
+  /* Ensure disabled elements don't show pointer cursor */
+  button:disabled,
+  [disabled] {
+    cursor: not-allowed !important;
+  }
+
+  /* Ensure loading states don't show pointer cursor inappropriately */
+  [aria-disabled="true"] {
+    cursor: not-allowed !important;
   }
 }
