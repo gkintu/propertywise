@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
+    const language = formData.get('language') as string || 'en';
 
     if (!file) {
       console.log('No file uploaded');
@@ -133,7 +134,13 @@ export async function POST(request: NextRequest) {
     const truncatedText = pdfText.length > maxLength ? pdfText.substring(0, maxLength) + "..." : pdfText;
 
     console.log('Sending text to AI (truncated length):', truncatedText.length);
+    console.log('Requested language:', language);
     console.log('About to call OpenRouter API...');
+
+    // Determine the language instruction for the AI prompt
+    const languageInstruction = language === 'no' 
+      ? 'Respond in Norwegian (Bokmål). All text fields including titles, descriptions, and the summary should be in Norwegian.'
+      : 'Respond in English. All text fields should be in English.';
 
     const completion = await openai.chat.completions.create({
       model: 'google/gemma-3-27b-it:free',
@@ -171,11 +178,14 @@ export async function POST(request: NextRequest) {
   "summary": "Brief overview of the property analysis"
 }
 
+LANGUAGE REQUIREMENT: ${languageInstruction}
+
 IMPORTANT: 
 - Return ONLY the JSON object, no markdown formatting, no code blocks, no extra text
 - If you cannot extract structured data from the document, return {"error": "Unable to parse property data from document", "summary": "your analysis"}
 - Focus on actionable insights for a potential buyer
-- Ensure all JSON is valid and properly formatted`,
+- Ensure all JSON is valid and properly formatted
+- All text content (titles, descriptions, summary, bottomLine) must be in the requested language`,
         },
         {
           role: 'user',

@@ -8,7 +8,6 @@ import { Separator } from "@/components/ui/separator";
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
-import LocaleSwitcher from '@/components/locale/LocaleSwitcher';
 import { 
   Home as HomeIcon, 
   ArrowLeft, 
@@ -274,7 +273,6 @@ export default function AnalysisResultPage() {
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
             </button>
             <div className="flex items-center gap-4">
-              <LocaleSwitcher />
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
                 {t('headerBadge')}
               </Badge>
@@ -309,7 +307,6 @@ export default function AnalysisResultPage() {
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
             </button>
             <div className="flex items-center gap-4">
-              <LocaleSwitcher />
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
                 {t('headerBadge')}
               </Badge>
@@ -372,7 +369,6 @@ export default function AnalysisResultPage() {
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
             </button>
             <div className="flex items-center gap-4">
-              <LocaleSwitcher />
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
                 {t('headerBadge')}
               </Badge>
@@ -558,7 +554,6 @@ export default function AnalysisResultPage() {
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
             </button>
             <div className="flex items-center gap-4">
-              <LocaleSwitcher />
               <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
                 {t('headerBadge')}
               </Badge>
