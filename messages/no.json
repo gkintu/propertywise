@@ -1,0 +1,102 @@
+{
+  "HomePage": {
+    "title": "Smarte eiendomsinnsikter\nfør du kjøper",
+    "description": "Få omfattende eiendomsanalyse med AI som avdekker potensielle problemer, markedstrender og investeringsmuligheter på minutter.",
+    "greeting": "Smart eiendomsanalyse gjort enkelt",
+    "badge": "AI-drevet eiendomsanalyse",
+    "headerBadge": "🏡 Vil du liste eiendommen din? Få øyeblikkelig verdivurdering →",
+    "searchPlaceholder": "Skriv inn eiendomsadresse eller oppførings-URL...",
+    "getAnalysisButton": "Få analyse",
+    "disclaimer": "PropertyWise gir detaljerte innsikter, men bør supplere profesjonelle råd. Alle analyser er basert på tilgjengelige data - vi er ikke ansvarlige for beslutninger som tas.",
+    "features": {
+      "riskDetection": {
+        "title": "Risikodeteksjon",
+        "description": "Identifiser strukturelle, juridiske og økonomiske risikoer før du legger inn bud"
+      },
+      "marketAnalysis": {
+        "title": "Markedsanalyse",
+        "description": "Sammenlign priser og trender med lignende eiendommer i området"
+      },
+      "investmentInsights": {
+        "title": "Investeringsinnsikt",
+        "description": "Forstå potensiell avkastning og langsiktig verdistigning"
+      }
+    },
+    "upload": {
+      "title": "Last opp eiendomsdokumenter",
+      "subtitle": "Dra og slipp PDF-dokumentene dine for AI-analyse",
+      "dropText": "Slipp PDF-en din her",
+      "browseText": "bla gjennom filer",
+      "supportText": "Støtter PDF-filer opptil 10 MB",
+      "selectButton": "Velg PDF-filer",
+      "uploadedFiles": "Opplastede filer",
+      "analyzing": "Analyserer...",
+      "analyzeButton": "Analyser dokumenter"
+    },
+    "recentAnalysis": {
+      "title": "Nylig eiendomsanalyse",
+      "keyFindings": "NØKKELFUNN",
+      "badges": {
+        "goodBuy": "Godt kjøp",
+        "consider": "Vurder",
+        "greatDeal": "Flott avtale", 
+        "caution": "Forsiktighet"
+      }
+    },
+    "cta": {
+      "title": "Klar til å ta informerte eiendomsbeslutninger?",
+      "description": "Bli med tusenvis av smarte kjøpere som bruker PropertyWise for å unngå kostbare feil og finne gode tilbud.",
+      "startButton": "Start gratis analyse",
+      "sampleButton": "Se eksempelrapport"
+    }
+  },
+  "AnalysisResult": {
+    "headerBadge": "🏡 Vil du liste eiendommen din? Få øyeblikkelig verdivurdering →",
+    "loading": {
+      "title": "Laster analyseresultater...",
+      "loadingText": "Laster analyseresultater..."
+    },
+    "error": {
+      "analysisFailedTitle": "Analyse mislyktes",
+      "analysisNotFoundTitle": "Analyse ikke funnet",
+      "noResultMessage": "Ingen analyseresultat ble funnet. Dette kan skje hvis du navigerte direkte til denne siden eller hvis det var et problem med å hente resultatet.",
+      "debugInfo": "Feilsøkingsinformasjon:",
+      "dataSource": "Datakilde:",
+      "expected": "Forventet: Strukturert JSON med PropertyAnalysis-format",
+      "goBackButton": "Gå tilbake til opplasting"
+    },
+    "analysis": {
+      "propertyAnalysisTitle": "Eiendomsanalyse",
+      "analysisSummaryTitle": "Analysesammendrag",
+      "marketPosition": "Markedsposisjon:",
+      "roomPropertyPriced": "-roms {propertyType} priset til {price} NOK",
+      "totalSize": "{size} kvm totalt",
+      "built": "Bygget {year}",
+      "keyFindingsTitle": "Nøkkelfunn",
+      "strongSellingPoints": "Sterke salgsargumenter",
+      "areasOfConcern": "Bekymringsområder",
+      "bottomLine": "Bunnlinjen:",
+      "analyzeAnotherButton": "Analyser et annet dokument",
+      "downloadPdfButton": "Last ned PDF",
+      "debugTitle": "🚧 Feilsøkingsdata (Fjern før distribusjon)",
+      "rawAnalysisData": "Rådata for analyse:"
+    },
+    "summary": {
+      "propertyAnalysisReportTitle": "Eiendomsanalyserapport",
+      "limitedAnalysisTitle": "Begrenset analyseformat:",
+      "limitedAnalysisMessage": "AI-en returnerte et tekstsammendrag i stedet for strukturerte data. For den beste opplevelsen med spesifikke sterke punkter og bekymringer, prøv å laste opp dokumentet ditt igjen.",
+      "dataSourceLabel": "Datakilde:",
+      "formatLabel": "Format: Tekstsammendrag (AI returnerte ikke strukturert JSON)",
+      "propertySummaryTitle": "Eiendomsanalysesammendrag",
+      "tipTitle": "Tips:",
+      "tipMessage": "For en mer detaljert analyse med spesifikke sterke punkter og bekymringsområder, prøv å laste opp dokumentet ditt igjen. Vår AI vil forsøke å gi en mer strukturert analyse.",
+      "tryAgainButton": "Prøv analyse igjen",
+      "downloadPdfButton": "Last ned PDF",
+      "debugTitle": "🚧 Feilsøkingsdata (Fjern før distribusjon)",
+      "rawSummaryData": "Rådata for sammendrag:"
+    }
+  },
+  "Navigation": {
+    "switchLanguage": "Bytt språk"
+  }
+}

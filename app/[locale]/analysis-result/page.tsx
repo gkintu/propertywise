@@ -7,6 +7,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { useTranslations } from 'next-intl';
+import LocaleSwitcher from '@/components/locale/LocaleSwitcher';
 import { 
   Home as HomeIcon, 
   ArrowLeft, 
@@ -168,6 +170,7 @@ async function downloadAsPDF() {
 }
 
 export default function AnalysisResultPage() {
+  const t = useTranslations('AnalysisResult');
   const [analysisData, setAnalysisData] = useState<PropertyAnalysis | null>(null);
   const [summaryData, setSummaryData] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -270,9 +273,12 @@ export default function AnalysisResultPage() {
               </div>
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
             </button>
-            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-              🏡 List your property? Get instant valuation →
-            </Badge>
+            <div className="flex items-center gap-4">
+              <LocaleSwitcher />
+              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+                {t('headerBadge')}
+              </Badge>
+            </div>
           </div>
         </header>
         
@@ -281,7 +287,7 @@ export default function AnalysisResultPage() {
             <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
               <FileText className="w-12 h-12 text-yellow-600" />
             </div>
-            <p className="text-xl text-gray-600">Loading analysis results...</p>
+            <p className="text-xl text-gray-600">{t('loading.loadingText')}</p>
           </div>
         </div>
       </div>
@@ -302,9 +308,12 @@ export default function AnalysisResultPage() {
               </div>
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
             </button>
-            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-              🏡 List your property? Get instant valuation →
-            </Badge>
+            <div className="flex items-center gap-4">
+              <LocaleSwitcher />
+              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+                {t('headerBadge')}
+              </Badge>
+            </div>
           </div>
         </header>
 
@@ -315,18 +324,18 @@ export default function AnalysisResultPage() {
                 <AlertTriangle className="w-8 h-8 text-red-600" />
               </div>
               <CardTitle className="text-2xl text-red-600">
-                {error ? 'Analysis Failed' : 'Analysis Not Found'}
+                {error ? t('error.analysisFailedTitle') : t('error.analysisNotFoundTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-gray-700 mb-6">
-                {error || 'No analysis result was found. This might happen if you navigated to this page directly or if there was an issue retrieving the result.'}
+                {error || t('error.noResultMessage')}
               </p>
               
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 text-left">
-                <h4 className="font-semibold text-gray-700 mb-2">Debug Information:</h4>
-                <p className="text-sm text-gray-600">Data Source: {dataSource}</p>
-                <p className="text-sm text-gray-600">Expected: Structured JSON with PropertyAnalysis format</p>
+                <h4 className="font-semibold text-gray-700 mb-2">{t('error.debugInfo')}</h4>
+                <p className="text-sm text-gray-600">{t('error.dataSource')} {dataSource}</p>
+                <p className="text-sm text-gray-600">{t('error.expected')}</p>
               </div>
 
               <Button 
@@ -338,7 +347,7 @@ export default function AnalysisResultPage() {
                 className="bg-yellow-500 hover:bg-yellow-600 text-white"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Go Back to Upload
+                {t('error.goBackButton')}
               </Button>
             </CardContent>
           </Card>
@@ -362,9 +371,12 @@ export default function AnalysisResultPage() {
               </div>
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
             </button>
-            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-              🏡 List your property? Get instant valuation →
-            </Badge>
+            <div className="flex items-center gap-4">
+              <LocaleSwitcher />
+              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+                {t('headerBadge')}
+              </Badge>
+            </div>
           </div>
         </header>
 
@@ -372,7 +384,7 @@ export default function AnalysisResultPage() {
           <div className="mb-8 pt-4">
             <h1 className="text-3xl font-bold text-gray-900 flex items-center">
               <MapPin className="w-7 h-7 mr-3 text-yellow-600" />
-              {analysisData?.propertyDetails?.address || 'Property Analysis'}
+              {analysisData?.propertyDetails?.address || t('analysis.propertyAnalysisTitle')}
             </h1>
           </div>
 
@@ -381,7 +393,7 @@ export default function AnalysisResultPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <FileText className="w-5 h-5" />
-                  Analysis Summary
+                  {t('analysis.analysisSummaryTitle')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -396,15 +408,18 @@ export default function AnalysisResultPage() {
 
           {analysisData?.propertyDetails && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-              <p className="text-sm font-medium text-blue-900 mb-2">Market Position:</p>
+              <p className="text-sm font-medium text-blue-900 mb-2">{t('analysis.marketPosition')}</p>
               <div className="flex flex-wrap items-center gap-4 text-sm text-blue-800">
                 <span className="font-medium">
-                  {analysisData.propertyDetails.bedrooms}-room {analysisData.propertyDetails.propertyType} priced at {analysisData.propertyDetails.price.toLocaleString()} NOK
+                  {analysisData.propertyDetails.bedrooms}{t('analysis.roomPropertyPriced', {
+                    propertyType: analysisData.propertyDetails.propertyType,
+                    price: analysisData.propertyDetails.price.toLocaleString()
+                  })}
                 </span>
                 <span>•</span>
-                <span>{analysisData.propertyDetails.size} sqm total</span>
+                <span>{t('analysis.totalSize', { size: analysisData.propertyDetails.size })}</span>
                 <span>•</span>
-                <span>Built {analysisData.propertyDetails.yearBuilt}</span>
+                <span>{t('analysis.built', { year: analysisData.propertyDetails.yearBuilt })}</span>
               </div>
             </div>
           )}
@@ -413,7 +428,7 @@ export default function AnalysisResultPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Eye className="w-5 h-5 text-gray-600 flex-shrink-0" />
-                {"Key Findings"}
+                {t('analysis.keyFindingsTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -421,7 +436,7 @@ export default function AnalysisResultPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <span className="text-green-700 text-lg font-semibold">Strong Selling Points</span>
+                    <span className="text-green-700 text-lg font-semibold">{t('analysis.strongSellingPoints')}</span>
                   </div>
                   <div className="space-y-2">
                     {analysisData?.strongPoints?.map((point, idx) => {
@@ -447,7 +462,7 @@ export default function AnalysisResultPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                    <span className="text-red-700 text-lg font-semibold">Areas of Concern</span>
+                    <span className="text-red-700 text-lg font-semibold">{t('analysis.areasOfConcern')}</span>
                   </div>
                   <div className="space-y-2">
                     {analysisData?.concerns?.map((concern, idx) => {
@@ -477,7 +492,7 @@ export default function AnalysisResultPage() {
             <Alert className="mb-6 border-yellow-200 bg-yellow-50">
               <AlertTriangle className="w-4 h-4 text-yellow-600" />
               <AlertDescription className="text-yellow-800">
-                <strong>Bottom Line:</strong> {analysisData.bottomLine}
+                <strong>{t('analysis.bottomLine')}</strong> {analysisData.bottomLine}
               </AlertDescription>
             </Alert>
           )}
@@ -494,7 +509,7 @@ export default function AnalysisResultPage() {
               className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Analyze Another Document
+              {t('analysis.analyzeAnotherButton')}
             </Button>
             <Button 
               variant="outline" 
@@ -502,19 +517,19 @@ export default function AnalysisResultPage() {
               onClick={downloadAsPDF}
             >
               <Download className="w-4 h-4 mr-2" />
-              Download PDF
+              {t('analysis.downloadPdfButton')}
             </Button>
           </div>
 
           <Separator className="my-8" />
           <Card className="border-red-200 bg-red-50" data-pdf-exclude="true">
             <CardHeader>
-              <CardTitle className="text-red-700 text-lg">🚧 Debug Data (Remove before deployment)</CardTitle>
+              <CardTitle className="text-red-700 text-lg">{t('analysis.debugTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-red-700 mb-2">Raw Analysis Data:</h4>
+                  <h4 className="font-semibold text-red-700 mb-2">{t('analysis.rawAnalysisData')}</h4>
                   <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
                     {JSON.stringify(analysisData, null, 2)}
                   </pre>
@@ -542,9 +557,12 @@ export default function AnalysisResultPage() {
               </div>
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
             </button>
-            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-              🏡 List your property? Get instant valuation →
-            </Badge>
+            <div className="flex items-center gap-4">
+              <LocaleSwitcher />
+              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+                {t('headerBadge')}
+              </Badge>
+            </div>
           </div>
         </header>
 
@@ -552,25 +570,24 @@ export default function AnalysisResultPage() {
           <div className="mb-8 pt-4">
             <h1 className="text-3xl font-bold text-gray-900 flex items-center">
               <MapPin className="w-7 h-7 mr-3 text-yellow-600" />
-              Property Analysis Report
+              {t('summary.propertyAnalysisReportTitle')}
             </h1>
           </div>
 
           <Alert className="mb-6 border-orange-200 bg-orange-50">
             <AlertTriangle className="w-4 h-4 text-orange-600" />
             <AlertDescription className="text-orange-800">
-              <strong>Limited Analysis Format:</strong> The AI returned a text summary instead of structured data. 
-              For the best experience with specific strong points and concerns, please try uploading your document again.
+              <strong>{t('summary.limitedAnalysisTitle')}</strong> {t('summary.limitedAnalysisMessage')}
             </AlertDescription>
           </Alert>
 
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
             <div className="flex items-center gap-2 text-orange-800">
               <Info className="w-5 h-5" />
-              <span className="font-medium">Data Source: {dataSource}</span>
+              <span className="font-medium">{t('summary.dataSourceLabel')} {dataSource}</span>
             </div>
             <div className="text-sm text-orange-700 mt-1">
-              Format: Text summary (AI did not return structured JSON)
+              {t('summary.formatLabel')}
             </div>
           </div>
 
@@ -578,7 +595,7 @@ export default function AnalysisResultPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="w-5 h-5" />
-                Property Analysis Summary
+                {t('summary.propertySummaryTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -593,8 +610,7 @@ export default function AnalysisResultPage() {
           <Alert className="mb-6 border-blue-200 bg-blue-50">
             <Info className="w-4 h-4 text-blue-600" />
             <AlertDescription className="text-blue-800">
-              <strong>Tip:</strong> For a more detailed analysis with specific strong points and areas of concern, 
-              try uploading your document again. Our AI will attempt to provide a more structured analysis.
+              <strong>{t('summary.tipTitle')}</strong> {t('summary.tipMessage')}
             </AlertDescription>
           </Alert>
 
@@ -610,7 +626,7 @@ export default function AnalysisResultPage() {
               className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Try Analysis Again
+              {t('summary.tryAgainButton')}
             </Button>
             <Button 
               variant="outline" 
@@ -618,19 +634,19 @@ export default function AnalysisResultPage() {
               onClick={downloadAsPDF}
             >
               <Download className="w-4 h-4 mr-2" />
-              Download PDF
+              {t('summary.downloadPdfButton')}
             </Button>
           </div>
 
           <Separator className="my-8" />
           <Card className="border-red-200 bg-red-50" data-pdf-exclude="true">
             <CardHeader>
-              <CardTitle className="text-red-700 text-lg">🚧 Debug Data (Remove before deployment)</CardTitle>
+              <CardTitle className="text-red-700 text-lg">{t('summary.debugTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-red-700 mb-2">Raw Summary Data:</h4>
+                  <h4 className="font-semibold text-red-700 mb-2">{t('summary.rawSummaryData')}</h4>
                   <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
                     {summaryData}
                   </pre>

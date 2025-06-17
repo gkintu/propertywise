@@ -1,0 +1,102 @@
+{
+  "HomePage": {
+    "title": "Smart property insights\nbefore you buy",
+    "description": "Get comprehensive property analysis with AI that uncovers potential issues, market trends, and investment opportunities in minutes.",
+    "greeting": "Smart Property Analysis Made Simple",
+    "badge": "AI-powered property analysis",
+    "headerBadge": "🏡 List your property? Get instant valuation →",
+    "searchPlaceholder": "Enter property address or listing URL...",
+    "getAnalysisButton": "Get Analysis",
+    "disclaimer": "PropertyWise provides detailed insights but should complement professional advice. All analyses are based on available data - we're not liable for any decisions made.",
+    "features": {
+      "riskDetection": {
+        "title": "Risk Detection",
+        "description": "Identify structural, legal, and financial risks before making an offer"
+      },
+      "marketAnalysis": {
+        "title": "Market Analysis", 
+        "description": "Compare prices and trends with similar properties in the area"
+      },
+      "investmentInsights": {
+        "title": "Investment Insights",
+        "description": "Understand potential returns and long-term value appreciation"
+      }
+    },
+    "upload": {
+      "title": "Upload Property Documents",
+      "subtitle": "Drag and drop your property PDF documents for AI analysis",
+      "dropText": "Drop your PDF here",
+      "browseText": "browse files",
+      "supportText": "Supports PDF files up to 10MB",
+      "selectButton": "Select PDF Files",
+      "uploadedFiles": "Uploaded Files",
+      "analyzing": "Analyzing...",
+      "analyzeButton": "Analyze Documents"
+    },
+    "recentAnalysis": {
+      "title": "Recent Property Analysis",
+      "keyFindings": "KEY FINDINGS",
+      "badges": {
+        "goodBuy": "Good Buy",
+        "consider": "Consider", 
+        "greatDeal": "Great Deal",
+        "caution": "Caution"
+      }
+    },
+    "cta": {
+      "title": "Ready to make informed property decisions?",
+      "description": "Join thousands of smart buyers who use PropertyWise to avoid costly mistakes and find great deals.",
+      "startButton": "Start Free Analysis",
+      "sampleButton": "See Sample Report"
+    }
+  },
+  "AnalysisResult": {
+    "headerBadge": "🏡 List your property? Get instant valuation →",
+    "loading": {
+      "title": "Loading analysis results...",
+      "loadingText": "Loading analysis results..."
+    },
+    "error": {
+      "analysisFailedTitle": "Analysis Failed",
+      "analysisNotFoundTitle": "Analysis Not Found",
+      "noResultMessage": "No analysis result was found. This might happen if you navigated to this page directly or if there was an issue retrieving the result.",
+      "debugInfo": "Debug Information:",
+      "dataSource": "Data Source:",
+      "expected": "Expected: Structured JSON with PropertyAnalysis format",
+      "goBackButton": "Go Back to Upload"
+    },
+    "analysis": {
+      "propertyAnalysisTitle": "Property Analysis",
+      "analysisSummaryTitle": "Analysis Summary",
+      "marketPosition": "Market Position:",
+      "roomPropertyPriced": "-room {propertyType} priced at {price} NOK",
+      "totalSize": "{size} sqm total",
+      "built": "Built {year}",
+      "keyFindingsTitle": "Key Findings",
+      "strongSellingPoints": "Strong Selling Points",
+      "areasOfConcern": "Areas of Concern",
+      "bottomLine": "Bottom Line:",
+      "analyzeAnotherButton": "Analyze Another Document",
+      "downloadPdfButton": "Download PDF",
+      "debugTitle": "🚧 Debug Data (Remove before deployment)",
+      "rawAnalysisData": "Raw Analysis Data:"
+    },
+    "summary": {
+      "propertyAnalysisReportTitle": "Property Analysis Report",
+      "limitedAnalysisTitle": "Limited Analysis Format:",
+      "limitedAnalysisMessage": "The AI returned a text summary instead of structured data. For the best experience with specific strong points and concerns, please try uploading your document again.",
+      "dataSourceLabel": "Data Source:",
+      "formatLabel": "Format: Text summary (AI did not return structured JSON)",
+      "propertySummaryTitle": "Property Analysis Summary",
+      "tipTitle": "Tip:",
+      "tipMessage": "For a more detailed analysis with specific strong points and areas of concern, try uploading your document again. Our AI will attempt to provide a more structured analysis.",
+      "tryAgainButton": "Try Analysis Again",
+      "downloadPdfButton": "Download PDF",
+      "debugTitle": "🚧 Debug Data (Remove before deployment)",
+      "rawSummaryData": "Raw Summary Data:"
+    }
+  },
+  "Navigation": {
+    "switchLanguage": "Switch Language"
+  }
+}

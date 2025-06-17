@@ -6,11 +6,19 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Search, Home as HomeIcon, AlertTriangle, CheckCircle, Clock, MapPin, Bed, Bath, Car, Upload, X } from "lucide-react"
 import Image from "next/image"
-import { useState, useRef } from "react"
+import { useState, useRef, use } from "react"
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import LocaleSwitcher from '@/components/locale/LocaleSwitcher'
 import Spinner from "@/components/customized/spinner/spinner-05";
 
-export default function Home() {
+interface PageProps {
+  params: Promise<{locale: string}>;
+}
+
+export default function Home({ params }: PageProps) {
+  const { locale } = use(params);
+  const t = useTranslations('HomePage');
   const [dragActive, setDragActive] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -114,9 +122,12 @@ export default function Home() {
             </div>
             <span className="text-xl font-bold text-gray-900">PropertyWise</span>
           </div>
-          <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-            🏡 List your property? Get instant valuation →
-          </Badge>
+          <div className="flex items-center gap-4">
+            <LocaleSwitcher />
+            <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+              {t('headerBadge')}
+            </Badge>
+          </div>
         </div>
       </header>
 
@@ -124,17 +135,19 @@ export default function Home() {
       <main className="max-w-5xl mx-auto px-4 py-16 text-center">
         <div className="mb-12">
           <Badge variant="outline" className="mb-6 text-yellow-600 border-yellow-200">
-            AI-powered property analysis
+            {t('badge')}
           </Badge>
           <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
-            Smart property insights
-            <br />
-            before you buy
+            {t('title')}
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Get comprehensive property analysis with AI that uncovers potential issues, market trends, and investment
-            opportunities in minutes.
+            {t('description')}
           </p>
+          <div className="mt-8">
+            <h2 className="text-3xl font-semibold text-gray-800 mb-4">
+              {t('greeting')}
+            </h2>
+          </div>
         </div>
 
         {/* Search Section */}
@@ -143,18 +156,17 @@ export default function Home() {
             <div className="flex-1 px-4">
               <Input
                 type="text"
-                placeholder="Enter property address or listing URL..."
+                placeholder={t('searchPlaceholder')}
                 className="border-0 text-lg placeholder:text-gray-400 focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
             <Button className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-full">
-              Get Analysis
+              {t('getAnalysisButton')}
               <Search className="w-4 h-4 ml-2" />
             </Button>
           </div>
           <p className="text-sm text-gray-500 mt-4 max-w-lg mx-auto">
-            PropertyWise provides detailed insights but should complement professional advice. All analyses are based on
-            available data - we&apos;re not liable for any decisions made.
+            {t('disclaimer')}
           </p>
         </div>
 
@@ -164,31 +176,31 @@ export default function Home() {
             <div className="w-16 h-16 bg-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-8 h-8 text-yellow-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Risk Detection</h3>
-            <p className="text-gray-600">Identify structural, legal, and financial risks before making an offer</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('features.riskDetection.title')}</h3>
+            <p className="text-gray-600">{t('features.riskDetection.description')}</p>
           </div>
           <div className="text-center">
             <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Market Analysis</h3>
-            <p className="text-gray-600">Compare prices and trends with similar properties in the area</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('features.marketAnalysis.title')}</h3>
+            <p className="text-gray-600">{t('features.marketAnalysis.description')}</p>
           </div>
           <div className="text-center">
             <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <HomeIcon className="w-8 h-8 text-blue-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Investment Insights</h3>
-            <p className="text-gray-600">Understand potential returns and long-term value appreciation</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('features.investmentInsights.title')}</h3>
+            <p className="text-gray-600">{t('features.investmentInsights.description')}</p>
           </div>
         </div>
 
         {/* PDF Upload Section */}
         <section className="text-left">
           <div className="text-center max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Upload Property Documents</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">{t('upload.title')}</h2>
             <p className="text-lg text-gray-600 mb-8">
-              Drag and drop your property PDF documents for AI analysis
+              {t('upload.subtitle')}
             </p>
             
             <Card className={`max-w-2xl mx-auto border-2 border-dashed transition-colors ${
@@ -205,15 +217,15 @@ export default function Home() {
                   <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Upload className="w-8 h-8 text-yellow-600" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Drop your PDF here</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('upload.dropText')}</h3>
                   <p className="text-gray-500 mb-4">
                     or <span 
                       className="text-yellow-600 font-medium cursor-pointer hover:text-yellow-700"
                       onClick={openFileDialog}
-                    >browse files</span>
+                    >{t('upload.browseText')}</span>
                   </p>
                   <div className="text-sm text-gray-400">
-                    Supports PDF files up to 10MB
+                    {t('upload.supportText')}
                   </div>
                   
                   {/* Hidden file input */}
@@ -232,7 +244,7 @@ export default function Home() {
                     className="mt-6 border-yellow-200 text-yellow-600 hover:bg-yellow-50"
                     onClick={openFileDialog}
                   >
-                    Select PDF Files
+                    {t('upload.selectButton')}
                   </Button>
                 </div>
               </CardContent>
@@ -241,7 +253,7 @@ export default function Home() {
             {/* Uploaded files display */}
             {uploadedFiles.length > 0 && (
               <div className="max-w-2xl mx-auto mt-6">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Uploaded Files</h4>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">{t('upload.uploadedFiles')}</h4>
                 <div className="space-y-3">
                   {uploadedFiles.map((file, index) => (
                     <Card key={index} className="border border-gray-200">
@@ -294,10 +306,10 @@ export default function Home() {
                     {isLoading ? (
                       <span className="flex items-center gap-2">
                         <Spinner size="sm" />
-                        Analyzing...
+                        {t('upload.analyzing')}
                       </span>
                     ) : (
-                      <>Analyze Documents</>
+                      <>{t('upload.analyzeButton')}</>
                     )}
                     <Search className="ml-2 w-5 h-5" />
                   </Button>
@@ -309,7 +321,7 @@ export default function Home() {
 
         {/* Recent Analysis Section */}
         <section className="text-left">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Recent Property Analysis</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">{t('recentAnalysis.title')}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Property 1 */}
@@ -338,7 +350,7 @@ export default function Home() {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-xs font-medium text-gray-500 mb-2">KEY FINDINGS</div>
+                  <div className="text-xs font-medium text-gray-500 mb-2">{t('recentAnalysis.keyFindings')}</div>
                   <div className="flex items-center gap-2 text-sm">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span className="text-gray-700">Well-maintained HVAC system</span>
@@ -359,7 +371,7 @@ export default function Home() {
                     </span>
                   </div>
                   <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs">
-                    Good Buy
+                    {t('recentAnalysis.badges.goodBuy')}
                   </Badge>
                 </div>
               </CardContent>
@@ -412,7 +424,7 @@ export default function Home() {
                     </span>
                   </div>
                   <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 text-xs">
-                    Consider
+                    {t('recentAnalysis.badges.consider')}
                   </Badge>
                 </div>
               </CardContent>
@@ -465,7 +477,7 @@ export default function Home() {
                     </span>
                   </div>
                   <Badge variant="secondary" className="bg-green-100 text-green-700 text-xs">
-                    Great Deal
+                    {t('recentAnalysis.badges.greatDeal')}
                   </Badge>
                 </div>
               </CardContent>
@@ -518,7 +530,7 @@ export default function Home() {
                     </span>
                   </div>
                   <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
-                    Caution
+                    {t('recentAnalysis.badges.caution')}
                   </Badge>
                 </div>
               </CardContent>
@@ -529,16 +541,16 @@ export default function Home() {
         {/* CTA Section */}
         <section className="py-16 text-center">
           <div className="bg-yellow-50 rounded-2xl p-12 max-w-4xl mx-auto border border-yellow-100">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to make informed property decisions?</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('cta.title')}</h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Join thousands of smart buyers who use PropertyWise to avoid costly mistakes and find great deals.
+              {t('cta.description')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="bg-yellow-500 hover:bg-yellow-600 px-8">
-                Start Free Analysis
+                {t('cta.startButton')}
               </Button>
               <Button size="lg" variant="outline" className="px-8 border-yellow-200 text-yellow-700 hover:bg-yellow-50">
-                See Sample Report
+                {t('cta.sampleButton')}
               </Button>
             </div>
           </div>
