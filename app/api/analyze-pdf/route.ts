@@ -130,7 +130,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Could not extract text from PDF, or PDF is empty.' }, { status: 400 });
     }
 
-    const maxLength = 15000;
+    // Stay within Gemma 3 27B's 96k token context window
+    // Reserve ~16k tokens for system prompt and response, leaving ~80k tokens for input
+    const maxLength = 320000; // ~80k tokens input, staying well within 96k context window
     const truncatedText = pdfText.length > maxLength ? pdfText.substring(0, maxLength) + "..." : pdfText;
 
     console.log('Sending text to AI (truncated length):', truncatedText.length);
