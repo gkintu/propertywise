@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
+import { toast } from "sonner";
 import { 
   Home as HomeIcon, 
   ArrowLeft, 
@@ -64,7 +65,7 @@ function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
 }
 
 // PDF download function using html2canvas-pro
-async function downloadAsPDF() {
+async function downloadAsPDF(t: ReturnType<typeof useTranslations>) {
   try {
     // Wait a bit to ensure DOM is fully loaded
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -159,12 +160,11 @@ async function downloadAsPDF() {
     
     const filename = `${propertyAddress}_Analysis_Report.pdf`;
     pdf.save(filename);
-    
     console.log('PDF generated successfully:', filename);
-    
+    toast.success(t('analysis.pdfGeneratedSuccess'));
   } catch (error) {
     console.error('Error generating PDF:', error);
-    alert('Failed to generate PDF. Please try again.');
+    toast.error(t('analysis.pdfGenerationError'));
   }
 }
 
@@ -436,16 +436,16 @@ export default function AnalysisResultPage() {
                   </div>
                   <div className="space-y-2">
                     {analysisData?.strongPoints?.map((point, idx) => {
-                      const title = typeof point === 'string' ? point : point.title;
-                      const description = typeof point === 'string' ? '' : point.description;
+                      const spTitle = typeof point === 'string' ? point : point.title;
+                      const spDescription = typeof point === 'string' ? '' : point.description;
                       return (
                         <div key={idx} className="bg-green-50 p-3 rounded border border-green-200">
                           <div className="flex items-start gap-2 text-green-800">
                             <CheckCircle className="w-5 h-5 text-green-800 flex-shrink-0 mt-0.5" />
                             <div className="flex-1">
-                              <div className="font-bold text-green-900">{title}</div>
-                              {description && (
-                                <div className="text-black mt-1">{description}</div>
+                              <div className="font-bold text-green-900">{spTitle}</div>
+                              {spDescription && (
+                                <div className="text-black mt-1">{spDescription}</div>
                               )}
                             </div>
                           </div>
@@ -462,16 +462,16 @@ export default function AnalysisResultPage() {
                   </div>
                   <div className="space-y-2">
                     {analysisData?.concerns?.map((concern, idx) => {
-                      const title = typeof concern === 'string' ? concern : concern.title;
-                      const description = typeof concern === 'string' ? '' : concern.description;
+                      const concernTitle = typeof concern === 'string' ? concern : concern.title;
+                      const concernDescription = typeof concern === 'string' ? '' : concern.description;
                       return (
                         <div key={idx} className="bg-red-50 p-3 rounded border border-red-200">
                           <div className="flex items-start gap-2 text-red-800">
                             <Info className="w-5 h-5 text-red-800 flex-shrink-0 mt-0.5" />
                             <div className="flex-1">
-                              <div className="font-bold text-red-900">{title}</div>
-                              {description && (
-                                <div className="text-black mt-1">{description}</div>
+                              <div className="font-bold text-red-900">{concernTitle}</div>
+                              {concernDescription && (
+                                <div className="text-black mt-1">{concernDescription}</div>
                               )}
                             </div>
                           </div>
@@ -510,7 +510,7 @@ export default function AnalysisResultPage() {
             <Button 
               variant="outline" 
               className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
-              onClick={downloadAsPDF}
+              onClick={() => downloadAsPDF(t)}
             >
               <Download className="w-4 h-4 mr-2" />
               {t('analysis.downloadPdfButton')}
@@ -626,7 +626,7 @@ export default function AnalysisResultPage() {
             <Button 
               variant="outline" 
               className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
-              onClick={downloadAsPDF}
+              onClick={() => downloadAsPDF(t)}
             >
               <Download className="w-4 h-4 mr-2" />
               {t('summary.downloadPdfButton')}

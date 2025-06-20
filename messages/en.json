@@ -39,7 +39,13 @@
         "invalidFileTypeSelect": "Please select a PDF file.",
         "fileSizeLimit": "File size must be less than 50MB.",
         "noFileSelected": "Please upload a PDF file."
-      }
+      },
+      "success": "Document analyzed successfully!",
+      "error": "Analysis failed",
+      "fileUploaded": "File uploaded: {fileName}",
+      "fileSelected": "File selected: {fileName}",
+      "fileRemoved": "File removed",
+      "releaseToUpload": "Release to upload file"
     },
     "recentAnalysis": {
       "title": "Recent Property Analysis",
@@ -86,6 +92,8 @@
       "bottomLine": "Bottom Line:",
       "analyzeAnotherButton": "Analyze Another Document",
       "downloadPdfButton": "Download PDF",
+      "pdfGeneratedSuccess": "PDF generated successfully!",
+      "pdfGenerationError": "Failed to generate PDF. Please try again.",
       "debugTitle": "🚧 Debug Data (Remove before deployment)",
       "rawAnalysisData": "Raw Analysis Data:"
     },

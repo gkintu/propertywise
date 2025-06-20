@@ -39,7 +39,13 @@
         "invalidFileTypeSelect": "Vennligst velg en PDF-fil.",
         "fileSizeLimit": "Filstørrelsen må være mindre enn 50 MB.",
         "noFileSelected": "Vennligst last opp en PDF-fil."
-      }
+      },
+      "success": "Dokument analysert vellykket!",
+      "error": "Analyse mislyktes",
+      "fileUploaded": "Fil lastet opp: {fileName}",
+      "fileSelected": "Fil valgt: {fileName}",
+      "fileRemoved": "Fil fjernet",
+      "releaseToUpload": "Slipp for å laste opp fil"
     },
     "recentAnalysis": {
       "title": "Nylig eiendomsanalyse",
@@ -86,6 +92,8 @@
       "bottomLine": "Bunnlinjen:",
       "analyzeAnotherButton": "Analyser et annet dokument",
       "downloadPdfButton": "Last ned PDF",
+      "pdfGeneratedSuccess": "PDF generert!",
+      "pdfGenerationError": "Kunne ikke generere PDF. Prøv igjen.",
       "debugTitle": "🚧 Feilsøkingsdata (Fjern før distribusjon)",
       "rawAnalysisData": "Rådata for analyse:"
     },
@@ -100,6 +108,8 @@
       "tipMessage": "For en mer detaljert analyse med spesifikke sterke punkter og bekymringsområder, prøv å laste opp dokumentet ditt igjen. Vår AI vil forsøke å gi en mer strukturert analyse.",
       "tryAgainButton": "Prøv analyse igjen",
       "downloadPdfButton": "Last ned PDF",
+      "pdfGeneratedSuccess": "PDF generert!",
+      "pdfGenerationError": "Kunne ikke generere PDF. Prøv igjen.",
       "debugTitle": "🚧 Feilsøkingsdata (Fjern før distribusjon)",
       "rawSummaryData": "Rådata for sammendrag:"
     }

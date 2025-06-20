@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import PDFParser from 'pdf2json'; 
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
 
 // Initialize Gemini client
 const genai = new GoogleGenAI({
@@ -55,82 +51,18 @@ export async function POST(request: NextRequest) {
 
     console.log('Received file:', file.name, 'Type:', file.type, 'Size:', file.size);
 
-    // Convert file to buffer for pdf2json processing
+    // Convert file to buffer and create PDF part for Gemini
     const fileBuffer = Buffer.from(await file.arrayBuffer());
     console.log('File buffer created, size:', fileBuffer.length);
 
-    // Create pdf2json parser instance
-    // Pass true as the second argument to enable raw text content extraction
-    const pdfParser = new PDFParser(null, true);
+    const pdfPart = {
+      inlineData: {
+        data: fileBuffer.toString('base64'),
+        mimeType: file.type, // 'application/pdf'
+      },
+    };
 
-    // Process PDF using pdf2json with Promise wrapper
-    const pdfText = await new Promise<string>((resolve, reject) => {
-      const timeoutId = setTimeout(() => {
-        reject(new Error('PDF parsing timed out'));
-      }, 30000); // 30 second timeout
-
-      pdfParser.on("pdfParser_dataError", (errData) => {
-        clearTimeout(timeoutId);
-        console.error('PDF parsing error:', errData.parserError);
-        reject(new Error(`PDF parsing failed: ${errData.parserError}`));
-      });
-
-      pdfParser.on("pdfParser_dataReady", () => {
-        clearTimeout(timeoutId);
-        try {
-          // Extract raw text content from parsed PDF
-          const rawText = pdfParser.getRawTextContent();
-          console.log('PDF text extracted successfully, length:', rawText.length);
-          resolve(rawText);
-        } catch (error) {
-          console.error('Error extracting text from parsed PDF:', error);
-          reject(new Error('Failed to extract text from parsed PDF'));
-        }
-      });
-
-      // Parse the PDF buffer - use the correct method for buffer parsing
-      try {
-        // Convert buffer to a temporary file approach or use loadPDF with buffer
-        // According to pdf2json docs, we need to use parseBuffer method properly
-        if (typeof pdfParser.parseBuffer === 'function') {
-          pdfParser.parseBuffer(fileBuffer);
-        } else {
-          // Alternative approach: write buffer to temp file
-          const tempDir = os.tmpdir();
-          const tempFile = path.join(tempDir, `temp_${Date.now()}.pdf`);
-          
-          fs.writeFileSync(tempFile, fileBuffer);
-          pdfParser.loadPDF(tempFile);
-          
-          // Clean up temp file after parsing
-          setTimeout(() => {
-            try {
-              fs.unlinkSync(tempFile);
-            } catch (e) {
-              console.log('Could not delete temp file:', e);
-            }
-          }, 5000);
-        }
-      } catch (error) {
-        clearTimeout(timeoutId);
-        console.error('Error parsing PDF buffer:', error);
-        reject(new Error('Failed to parse PDF buffer'));
-      }
-    });
-
-    console.log('Extracted text length:', pdfText.length);
-
-    if (!pdfText || pdfText.trim().length === 0) {
-      console.log('No text extracted from PDF');
-      return NextResponse.json({ error: 'Could not extract text from PDF, or PDF is empty.' }, { status: 400 });
-    }
-
-    // Stay within Gemma 3 27B's 96k token context window
-    // Reserve ~16k tokens for system prompt and response, leaving ~80k tokens for input
-    const maxLength = 320000; // ~80k tokens input, staying well within 96k context window
-    const truncatedText = pdfText.length > maxLength ? pdfText.substring(0, maxLength) + "..." : pdfText;
-
-    console.log('Sending text to AI (truncated length):', truncatedText.length);
+    console.log('PDF part created for Gemini API');
     console.log('Requested language:', language);
     console.log('About to call Gemini API...');
 
@@ -139,7 +71,7 @@ export async function POST(request: NextRequest) {
       ? 'Respond in Norwegian (Bokmål). All text fields including titles, descriptions, and the summary should be in Norwegian.'
       : 'Respond in English. All text fields should be in English.';
 
-    const systemPrompt = `You are an AI assistant specialized in analyzing property reports. Given the text from a property document, extract key information and return it as a JSON object with the following structure:
+    const systemPrompt = `You are an AI assistant specialized in analyzing property reports. Given the attached PDF property document, extract key information and return it as a JSON object with the following structure:
 
 {
   "propertyDetails": {
@@ -181,7 +113,10 @@ IMPORTANT:
 
     const response = await genai.models.generateContent({
       model: 'gemini-2.5-flash-lite-preview-06-17',
-      contents: `${systemPrompt}\n\nDocument text to analyze:\n${truncatedText}`,
+      contents: [
+        { text: systemPrompt },
+        pdfPart
+      ],
       config: {
         thinkingConfig: {
           thinkingBudget: 0, // Disables thinking for faster response

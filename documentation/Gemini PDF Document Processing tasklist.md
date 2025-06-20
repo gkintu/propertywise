@@ -5,10 +5,10 @@
 
 1.  **Refactor Imports if not done already, check if its done first:**
     *   [ ] Remove `PDFParser`, `fs`, `path`, `os` imports.
-    *   [ ] Change `import { GoogleGenAI } from '@google/genai';` to `import { GoogleGenerativeAI, Part } from '@google/generative-ai';` (Note: `GoogleGenAI` might be an older or custom wrapper, ensure you're using the official `GoogleGenerativeAI`).
+    *   [ ] Keep `import { GoogleGenAI } from '@google/genai';` as this is the correct official package (confirmed from Google's official documentation).
 
 2.  **Initialize Gemini Client:**
-    *   [ ] Update initialization if needed: `const genai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');` (You already have this mostly correct, just ensure `GoogleGenerativeAI` is used).
+    *   [ ] Keep existing initialization: `const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });` (This is already correct).
 
 3.  **Update `POST` Function:**
     *   [ ] **Remove `pdf2json` Logic:**

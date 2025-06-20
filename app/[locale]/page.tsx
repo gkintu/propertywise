@@ -7,9 +7,11 @@ import { Badge } from "@/components/ui/badge"
 import { Search, Home as HomeIcon, AlertTriangle, CheckCircle, Clock, MapPin, Bed, Bath, Car, Upload, X } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useState, useRef, use } from "react"
+import { useState, use } from "react"
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
+import { toast } from "sonner"
+import { useFileUpload } from '@/hooks/useFileUpload'
 import LocaleSwitcher from '@/components/locale/LocaleSwitcher'
 import Spinner from "@/components/customized/spinner/spinner-05";
 
@@ -21,106 +23,23 @@ export default function Home({ params }: PageProps) {
   const { locale } = use(params);
   const t = useTranslations('HomePage');
   const f = useTranslations('Footer');
-  const [dragActive, setDragActive] = useState(false)
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const {
+    dragActive,
+    uploadedFiles,
+    statusMessage,
+    fileInputRef,
+    handleDrag,
+    handleDrop,
+    handleFileSelect,
+    removeFile,
+    openFileDialog,
+  } = useFileUpload();
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true)
-    } else if (e.type === "dragleave") {
-      setDragActive(false)
-    }
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-    
-    const files = Array.from(e.dataTransfer.files)
-    
-    // Validate file count
-    if (files.length > 1) {
-      alert(t('upload.validation.multipleFilesDrop'))
-      return
-    }
-    
-    if (files.length === 1) {
-      const file = files[0]
-      
-      // Validate file type
-      if (file.type !== "application/pdf") {
-        alert(t('upload.validation.invalidFileTypeDrop'))
-        return
-      }
-      
-      // Validate file size (50MB limit)
-      if (file.size > 50 * 1024 * 1024) {
-        alert(t('upload.validation.fileSizeLimit'))
-        return
-      }
-      
-      // Clear previous files and set the new one
-      setUploadedFiles([file])
-    }
-  }
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
-    
-    // Validate file count
-    if (files.length > 1) {
-      alert(t('upload.validation.multipleFilesSelect'))
-      e.target.value = '' // Clear the input
-      return
-    }
-    
-    if (files.length === 1) {
-      const file = files[0]
-      
-      // Validate file type
-      if (file.type !== "application/pdf") {
-        alert(t('upload.validation.invalidFileTypeSelect'))
-        e.target.value = '' // Clear the input
-        return
-      }
-      
-      // Validate file size (50MB limit)
-      if (file.size > 50 * 1024 * 1024) {
-        alert(t('upload.validation.fileSizeLimit'))
-        e.target.value = '' // Clear the input
-        return
-      }
-      
-      // Clear previous files and set the new one
-      setUploadedFiles([file])
-    }
-  }
-
-  const removeFile = () => {
-    setUploadedFiles([])
-    // Clear the file input as well
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
-  }
-
-  const openFileDialog = () => {
-    // Clear any existing files before opening dialog
-    if (uploadedFiles.length > 0) {
-      setUploadedFiles([])
-    }
-    fileInputRef.current?.click()
-  }
-
   const handleAnalyzeDocuments = async () => {
     if (uploadedFiles.length === 0) {
-      alert(t('upload.validation.noFileSelected'))
+      toast.error(t('upload.validation.noFileSelected'))
       return
     }
 
@@ -157,6 +76,7 @@ export default function Home({ params }: PageProps) {
       // Validate that we have actual data before storing
       if (data && (data.analysis || data.summary)) {
         localStorage.setItem('analysisResult', JSON.stringify(data))
+        toast.success(t('upload.success'))
         router.push('/analysis-result')
       } else {
         throw new Error("No analysis data received from server")
@@ -164,6 +84,7 @@ export default function Home({ params }: PageProps) {
     } catch (error) {
       console.error("Error analyzing document:", error)
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+      toast.error(`${t('upload.error')}: ${errorMessage}`)
       localStorage.setItem('analysisError', errorMessage)
       router.push('/analysis-result')
     } finally {
@@ -173,6 +94,11 @@ export default function Home({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
+      {/* Screen reader status announcements */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {statusMessage}
+      </div>
+      
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -268,10 +194,19 @@ export default function Home({ params }: PageProps) {
             }`}>
               <CardContent 
                 className="p-12"
+                role="region"
+                aria-label={t('upload.dropText')}
+                tabIndex={0}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openFileDialog();
+                  }
+                }}
               >
                 <div className="text-center">
                   <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -302,6 +237,7 @@ export default function Home({ params }: PageProps) {
                     variant="outline" 
                     className="mt-6 border-yellow-200 text-yellow-600 hover:bg-yellow-50"
                     onClick={openFileDialog}
+                    aria-label={t('upload.selectButton')}
                   >
                     {t('upload.selectButton')}
                   </Button>
@@ -347,6 +283,7 @@ export default function Home({ params }: PageProps) {
                             size="sm"
                             onClick={() => removeFile()}
                             className="text-gray-500 hover:text-red-600"
+                            aria-label={`Remove ${file.name}`}
                           >
                             <X className="w-4 h-4" />
                           </Button>
@@ -462,7 +399,7 @@ export default function Home({ params }: PageProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-xs font-medium text-gray-500 mb-2">KEY FINDINGS</div>
+                  <div className="text-xs font-medium text-gray-500 mb-2">{t('recentAnalysis.keyFindings')}</div>
                   <div className="flex items-center gap-2 text-sm">
                     <AlertTriangle className="w-4 h-4 text-yellow-500" />
                     <span className="text-gray-700">High HOA fees</span>
@@ -515,7 +452,7 @@ export default function Home({ params }: PageProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-xs font-medium text-gray-500 mb-2">KEY FINDINGS</div>
+                  <div className="text-xs font-medium text-gray-500 mb-2">{t('recentAnalysis.keyFindings')}</div>
                   <div className="flex items-center gap-2 text-sm">
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <span className="text-gray-700">Recently renovated kitchen</span>
@@ -568,7 +505,7 @@ export default function Home({ params }: PageProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-xs font-medium text-gray-500 mb-2">KEY FINDINGS</div>
+                  <div className="text-xs font-medium text-gray-500 mb-2">{t('recentAnalysis.keyFindings')}</div>
                   <div className="flex items-center gap-2 text-sm">
                     <AlertTriangle className="w-4 h-4 text-red-500" />
                     <span className="text-gray-700">Foundation issues detected</span>

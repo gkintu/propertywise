@@ -4,6 +4,7 @@ import {setRequestLocale} from 'next-intl/server';
 import {routing} from '@/i18n/routing';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 import "../globals.css";
 
 const geistSans = Geist({
@@ -45,6 +46,7 @@ export default async function LocaleLayout({
       >
         <NextIntlClientProvider>
           {children}
+          <Toaster />
         </NextIntlClientProvider>
       </body>
     </html>
