@@ -1,25 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { GoogleGenAI } from '@google/genai';
 import PDFParser from 'pdf2json'; 
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
 
-// Initialize OpenAI client for OpenRouter
-const openai = new OpenAI({
-  baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.OPENROUTER_API_KEY,
-  defaultHeaders: {
-    'HTTP-Referer': process.env.SITE_URL || 'http://localhost:3000',
-    'X-Title': process.env.APP_TITLE || 'PropertyAI',
-  },
+// Initialize Gemini client
+const genai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY || '',
 });
 
 export async function GET() {
   // Simple test endpoint to check if API is working
-  if (!process.env.OPENROUTER_API_KEY) {
+  if (!process.env.GEMINI_API_KEY) {
     return NextResponse.json({ 
-      error: 'OpenRouter API key is not configured. Please set OPENROUTER_API_KEY in your .env.local file.',
+      error: 'Gemini API key is not configured. Please set GEMINI_API_KEY in your .env.local file.',
       status: 'API key missing'
     }, { status: 500 });
   }
@@ -34,13 +29,13 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     console.log('POST request received');
-    console.log('OPENROUTER_API_KEY exists:', !!process.env.OPENROUTER_API_KEY);
+    console.log('GEMINI_API_KEY exists:', !!process.env.GEMINI_API_KEY);
     
-    // Check if OpenRouter API key is configured
-    if (!process.env.OPENROUTER_API_KEY) {
+    // Check if Gemini API key is configured
+    if (!process.env.GEMINI_API_KEY) {
       console.log('Missing API key');
       return NextResponse.json({ 
-        error: 'OpenRouter API key is not configured. Please set OPENROUTER_API_KEY in your .env.local file.' 
+        error: 'Gemini API key is not configured. Please set GEMINI_API_KEY in your .env.local file.' 
       }, { status: 500 });
     }
 
@@ -137,19 +132,14 @@ export async function POST(request: NextRequest) {
 
     console.log('Sending text to AI (truncated length):', truncatedText.length);
     console.log('Requested language:', language);
-    console.log('About to call OpenRouter API...');
+    console.log('About to call Gemini API...');
 
     // Determine the language instruction for the AI prompt
     const languageInstruction = language === 'no' 
       ? 'Respond in Norwegian (Bokmål). All text fields including titles, descriptions, and the summary should be in Norwegian.'
       : 'Respond in English. All text fields should be in English.';
 
-    const completion = await openai.chat.completions.create({
-      model: 'google/gemma-3-27b-it:free',
-      messages: [
-        {
-          role: 'system',
-          content: `You are an AI assistant specialized in analyzing property reports. Given the text from a property document, extract key information and return it as a JSON object with the following structure:
+    const systemPrompt = `You are an AI assistant specialized in analyzing property reports. Given the text from a property document, extract key information and return it as a JSON object with the following structure:
 
 {
   "propertyDetails": {
@@ -187,17 +177,20 @@ IMPORTANT:
 - If you cannot extract structured data from the document, return {"error": "Unable to parse property data from document", "summary": "your analysis"}
 - Focus on actionable insights for a potential buyer
 - Ensure all JSON is valid and properly formatted
-- All text content (titles, descriptions, summary, bottomLine) must be in the requested language`,
+- All text content (titles, descriptions, summary, bottomLine) must be in the requested language`;
+
+    const response = await genai.models.generateContent({
+      model: 'gemini-2.5-flash-lite-preview-06-17',
+      contents: `${systemPrompt}\n\nDocument text to analyze:\n${truncatedText}`,
+      config: {
+        thinkingConfig: {
+          thinkingBudget: 0, // Disables thinking for faster response
         },
-        {
-          role: 'user',
-          content: truncatedText,
-        },
-      ],
+      },
     });
 
-    console.log('OpenRouter API response received');
-    const aiSummary = completion.choices[0].message.content;
+    console.log('Gemini API response received');
+    const aiSummary = response.text;
 
     if (!aiSummary) {
       console.log('AI failed to generate summary');

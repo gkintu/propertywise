@@ -1,34 +1,27 @@
 // npx tsx open-ai-sdk-docs.ts to test the file
 import 'dotenv/config';
-import OpenAI from 'openai';
+import { GoogleGenAI } from '@google/genai';
 
-const openai = new OpenAI({
-  baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.OPENROUTER_API_KEY,
-  defaultHeaders: {
-    'HTTP-Referer': 'https://yourdomain.com', // Replace with your site URL
-    'X-Title': 'ComedyBot', // Replace with your app's title
-  },
+const genai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY || '',
 });
 
 async function main() {
   const userWord = 'tesla'; // Try changing this to anything
 
-  const completion = await openai.chat.completions.create({
-    model: 'google/gemma-3-27b-it:free',
-    messages: [
-      {
-        role: 'system',
-        content: 'You are a stand-up comedian. When the user gives you a single word, you respond with a very short, funny joke based on that word. Keep it light and witty.',
+  const response = await genai.models.generateContent({
+    model: 'gemini-2.5-flash-lite-preview-06-17',
+    contents: `You are a stand-up comedian. When the user gives you a single word, you respond with a very short, funny joke based on that word. Keep it light and witty.
+
+User word: ${userWord}`,
+    config: {
+      thinkingConfig: {
+        thinkingBudget: 0, // Disables thinking for better performance
       },
-      {
-        role: 'user',
-        content: userWord
-      },
-    ],
+    }
   });
 
-  console.log(completion.choices[0].message.content);
+  console.log(response.text);
 }
 
 main();
