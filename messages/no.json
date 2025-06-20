@@ -27,11 +27,19 @@
       "subtitle": "Dra og slipp PDF-dokumentene dine for AI-analyse",
       "dropText": "Slipp PDF-en din her",
       "browseText": "bla gjennom filer",
-      "supportText": "Støtter PDF-filer opptil 10 MB",
+      "supportText": "Støtter PDF-filer opptil 50 MB",
       "selectButton": "Velg PDF-filer",
       "uploadedFiles": "Opplastede filer",
       "analyzing": "Analyserer...",
-      "analyzeButton": "Analyser dokumenter"
+      "analyzeButton": "Analyser dokumenter",
+      "validation": {
+        "multipleFilesDrop": "Vennligst slipp bare én PDF-fil om gangen.",
+        "multipleFilesSelect": "Vennligst velg bare én PDF-fil om gangen.",
+        "invalidFileTypeDrop": "Vennligst slipp en PDF-fil.",
+        "invalidFileTypeSelect": "Vennligst velg en PDF-fil.",
+        "fileSizeLimit": "Filstørrelsen må være mindre enn 50 MB.",
+        "noFileSelected": "Vennligst last opp en PDF-fil."
+      }
     },
     "recentAnalysis": {
       "title": "Nylig eiendomsanalyse",

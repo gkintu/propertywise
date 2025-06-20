@@ -41,27 +41,84 @@ export default function Home({ params }: PageProps) {
     setDragActive(false)
     
     const files = Array.from(e.dataTransfer.files)
-    const pdfFiles = files.filter(file => file.type === "application/pdf")
-    setUploadedFiles(prev => [...prev, ...pdfFiles])
+    
+    // Validate file count
+    if (files.length > 1) {
+      alert(t('upload.validation.multipleFilesDrop'))
+      return
+    }
+    
+    if (files.length === 1) {
+      const file = files[0]
+      
+      // Validate file type
+      if (file.type !== "application/pdf") {
+        alert(t('upload.validation.invalidFileTypeDrop'))
+        return
+      }
+      
+      // Validate file size (50MB limit)
+      if (file.size > 50 * 1024 * 1024) {
+        alert(t('upload.validation.fileSizeLimit'))
+        return
+      }
+      
+      // Clear previous files and set the new one
+      setUploadedFiles([file])
+    }
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    const pdfFiles = files.filter(file => file.type === "application/pdf")
-    setUploadedFiles(prev => [...prev, ...pdfFiles])
+    
+    // Validate file count
+    if (files.length > 1) {
+      alert(t('upload.validation.multipleFilesSelect'))
+      e.target.value = '' // Clear the input
+      return
+    }
+    
+    if (files.length === 1) {
+      const file = files[0]
+      
+      // Validate file type
+      if (file.type !== "application/pdf") {
+        alert(t('upload.validation.invalidFileTypeSelect'))
+        e.target.value = '' // Clear the input
+        return
+      }
+      
+      // Validate file size (50MB limit)
+      if (file.size > 50 * 1024 * 1024) {
+        alert(t('upload.validation.fileSizeLimit'))
+        e.target.value = '' // Clear the input
+        return
+      }
+      
+      // Clear previous files and set the new one
+      setUploadedFiles([file])
+    }
   }
 
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index))
+  const removeFile = () => {
+    setUploadedFiles([])
+    // Clear the file input as well
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   const openFileDialog = () => {
+    // Clear any existing files before opening dialog
+    if (uploadedFiles.length > 0) {
+      setUploadedFiles([])
+    }
     fileInputRef.current?.click()
   }
 
   const handleAnalyzeDocuments = async () => {
     if (uploadedFiles.length === 0) {
-      alert("Please upload at least one PDF file.")
+      alert(t('upload.validation.noFileSelected'))
       return
     }
 
@@ -235,7 +292,6 @@ export default function Home({ params }: PageProps) {
                     type="file"
                     accept=".pdf"
                     className="hidden"
-                    multiple
                     onChange={handleFileSelect}
                   />
                   
@@ -287,7 +343,7 @@ export default function Home({ params }: PageProps) {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => removeFile(index)}
+                            onClick={() => removeFile()}
                             className="text-gray-500 hover:text-red-600"
                           >
                             <X className="w-4 h-4" />

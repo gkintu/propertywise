@@ -27,11 +27,19 @@
       "subtitle": "Drag and drop your property PDF documents for AI analysis",
       "dropText": "Drop your PDF here",
       "browseText": "browse files",
-      "supportText": "Supports PDF files up to 10MB",
+      "supportText": "Supports PDF files up to 50MB",
       "selectButton": "Select PDF Files",
       "uploadedFiles": "Uploaded Files",
       "analyzing": "Analyzing...",
-      "analyzeButton": "Analyze Documents"
+      "analyzeButton": "Analyze Documents",
+      "validation": {
+        "multipleFilesDrop": "Please drop only one PDF file at a time.",
+        "multipleFilesSelect": "Please select only one PDF file at a time.",
+        "invalidFileTypeDrop": "Please drop a PDF file.",
+        "invalidFileTypeSelect": "Please select a PDF file.",
+        "fileSizeLimit": "File size must be less than 50MB.",
+        "noFileSelected": "Please upload a PDF file."
+      }
     },
     "recentAnalysis": {
       "title": "Recent Property Analysis",
