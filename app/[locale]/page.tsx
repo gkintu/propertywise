@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Search, Home as HomeIcon, AlertTriangle, CheckCircle, Clock, MapPin, Bed, Bath, Car, Upload, X } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 import { useState, useRef, use } from "react"
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -19,6 +20,7 @@ interface PageProps {
 export default function Home({ params }: PageProps) {
   const { locale } = use(params);
   const t = useTranslations('HomePage');
+  const f = useTranslations('Footer');
   const [dragActive, setDragActive] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -612,6 +614,25 @@ export default function Home({ params }: PageProps) {
             </div>
           </div>
         </section>
+        
+        {/* Footer */}
+        <footer className="py-8 border-t border-gray-200 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <div className="text-sm text-gray-600">
+                © 2025 PropertyWise AS. {f('rights')}
+              </div>
+              <div className="flex gap-6 text-sm">
+                <Link href={`/${locale}/privacy`} className="text-blue-600 hover:underline">
+                  {f('privacy')}
+                </Link>
+                <a href="mailto:support@propertywise.no" className="text-gray-600 hover:text-gray-800">
+                  {f('contact')}
+                </a>
+              </div>
+            </div>
+          </div>
+        </footer>
       </main>
     </div>
   )

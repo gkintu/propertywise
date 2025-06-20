@@ -106,5 +106,197 @@
   },
   "Navigation": {
     "switchLanguage": "Switch Language"
+  },
+  "Footer": {
+    "rights": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "contact": "Contact"
+  },
+  "PrivacyPolicy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated",
+    "backToHome": "Back to Home",
+    "introduction": {
+      "title": "Introduction",
+      "description": "PropertyWise is committed to protecting your privacy and personal data. This privacy policy explains how we collect, use, and protect your information when you use our AI-powered property analysis services.",
+      "commitment": "As a Norwegian company, we comply with the General Data Protection Regulation (GDPR) and Norwegian privacy laws. This policy describes your rights and how we handle your personal information."
+    },
+    "dataController": {
+      "title": "Data Controller Information",
+      "company": "PropertyWise AS",
+      "address": "Your Address Here, Oslo, Norway",
+      "organizationNumber": "Org. no: XXX XXX XXX"
+    },
+    "dataCollection": {
+      "title": "What Data We Collect",
+      "personalData": {
+        "title": "Personal Information",
+        "contactInfo": "Name, email address, phone number",
+        "accountInfo": "Account credentials and preferences",
+        "paymentInfo": "Payment information (processed securely through third-party providers)",
+        "communicationData": "Communications with our support team"
+      },
+      "propertyData": {
+        "title": "Property-Related Information",
+        "documents": "Property documents you upload (housing reports, contracts, etc.)",
+        "addresses": "Property addresses and location data",
+        "analysisResults": "AI analysis results and reports we generate",
+        "uploadedFiles": "PDF files and other documents you submit for analysis"
+      },
+      "technicalData": {
+        "title": "Technical Information",
+        "ipAddress": "IP address and device information",
+        "browserData": "Browser type, version, and settings",
+        "usageData": "How you interact with our service",
+        "cookies": "Cookies and similar tracking technologies"
+      }
+    },
+    "dataUsage": {
+      "title": "How We Use Your Data",
+      "legalBasis": "Legal basis",
+      "propertyAnalysis": {
+        "title": "Property Analysis Services",
+        "description": "We process your property documents using AI to provide analysis, risk assessment, and market insights.",
+        "legalBasis": "Contract performance and legitimate interest"
+      },
+      "serviceProvision": {
+        "title": "Service Provision",
+        "description": "To provide, maintain, and improve our services, including customer support and account management.",
+        "legalBasis": "Contract performance"
+      },
+      "communication": {
+        "title": "Communication",
+        "description": "To send you service updates, analysis results, and respond to your inquiries.",
+        "legalBasis": "Contract performance and legitimate interest"
+      },
+      "improvement": {
+        "title": "Service Improvement",
+        "description": "To analyze usage patterns and improve our AI algorithms and user experience (anonymized data only).",
+        "legalBasis": "Legitimate interest"
+      },
+      "legal": {
+        "title": "Legal Compliance",
+        "description": "To comply with legal obligations and protect our rights and interests.",
+        "legalBasis": "Legal obligation and legitimate interest"
+      }
+    },
+    "dataSharing": {
+      "title": "Data Sharing and Third Parties",
+      "description": "We do not sell your personal data. We only share your information in the following limited circumstances:",
+      "serviceProviders": {
+        "title": "Service Providers",
+        "aiProcessing": "AI processing providers (for document analysis)",
+        "cloudStorage": "Cloud storage providers (for secure data storage)",
+        "analytics": "Analytics providers (anonymized data only)",
+        "payment": "Payment processors (for billing purposes)"
+      },
+      "legal": {
+        "title": "Legal Requirements",
+        "description": "We may disclose your information if required by law, court order, or to protect our rights or the safety of others."
+      }
+    },
+    "dataSecurity": {
+      "title": "Data Security",
+      "description": "We implement comprehensive security measures to protect your personal data:",
+      "technical": {
+        "title": "Technical Safeguards",
+        "encryption": "End-to-end encryption for data transmission",
+        "secureTransmission": "SSL/TLS encryption for all communications",
+        "accessControls": "Multi-factor authentication and access controls",
+        "monitoring": "Continuous security monitoring and threat detection"
+      },
+      "organizational": {
+        "title": "Organizational Measures",
+        "staffTraining": "Regular privacy and security training for staff",
+        "limitedAccess": "Principle of least privilege access",
+        "regularAudits": "Regular security audits and assessments",
+        "incidentResponse": "Data breach response procedures"
+      }
+    },
+    "dataRetention": {
+      "title": "Data Retention",
+      "description": "We retain your data only as long as necessary for the purposes outlined in this policy:",
+      "accountData": "Account Data",
+      "accountDataPeriod": "Until account deletion + 30 days",
+      "propertyDocuments": "Property Documents",
+      "propertyDocumentsPeriod": "2 years after last analysis",
+      "analysisResults": "Analysis Results",
+      "analysisResultsPeriod": "5 years (for improvement purposes)",
+      "marketingData": "Marketing Data",
+      "marketingDataPeriod": "Until consent withdrawal"
+    },
+    "yourRights": {
+      "title": "Your Privacy Rights",
+      "description": "Under GDPR, you have the following rights regarding your personal data:",
+      "access": {
+        "title": "Right to Access",
+        "description": "Request copies of your personal data we process"
+      },
+      "rectification": {
+        "title": "Right to Rectification",
+        "description": "Request correction of inaccurate or incomplete data"
+      },
+      "erasure": {
+        "title": "Right to Erasure",
+        "description": "Request deletion of your personal data under certain conditions"
+      },
+      "restriction": {
+        "title": "Right to Restrict Processing",
+        "description": "Request limitation of processing under certain circumstances"
+      },
+      "portability": {
+        "title": "Right to Data Portability",
+        "description": "Request transfer of your data to another service provider"
+      },
+      "objection": {
+        "title": "Right to Object",
+        "description": "Object to processing based on legitimate interest or direct marketing"
+      },
+      "exercising": {
+        "title": "Exercising Your Rights",
+        "description": "To exercise any of these rights, contact us at privacy@propertywise.no. We will respond within 30 days."
+      }
+    },
+    "cookies": {
+      "title": "Cookies and Tracking",
+      "description": "We use cookies and similar technologies to enhance your experience:",
+      "essential": {
+        "title": "Essential Cookies",
+        "description": "Required for basic site functionality and security"
+      },
+      "functional": {
+        "title": "Functional Cookies",
+        "description": "Remember your preferences and settings"
+      },
+      "analytics": {
+        "title": "Analytics Cookies",
+        "description": "Help us understand how you use our service (with your consent)"
+      },
+      "management": "You can manage cookie preferences in your browser settings or through our cookie banner."
+    },
+    "internationalTransfers": {
+      "title": "International Data Transfers",
+      "description": "Some of our service providers may be located outside the EU/EEA. When we transfer data internationally, we ensure appropriate safeguards are in place.",
+      "safeguards": "We use standard contractual clauses, adequacy decisions, or other approved transfer mechanisms to protect your data during international transfers."
+    },
+    "contact": {
+      "title": "Contact Information",
+      "description": "For any privacy-related questions or to exercise your rights, please contact us:",
+      "privacy": {
+        "title": "Privacy Contact"
+      },
+      "authority": {
+        "title": "Norwegian Data Protection Authority",
+        "name": "Datatilsynet"
+      }
+    },
+    "changes": {
+      "title": "Changes to This Privacy Policy",
+      "description": "We may update this privacy policy from time to time. We will notify you of any significant changes by email or through our service. The updated policy will be effective from the date of posting."
+    },
+    "actions": {
+      "contactUs": "Contact Us",
+      "backToHome": "Back to Home"
+    }
   }
 }

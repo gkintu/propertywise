@@ -106,5 +106,197 @@
   },
   "Navigation": {
     "switchLanguage": "Bytt språk"
+  },
+  "Footer": {
+    "rights": "Alle rettigheter forbeholdt.",
+    "privacy": "Personvernerklæring",
+    "contact": "Kontakt"
+  },
+  "PrivacyPolicy": {
+    "title": "Personvernerklæring",
+    "lastUpdated": "Sist oppdatert",
+    "backToHome": "Tilbake til forsiden",
+    "introduction": {
+      "title": "Innledning",
+      "description": "PropertyWise er forpliktet til å beskytte ditt personvern og personopplysninger. Denne personvernerklæringen forklarer hvordan vi samler inn, bruker og beskytter informasjonen din når du bruker våre AI-drevne eiendomsanalysetjenester.",
+      "commitment": "Som et norsk selskap overholder vi Personvernforordningen (GDPR) og norske personvernlover. Denne erklæringen beskriver dine rettigheter og hvordan vi håndterer din personlige informasjon."
+    },
+    "dataController": {
+      "title": "Behandlingsansvarlig informasjon",
+      "company": "PropertyWise AS",
+      "address": "Din adresse her, Oslo, Norge",
+      "organizationNumber": "Org. nr: XXX XXX XXX"
+    },
+    "dataCollection": {
+      "title": "Hvilke data vi samler inn",
+      "personalData": {
+        "title": "Personlig informasjon",
+        "contactInfo": "Navn, e-postadresse, telefonnummer",
+        "accountInfo": "Kontoinformasjon og preferanser",
+        "paymentInfo": "Betalingsinformasjon (behandles sikkert gjennom tredjepartsleverandører)",
+        "communicationData": "Kommunikasjon med vårt supportteam"
+      },
+      "propertyData": {
+        "title": "Eiendomsrelatert informasjon",
+        "documents": "Eiendomsdokumenter du laster opp (boligrapporter, kontrakter, etc.)",
+        "addresses": "Eiendomsadresser og stedsdata",
+        "analysisResults": "AI-analyseresultater og rapporter vi genererer",
+        "uploadedFiles": "PDF-filer og andre dokumenter du sender inn for analyse"
+      },
+      "technicalData": {
+        "title": "Teknisk informasjon",
+        "ipAddress": "IP-adresse og enhetsinformasjon",
+        "browserData": "Nettlesertype, versjon og innstillinger",
+        "usageData": "Hvordan du samhandler med tjenesten vår",
+        "cookies": "Informasjonskapsler og lignende sporingsteknologier"
+      }
+    },
+    "dataUsage": {
+      "title": "Hvordan vi bruker dine data",
+      "legalBasis": "Rettslig grunnlag",
+      "propertyAnalysis": {
+        "title": "Eiendomsanalysetjenester",
+        "description": "Vi behandler eiendomsdokumentene dine ved hjelp av AI for å gi analyse, risikovurdering og markedsinnsikt.",
+        "legalBasis": "Kontraktsoppfyllelse og berettiget interesse"
+      },
+      "serviceProvision": {
+        "title": "Tjenesteyting",
+        "description": "For å levere, vedlikeholde og forbedre våre tjenester, inkludert kundestøtte og kontoadministrasjon.",
+        "legalBasis": "Kontraktsoppfyllelse"
+      },
+      "communication": {
+        "title": "Kommunikasjon",
+        "description": "For å sende deg tjenesteoppdateringer, analyseresultater og svare på dine henvendelser.",
+        "legalBasis": "Kontraktsoppfyllelse og berettiget interesse"
+      },
+      "improvement": {
+        "title": "Tjenesteforbedring",
+        "description": "For å analysere bruksmønstre og forbedre våre AI-algoritmer og brukeropplevelse (kun anonymiserte data).",
+        "legalBasis": "Berettiget interesse"
+      },
+      "legal": {
+        "title": "Lovpålagte forpliktelser",
+        "description": "For å overholde juridiske forpliktelser og beskytte våre rettigheter og interesser.",
+        "legalBasis": "Juridisk forpliktelse og berettiget interesse"
+      }
+    },
+    "dataSharing": {
+      "title": "Datadeling og tredjeparter",
+      "description": "Vi selger ikke dine personopplysninger. Vi deler kun informasjonen din under følgende begrensede omstendigheter:",
+      "serviceProviders": {
+        "title": "Tjenesteleverandører",
+        "aiProcessing": "AI-behandlingsleverandører (for dokumentanalyse)",
+        "cloudStorage": "Skylagerløsninger (for sikker datalagring)",
+        "analytics": "Analyseleverandører (kun anonymiserte data)",
+        "payment": "Betalingsbehandlere (for faktureringsformål)"
+      },
+      "legal": {
+        "title": "Juridiske krav",
+        "description": "Vi kan avsløre informasjonen din hvis det kreves av loven, rettskjennelse, eller for å beskytte våre rettigheter eller andres sikkerhet."
+      }
+    },
+    "dataSecurity": {
+      "title": "Datasikkerhet",
+      "description": "Vi implementerer omfattende sikkerhetstiltak for å beskytte dine personopplysninger:",
+      "technical": {
+        "title": "Tekniske sikkerhetstiltak",
+        "encryption": "Ende-til-ende kryptering for dataoverføring",
+        "secureTransmission": "SSL/TLS-kryptering for all kommunikasjon",
+        "accessControls": "Multifaktor-autentisering og tilgangskontroller",
+        "monitoring": "Kontinuerlig sikkerhetsovervåking og trusseldeteksjon"
+      },
+      "organizational": {
+        "title": "Organisatoriske tiltak",
+        "staffTraining": "Regelmessig personvern- og sikkerhetsopplæring for ansatte",
+        "limitedAccess": "Prinsippet om minste privilegium tilgang",
+        "regularAudits": "Regelmessige sikkerhetsrevisjoner og vurderinger",
+        "incidentResponse": "Prosedyrer for respons på databrudd"
+      }
+    },
+    "dataRetention": {
+      "title": "Datalagring",
+      "description": "Vi oppbevarer dine data kun så lenge som nødvendig for formålene beskrevet i denne erklæringen:",
+      "accountData": "Kontodata",
+      "accountDataPeriod": "Til kontosletting + 30 dager",
+      "propertyDocuments": "Eiendomsdokumenter",
+      "propertyDocumentsPeriod": "2 år etter siste analyse",
+      "analysisResults": "Analyseresultater",
+      "analysisResultsPeriod": "5 år (for forbedringsformål)",
+      "marketingData": "Markedsføringsdata",
+      "marketingDataPeriod": "Til samtykke trekkes tilbake"
+    },
+    "yourRights": {
+      "title": "Dine personvernrettigheter",
+      "description": "Under GDPR har du følgende rettigheter angående dine personopplysninger:",
+      "access": {
+        "title": "Rett til innsyn",
+        "description": "Be om kopier av personopplysningene vi behandler"
+      },
+      "rectification": {
+        "title": "Rett til retting",
+        "description": "Be om korrigering av unøyaktige eller ufullstendige data"
+      },
+      "erasure": {
+        "title": "Rett til sletting",
+        "description": "Be om sletting av dine personopplysninger under visse betingelser"
+      },
+      "restriction": {
+        "title": "Rett til begrensning av behandling",
+        "description": "Be om begrensning av behandling under visse omstendigheter"
+      },
+      "portability": {
+        "title": "Rett til dataportabilitet",
+        "description": "Be om overføring av dine data til en annen tjenesteleverandør"
+      },
+      "objection": {
+        "title": "Rett til innsigelse",
+        "description": "Motsette seg behandling basert på berettiget interesse eller direktemarkedsføring"
+      },
+      "exercising": {
+        "title": "Utøvelse av rettigheter",
+        "description": "For å utøve noen av disse rettighetene, kontakt oss på privacy@propertywise.no. Vi vil svare innen 30 dager."
+      }
+    },
+    "cookies": {
+      "title": "Informasjonskapsler og sporing",
+      "description": "Vi bruker informasjonskapsler og lignende teknologier for å forbedre din opplevelse:",
+      "essential": {
+        "title": "Nødvendige informasjonskapsler",
+        "description": "Nødvendige for grunnleggende sidefunksjonalitet og sikkerhet"
+      },
+      "functional": {
+        "title": "Funksjonelle informasjonskapsler",
+        "description": "Husker dine preferanser og innstillinger"
+      },
+      "analytics": {
+        "title": "Analyse-informasjonskapsler",
+        "description": "Hjelper oss å forstå hvordan du bruker tjenesten vår (med ditt samtykke)"
+      },
+      "management": "Du kan administrere informasjonskapsel-preferanser i nettleserinnstillingene eller gjennom vårt informasjonskapsel-banner."
+    },
+    "internationalTransfers": {
+      "title": "Internasjonale dataoverføringer",
+      "description": "Noen av våre tjenesteleverandører kan være lokalisert utenfor EU/EØS. When vi overfører data internasjonalt, sørger vi for at passende sikringstiltak er på plass.",
+      "safeguards": "Vi bruker standard kontraktsklausuler, tilstrekkelighetsbeslutninger eller andre godkjente overføringsmekanismer for å beskytte dine data under internasjonale overføringer."
+    },
+    "contact": {
+      "title": "Kontaktinformasjon",
+      "description": "For personvernrelaterte spørsmål eller for å utøve dine rettigheter, vennligst kontakt oss:",
+      "privacy": {
+        "title": "Personvernkontakt"
+      },
+      "authority": {
+        "title": "Datatilsynet",
+        "name": "Datatilsynet"
+      }
+    },
+    "changes": {
+      "title": "Endringer i denne personvernerklæringen",
+      "description": "Vi kan oppdatere denne personvernerklæringen fra tid til annen. Vi vil varsle deg om betydelige endringer via e-post eller gjennom tjenesten vår. Den oppdaterte erklæringen vil være gjeldende fra datoen for publisering."
+    },
+    "actions": {
+      "contactUs": "Kontakt oss",
+      "backToHome": "Tilbake til forsiden"
+    }
   }
 }
