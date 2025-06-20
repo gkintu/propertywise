@@ -4,6 +4,7 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { PropertyAnalysis } from '@/lib/types';
 import { TranslationFunction } from '@/lib/i18n-types';
+import { CheckCircleIcon, AlertTriangleIcon, HomeIcon, MapPinIcon, FileTextIcon, EyeIcon } from './icons';
 
 // Register fonts if needed (optional)
 // Font.register({
@@ -26,13 +27,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 15,
     borderBottom: '1 solid #E5E7EB',
-  },
-  brandIcon: {
-    width: 8,
-    height: 8,
-    backgroundColor: '#EAB308',
-    marginRight: 8,
-    borderRadius: 2,
+    gap: 8,
   },
   brandText: {
     fontSize: 16,
@@ -134,6 +129,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#065F46',
     marginBottom: 4,
+    flex: 1,
   },
   strongPointDescription: {
     fontSize: 11,
@@ -161,6 +157,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#991B1B',
     marginBottom: 4,
+    flex: 1,
   },
   concernDescription: {
     fontSize: 11,
@@ -219,15 +216,20 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
     <Page size="A4" style={styles.page}>
       {/* PropertyWise Header (matching web page) */}
       <View style={styles.brandHeader}>
-        <View style={styles.brandIcon} />
+        <HomeIcon size={16} color="#EAB308" />
         <Text style={styles.brandText}>PropertyWise</Text>
       </View>
 
       {/* Main Title */}
       <View>
-        <Text style={styles.mainTitle}>
-          {analysisData?.propertyDetails?.address || t('analysis.propertyAnalysisTitle')}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 4 }}>
+          <View style={{ marginTop: 2 }}>
+            <MapPinIcon size={24} color="#EAB308" />
+          </View>
+          <Text style={styles.mainTitle}>
+            {analysisData?.propertyDetails?.address || t('analysis.propertyAnalysisTitle')}
+          </Text>
+        </View>
         <Text style={styles.subtitle}>
           {t('analysis.reportGeneratedOn', { date: new Date().toLocaleDateString() })}
         </Text>
@@ -236,9 +238,14 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
       {/* Summary Card (if exists) */}
       {analysisData?.summary && (
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryCardTitle}>
-            {t('analysis.analysisSummaryTitle')}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 12 }}>
+            <View style={{ marginTop: 2 }}>
+              <FileTextIcon size={16} color="#111827" />
+            </View>
+            <Text style={styles.summaryCardTitle}>
+              {t('analysis.analysisSummaryTitle')}
+            </Text>
+          </View>
           <Text style={styles.summaryText}>
             {analysisData.summary}
           </Text>
@@ -262,17 +269,25 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
 
       {/* Key Findings Card (matching web page layout) */}
       <View style={styles.keyFindingsCard}>
-        <Text style={styles.keyFindingsTitle}>
-          {t('analysis.keyFindingsTitle')}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 16 }}>
+          <View style={{ marginTop: 2 }}>
+            <EyeIcon size={16} color="#374151" />
+          </View>
+          <Text style={styles.keyFindingsTitle}>
+            {t('analysis.keyFindingsTitle')}
+          </Text>
+        </View>
         
         <View style={styles.twoColumnLayout}>
           {/* Strong Points Column */}
           <View style={styles.strongPointsContainer}>
             <View style={styles.strongPointsHeader}>
-              <Text style={styles.strongPointsTitle}>
-                {t('analysis.strongSellingPoints')}
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <CheckCircleIcon size={16} color="#047857" />
+                <Text style={styles.strongPointsTitle}>
+                  {t('analysis.strongSellingPoints')}
+                </Text>
+              </View>
             </View>
             
             {analysisData?.strongPoints?.map((point, idx) => {
@@ -280,9 +295,12 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
               const spDescription = typeof point === 'string' ? '' : point.description;
               return (
                 <View key={idx} style={styles.strongPointItem}>
-                  <Text style={styles.strongPointTitle}>
-                    {spTitle}
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 4 }}>
+                    <CheckCircleIcon size={12} color="#059669" />
+                    <Text style={styles.strongPointTitle}>
+                      {spTitle}
+                    </Text>
+                  </View>
                   {spDescription && (
                     <Text style={styles.strongPointDescription}>
                       {spDescription}
@@ -296,9 +314,12 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
           {/* Concerns Column */}
           <View style={styles.concernsContainer}>
             <View style={styles.concernsHeader}>
-              <Text style={styles.concernsTitle}>
-                {t('analysis.areasOfConcern')}
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <AlertTriangleIcon size={16} color="#DC2626" />
+                <Text style={styles.concernsTitle}>
+                  {t('analysis.areasOfConcern')}
+                </Text>
+              </View>
             </View>
             
             {analysisData?.concerns?.map((concern, idx) => {
@@ -306,9 +327,12 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
               const concernDescription = typeof concern === 'string' ? '' : concern.description;
               return (
                 <View key={idx} style={styles.concernItem}>
-                  <Text style={styles.concernTitle}>
-                    {concernTitle}
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 4 }}>
+                    <AlertTriangleIcon size={12} color="#DC2626" />
+                    <Text style={styles.concernTitle}>
+                      {concernTitle}
+                    </Text>
+                  </View>
                   {concernDescription && (
                     <Text style={styles.concernDescription}>
                       {concernDescription}
@@ -325,7 +349,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
       {analysisData?.bottomLine && (
         <View style={styles.bottomLineAlert}>
           <View style={styles.bottomLineIcon}>
-            <Text style={{ fontSize: 12, color: '#CA8A04' }}>⚠</Text>
+            <AlertTriangleIcon size={14} color="#CA8A04" />
           </View>
           <View style={styles.bottomLineContent}>
             <Text style={styles.bottomLineTextBold}>
