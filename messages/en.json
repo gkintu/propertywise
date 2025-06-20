@@ -31,7 +31,7 @@
       "selectButton": "Select PDF Files",
       "uploadedFiles": "Uploaded Files",
       "analyzing": "Analyzing...",
-      "analyzeButton": "Analyze Documents",
+      "analyzeButton": "Analyze Document",
       "validation": {
         "multipleFilesDrop": "Please drop only one PDF file at a time.",
         "multipleFilesSelect": "Please select only one PDF file at a time.",
@@ -82,6 +82,7 @@
     "analysis": {
       "propertyAnalysisTitle": "Property Analysis",
       "analysisSummaryTitle": "Analysis Summary",
+      "reportGeneratedOn": "Report generated on {date}",
       "marketPosition": "Market Position:",
       "roomPropertyPriced": "-room {propertyType} priced at {price} NOK",
       "totalSize": "{size} sqm total",

@@ -31,7 +31,7 @@
       "selectButton": "Velg PDF-filer",
       "uploadedFiles": "Opplastede filer",
       "analyzing": "Analyserer...",
-      "analyzeButton": "Analyser dokumenter",
+      "analyzeButton": "Analyser dokument",
       "validation": {
         "multipleFilesDrop": "Vennligst slipp bare én PDF-fil om gangen.",
         "multipleFilesSelect": "Vennligst velg bare én PDF-fil om gangen.",
@@ -82,6 +82,7 @@
     "analysis": {
       "propertyAnalysisTitle": "Eiendomsanalyse",
       "analysisSummaryTitle": "Analysesammendrag",
+      "reportGeneratedOn": "Rapport generert {date}",
       "marketPosition": "Markedsposisjon:",
       "roomPropertyPriced": "-roms {propertyType} priset til {price} NOK",
       "totalSize": "{size} kvm totalt",
