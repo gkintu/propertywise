@@ -294,7 +294,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
               const spTitle = typeof point === 'string' ? point : point.title;
               const spDescription = typeof point === 'string' ? '' : point.description;
               return (
-                <View key={idx} style={styles.strongPointItem}>
+                <View key={idx} style={styles.strongPointItem} wrap={false}>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 4 }}>
                     <CheckCircleIcon size={12} color="#059669" />
                     <Text style={styles.strongPointTitle}>
@@ -326,7 +326,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
               const concernTitle = typeof concern === 'string' ? concern : concern.title;
               const concernDescription = typeof concern === 'string' ? '' : concern.description;
               return (
-                <View key={idx} style={styles.concernItem}>
+                <View key={idx} style={styles.concernItem} wrap={false}>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 4 }}>
                     <AlertTriangleIcon size={12} color="#DC2626" />
                     <Text style={styles.concernTitle}>
@@ -347,7 +347,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
 
       {/* Bottom Line Alert (matching yellow alert from web page) */}
       {analysisData?.bottomLine && (
-        <View style={styles.bottomLineAlert}>
+        <View style={styles.bottomLineAlert} wrap={false}>
           <View style={styles.bottomLineIcon}>
             <AlertTriangleIcon size={14} color="#CA8A04" />
           </View>
