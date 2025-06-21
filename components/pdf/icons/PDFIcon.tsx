@@ -19,7 +19,8 @@ export type IconName =
   | 'Success'
   | 'Error'
   | 'FileText'
-  | 'Eye';
+  | 'Eye'
+  | 'TrendingUp';
 
 interface PDFIconProps {
   name: IconName;
@@ -30,8 +31,7 @@ interface PDFIconProps {
 // Icon path data extracted from Lucide React icons
 const iconPaths: Record<IconName, { paths: string[]; viewBox?: string; circles?: Array<{cx: string, cy: string, r: string}>; rects?: Array<{x: string, y: string, width: string, height: string}> }> = {
   CheckCircle: {
-    paths: ['m9 12 2 2 4-4'],
-    circles: [{ cx: '12', cy: '12', r: '10' }],
+    paths: ['m9 12 2 2 4-4', 'M21.801 10A10 10 0 1 1 17 3.335'],
     viewBox: '0 0 24 24'
   },
   AlertTriangle: {
@@ -100,8 +100,12 @@ const iconPaths: Record<IconName, { paths: string[]; viewBox?: string; circles?:
     circles: [{ cx: '12', cy: '12', r: '10' }],
     viewBox: '0 0 24 24'
   },
+  TrendingUp: {
+    paths: ['M22 7 13.5 15.5 8.5 10.5 2 17', 'M16 7h6v6'],
+    viewBox: '0 0 24 24'
+  },
   FileText: {
-    paths: ['M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z', 'm14 2 6 6', 'M16 13H8', 'M16 17H8', 'M10 9H8'],
+    paths: ['M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z', 'M14 2v6h6'],
     viewBox: '0 0 24 24'
   },
   Eye: {

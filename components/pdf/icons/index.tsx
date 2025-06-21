@@ -50,3 +50,11 @@ export const FileTextIcon = ({ size = 16, color = '#3B82F6' }) => (
 export const EyeIcon = ({ size = 16, color = '#374151' }) => (
   <PDFIcon name="Eye" size={size} color={color} />
 );
+
+export const TrendingUpIcon = ({ size = 16, color = '#047857' }) => (
+  <PDFIcon name="TrendingUp" size={size} color={color} />
+);
+
+export const InfoIcon = ({ size = 16, color = '#991B1B' }) => (
+  <PDFIcon name="Info" size={size} color={color} />
+);

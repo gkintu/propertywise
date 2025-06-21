@@ -4,7 +4,7 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { PropertyAnalysis } from '@/lib/types';
 import { TranslationFunction } from '@/lib/i18n-types';
-import { CheckCircleIcon, AlertTriangleIcon, HomeIcon, MapPinIcon, FileTextIcon, EyeIcon } from './icons';
+import { CheckCircleIcon, AlertTriangleIcon, HomeIcon, MapPinIcon, FileTextIcon, EyeIcon, TrendingUpIcon, InfoIcon } from './icons';
 
 // Register fonts if needed (optional)
 // Font.register({
@@ -283,7 +283,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
           <View style={styles.strongPointsContainer}>
             <View style={styles.strongPointsHeader}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <CheckCircleIcon size={16} color="#047857" />
+                <TrendingUpIcon size={16} color="#047857" />
                 <Text style={styles.strongPointsTitle}>
                   {t('analysis.strongSellingPoints')}
                 </Text>
@@ -328,7 +328,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
               return (
                 <View key={idx} style={styles.concernItem} wrap={false}>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 4 }}>
-                    <AlertTriangleIcon size={12} color="#DC2626" />
+                    <InfoIcon size={12} color="#991B1B" />
                     <Text style={styles.concernTitle}>
                       {concernTitle}
                     </Text>
