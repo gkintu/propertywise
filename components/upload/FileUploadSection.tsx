@@ -131,15 +131,17 @@ export default function FileUploadSection({
       <div className={`text-center ${containerWidth === 'full' ? 'max-w-5xl' : 'max-w-4xl'} mx-auto`}>
         {showTitle && (
           <>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">{t('upload.title')}</h2>
-            <p className="text-lg text-gray-600 mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">{t('upload.title')}</h2>
+            <p className="text-lg text-gray-600 dark:text-[#D1D5DB] mb-8">
               {t('upload.subtitle')}
             </p>
           </>
         )}
         
         <Card className={`max-w-2xl mx-auto border-2 border-dashed transition-colors ${
-          dragActive ? 'border-yellow-400 bg-yellow-50' : 'border-yellow-200 hover:border-yellow-400'
+          dragActive 
+            ? 'border-yellow-400 bg-yellow-50 dark:border-yellow-500/50 dark:bg-gray-800/50' 
+            : 'border-yellow-200 hover:border-yellow-400 dark:border-gray-600 dark:hover:border-yellow-500/50 dark:bg-gray-800/50'
         }`}>
           <CardContent 
             className="p-12"
@@ -158,17 +160,17 @@ export default function FileUploadSection({
             }}
           >
             <div className="text-center">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Upload className="w-8 h-8 text-yellow-600" />
+              <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Upload className="w-8 h-8 text-yellow-600 dark:text-[#FBBF24]" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">{t('upload.dropText')}</h3>
-              <p className="text-gray-500 mb-4">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('upload.dropText')}</h3>
+              <p className="text-gray-500 dark:text-[#6B7280] mb-4">
                 or <span 
-                  className="text-yellow-600 font-medium cursor-pointer hover:text-yellow-700"
+                  className="text-yellow-600 dark:text-[#FBBF24] font-medium cursor-pointer hover:text-yellow-700 dark:hover:text-[#F59E0B] underline"
                   onClick={openFileDialog}
                 >{t('upload.browseText')}</span>
               </p>
-              <div className="text-sm text-gray-400">
+              <div className="text-sm text-gray-400 dark:text-[#6B7280]">
                 {t('upload.supportText')}
               </div>
               
@@ -184,7 +186,7 @@ export default function FileUploadSection({
               {/* Upload button */}
               <Button 
                 variant="outline" 
-                className="mt-6 border-yellow-200 text-yellow-600 hover:bg-yellow-50"
+                className="mt-6 border-yellow-200 dark:border-[#FBBF24] text-yellow-600 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#FBBF24] dark:hover:text-black font-medium"
                 onClick={openFileDialog}
                 aria-label={t('upload.selectButton')}
               >
@@ -197,16 +199,16 @@ export default function FileUploadSection({
         {/* Uploaded files display */}
         {uploadedFiles.length > 0 && (
           <div className="max-w-2xl mx-auto mt-6">
-            <h4 className="text-lg font-semibold text-gray-900 mb-4">{t('upload.uploadedFiles')}</h4>
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('upload.uploadedFiles')}</h4>
             <div className="space-y-3">
               {uploadedFiles.map((file, index) => (
-                <Card key={index} className="border border-gray-200">
+                <Card key={index} className="border border-gray-200 dark:border-gray-600 dark:bg-gray-800/50">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                        <div className="w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center">
                           <svg
-                            className="w-6 h-6 text-red-600"
+                            className="w-6 h-6 text-red-600 dark:text-red-400"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -221,8 +223,8 @@ export default function FileUploadSection({
                           </svg>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">{file.name}</p>
-                          <p className="text-sm text-gray-500">
+                          <p className="font-medium text-gray-900 dark:text-white">{file.name}</p>
+                          <p className="text-sm text-gray-500 dark:text-[#9CA3AF]">
                             {(file.size / 1024 / 1024).toFixed(2)} MB
                           </p>
                         </div>
@@ -231,7 +233,7 @@ export default function FileUploadSection({
                         variant="outline"
                         size="sm"
                         onClick={() => removeFile()}
-                        className="text-gray-500 hover:text-red-600"
+                        className="text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 dark:border-gray-600"
                         aria-label={`Remove ${file.name}`}
                       >
                         <X className="w-4 h-4" />
@@ -244,7 +246,7 @@ export default function FileUploadSection({
             
             <div className="mt-6 text-center">
               <Button
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 relative flex items-center justify-center"
+                className="bg-yellow-500 hover:bg-yellow-600 dark:bg-[#EAB308] dark:hover:bg-[#D97706] text-white dark:text-black font-medium px-8 relative flex items-center justify-center"
                 onClick={handleAnalyzeDocuments}
                 disabled={isLoading || uploadedFiles.length === 0}
               >
