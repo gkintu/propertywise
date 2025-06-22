@@ -27,6 +27,7 @@ import { PropertyAnalysis } from '@/lib/types';
 import { TranslationFunction } from '@/lib/i18n-types';
 import { AnalysisReportPDF } from '@/components/pdf/AnalysisReportPDF';
 import FileUploadSection from '@/components/upload/FileUploadSection';
+import { isFeatureEnabled } from '@/lib/feature-flags';
 
 // Helper function to extract JSON from text that might be wrapped in markdown or have extra formatting
 function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
@@ -212,9 +213,11 @@ export default function AnalysisResultPage() {
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
             </button>
             <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-                {t('headerBadge')}
-              </Badge>
+              {isFeatureEnabled('PROPERTY_LISTING') && (
+                <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+                  {t('headerBadge')}
+                </Badge>
+              )}
             </div>
           </div>
         </header>
@@ -246,9 +249,11 @@ export default function AnalysisResultPage() {
               <span className="text-xl font-bold text-gray-900">PropertyWise</span>
             </button>
             <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-                {t('headerBadge')}
-              </Badge>
+              {isFeatureEnabled('PROPERTY_LISTING') && (
+                <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
+                  {t('headerBadge')}
+                </Badge>
+              )}
             </div>
           </div>
         </header>

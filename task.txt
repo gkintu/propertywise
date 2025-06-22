@@ -1,18 +1,24 @@
+
 copy the function of this site and create a md file for my repo, leave out .env.local and everything listed in .gitignore and also unecessary files like history files etc; #fetch https://gitingest.com/
 
+# Task List
 
----
-Fix pdf break points, ta bilde og spør google ai studio 
-om mulige løsninger, ta me dtech stack fra package.json filen **
+## Completed Tasks ✅
 
+- [x] **Fix PDF break points** - Take screenshot and ask Google AI Studio for possible solutions, include tech stack from package.json file
+- [x] **Restrict uploads to housing report PDFs only** - Users should only be able to upload and analyze housing report PDFs
+- [x] **Implement structured JSON output** - Current system prompt tells the model to output structured JSON format
 
+## Pending Tasks 📋
 
-users should only be able to upload and analyze housing report
-pdf's
+- [ ] **Review JSON output best practices** - Reference: https://ai.google.dev/gemini-api/docs/structured-output for documentation
+- [ ] **Implement rate limiting and security features**
+- [ ] **Style improvements**
 
+## Reference Data 📊
 
-
-is the current system prompt thats telling the model to
-output a structured JSON fromat best practice ?
-reffrence #fetch https://ai.google.dev/gemini-api/docs/structured-output
-for documentation
+### Market Position Example:
+- Property type: 2-room apartment
+- Price: 1,950,000 NOK
+- Size: 51 sqm total
+- Built: 1971 
