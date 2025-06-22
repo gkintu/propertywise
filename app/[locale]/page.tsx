@@ -359,17 +359,17 @@ export default function Home({ params }: PageProps) {
         </section>
         
         {/* Footer */}
-        <footer className="py-8 border-t border-gray-200 bg-gray-50">
+        <footer className="py-8 border-t border-yellow-200/30 bg-gradient-to-b from-[#fffef2] to-yellow-50/30">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-700">
                 © 2025 PropertyWise AS. {f('rights')}
               </div>
               <div className="flex gap-6 text-sm">
-                <Link href={`/${locale}/privacy`} className="text-blue-600 hover:underline">
+                <Link href={`/${locale}/privacy`} className="text-yellow-600 hover:text-yellow-700 hover:underline transition-colors">
                   {f('privacy')}
                 </Link>
-                <a href="mailto:support@propertywise.no" className="text-gray-600 hover:text-gray-800">
+                <a href="mailto:support@propertywise.no" className="text-gray-700 hover:text-gray-900 transition-colors">
                   {f('contact')}
                 </a>
               </div>
