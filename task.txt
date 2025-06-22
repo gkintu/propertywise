@@ -1,9 +1,13 @@
+copy the function of this site and create a md file for my repo, leave out .env.local and everything listed in .gitignore and also unecessary files like history files etc; #fetch https://gitingest.com/
+
+
+---
 Fix pdf break points, ta bilde og spør google ai studio 
-om mulige løsninger, ta me dtech stack fra package.json filen
+om mulige løsninger, ta me dtech stack fra package.json filen **
 
 
 
-users should only be able to upload and analyze hosuing report
+users should only be able to upload and analyze housing report
 pdf's
 
 
