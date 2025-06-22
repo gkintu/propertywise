@@ -5,15 +5,16 @@
 
 ## 📋 Project Overview
 
-This is a **Next.js 15** application with **TypeScript** that implements a PDF document analysis system using **Google Gemini AI**. The project features **internationalization (i18n)** support with English and Norwegian locales, modern UI components built with **Radix UI** and **Tailwind CSS**, and PDF processing capabilities.
+This is a **Next.js 15** application with **TypeScript** that implements a property analysis system using **Google Gemini AI**. The project features **internationalization (i18n)** support with English and Norwegian locales, modern UI components built with **Radix UI** and **Tailwind CSS**, and PDF processing capabilities with structured AI analysis specifically designed for property documents.
 
 ### Key Features
-- 📄 PDF document upload and AI-powered analysis
-- 🌍 Multi-language support (English/Norwegian)
+- 📄 PDF document upload and AI-powered property analysis using structured schema
+- 🌍 Multi-language support (English/Norwegian) with language-specific AI responses
 - 🎨 Modern UI with shadcn/ui components
 - ⚡ Next.js 15 with App Router
-- 🤖 Google Gemini AI integration
+- 🤖 Google Gemini AI integration with structured JSON output
 - 📱 Responsive design with Tailwind CSS
+- 🏠 Property analysis with categorized insights (strong points, concerns, recommendations)
 
 ---
 
@@ -348,13 +349,111 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid file type. Only PDFs are allowed.' }, { status: 400 });
     }
 
-    // Process PDF with Gemini AI
-    // ... (167 total lines with AI processing logic)
+    // Convert file to buffer and create PDF part for Gemini
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const pdfPart = {
+      inlineData: {
+        data: fileBuffer.toString('base64'),
+        mimeType: file.type,
+      },
+    };
+
+    // Determine language instruction for AI prompt
+    const languageInstruction = language === 'no' 
+      ? 'Respond in Norwegian (Bokmål). All text fields including titles, descriptions, and the summary should be in Norwegian.'
+      : 'Respond in English. All text fields should be in English.';
+
+    // Define structured output schema for property analysis
+    const propertyAnalysisSchema = {
+      type: "object",
+      properties: {
+        propertyDetails: {
+          type: "object",
+          properties: {
+            address: { type: "string", description: "Full property address" },
+            bedrooms: { type: "number", description: "Number of bedrooms" },
+            price: { type: "number", description: "Price in NOK" },
+            size: { type: "number", description: "Size in square meters" },
+            yearBuilt: { type: "number", description: "Year the property was built" },
+            propertyType: { 
+              type: "string", 
+              enum: ["apartment", "house", "condo"],
+              description: "Type of property" 
+            }
+          },
+          required: ["address", "propertyType"]
+        },
+        strongPoints: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              title: { type: "string", description: "Brief title of the strong point" },
+              description: { type: "string", description: "Detailed description" },
+              category: { 
+                type: "string", 
+                enum: ["kitchen", "location", "fees", "outdoor", "storage", "condition", "other"]
+              }
+            },
+            required: ["title", "description", "category"]
+          }
+        },
+        concerns: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              title: { type: "string", description: "Brief title of the concern" },
+              description: { type: "string", description: "Detailed description" },
+              severity: { 
+                type: "string", 
+                enum: ["low", "medium", "high"]
+              },
+              estimatedCost: { type: "string", description: "Estimated cost to address (optional)" },
+              category: { 
+                type: "string", 
+                enum: ["electrical", "structural", "safety", "pest", "maintenance", "age", "other"]
+              }
+            },
+            required: ["title", "description", "severity", "category"]
+          }
+        },
+        bottomLine: { type: "string", description: "Overall recommendation and key points" },
+        summary: { type: "string", description: "Brief overview of the property analysis" }
+      },
+      required: ["propertyDetails", "strongPoints", "concerns", "bottomLine", "summary"]
+    };
+
+    // Call Gemini API with structured output schema
+    const response = await genai.models.generateContent({
+      model: 'gemini-2.5-flash-lite-preview-06-17',
+      contents: [
+        { text: `You are an AI assistant specialized in analyzing property reports. Given the attached PDF property document, extract key information and provide structured analysis.\n\n${languageInstruction}\n\nFocus on actionable insights for a potential buyer. If you cannot extract structured data from the document, provide a brief summary in the summary field.` },
+        pdfPart
+      ],
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: propertyAnalysisSchema,
+        thinkingConfig: {
+          thinkingBudget: 0, // Disables thinking for faster response
+        },
+      },
+    });
+
+    const aiSummary = response.text;
+    if (!aiSummary) {
+      return NextResponse.json({ error: 'AI failed to generate a summary.' }, { status: 500 });
+    }
+
+    // Parse structured JSON response
+    const parsedAnalysis = JSON.parse(aiSummary);
+    return NextResponse.json({ analysis: parsedAnalysis });
+    
   } catch (error) {
-    console.error('Error in PDF analysis API:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error occurred during PDF analysis.' 
-    }, { status: 500 });
+    console.error('Error in /api/analyze-pdf:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return NextResponse.json({ error: `Failed to process file: ${errorMessage}` }, { status: 500 });
   }
 }
 ```
@@ -609,12 +708,14 @@ npm run lint     # Run ESLint
 ## 🔍 Key Technical Insights
 
 1. **Modern Next.js Architecture**: Uses App Router with Server/Client Components
-2. **AI Integration**: Google Gemini API for PDF document analysis
-3. **Internationalization**: Full i18n support with next-intl
-4. **Type Safety**: Comprehensive TypeScript implementation
-5. **Modern UI**: shadcn/ui components with Radix UI primitives
-6. **File Handling**: Drag-and-drop PDF upload with validation
-7. **Error Handling**: Comprehensive error management throughout the app
-8. **Responsive Design**: Mobile-first approach with Tailwind CSS
+2. **AI Integration**: Google Gemini API with structured JSON schema for property analysis
+3. **Property Analysis Schema**: Structured output with property details, strong points, concerns, and recommendations
+4. **Internationalization**: Full i18n support with language-specific AI responses
+5. **Type Safety**: Comprehensive TypeScript implementation
+6. **Modern UI**: shadcn/ui components with Radix UI primitives
+7. **File Handling**: Drag-and-drop PDF upload with validation
+8. **Error Handling**: Comprehensive error management throughout the app
+9. **Responsive Design**: Mobile-first approach with Tailwind CSS
+10. **Structured AI Output**: Uses Gemini's responseSchema for consistent JSON responses
 
 This digest represents the complete codebase structure and key functionality, optimized for LLM consumption and development assistance.

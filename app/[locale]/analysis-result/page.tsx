@@ -19,12 +19,14 @@ import {
   TrendingUp,
   CheckCircle,
   Info,
-  Download
+  Download,
+  Upload
 } from 'lucide-react';
 import { pdf } from '@react-pdf/renderer';
 import { PropertyAnalysis } from '@/lib/types';
 import { TranslationFunction } from '@/lib/i18n-types';
 import { AnalysisReportPDF } from '@/components/pdf/AnalysisReportPDF';
+import FileUploadSection from '@/components/upload/FileUploadSection';
 
 // Helper function to extract JSON from text that might be wrapped in markdown or have extra formatting
 function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
@@ -106,12 +108,16 @@ export default function AnalysisResultPage() {
   const [summaryData, setSummaryData] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<string | null>(null);
   const [dataSource, setDataSource] = useState<string>('');
+  const [showUpload, setShowUpload] = useState(false);
+  const [showAnalyzeUpload, setShowAnalyzeUpload] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const storedAnalysis = localStorage.getItem('analysisResult');
     const storedError = localStorage.getItem('analysisError');
+    const storedErrorType = localStorage.getItem('analysisErrorType');
     
     if (storedAnalysis && storedAnalysis !== 'undefined' && storedAnalysis !== 'null') {
       try {
@@ -181,6 +187,7 @@ export default function AnalysisResultPage() {
       }
     } else if (storedError && storedError !== 'undefined' && storedError !== 'null') {
       setError(storedError);
+      setErrorType(storedErrorType || 'processing_error');
       setDataSource('Stored Error');
     } else {
       // No valid data found
@@ -253,33 +260,64 @@ export default function AnalysisResultPage() {
                 <AlertTriangle className="w-8 h-8 text-red-600" />
               </div>
               <CardTitle className="text-2xl text-red-600">
-                {error ? t('error.analysisFailedTitle') : t('error.analysisNotFoundTitle')}
+                {errorType === 'invalid_document_type' ? t('error.invalidDocumentTitle') :
+                 errorType === 'insufficient_property_data' ? t('error.insufficientDataTitle') :
+                 errorType === 'classification_error' ? t('error.classificationErrorTitle') :
+                 errorType === 'processing_error' ? t('error.processingErrorTitle') :
+                 error ? t('error.analysisFailedTitle') : t('error.analysisNotFoundTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center">
               <p className="text-gray-700 mb-6">
-                {error || t('error.noResultMessage')}
+                {errorType === 'invalid_document_type' ? t('error.invalidDocumentMessage') :
+                 errorType === 'insufficient_property_data' ? t('error.insufficientDataMessage') :
+                 errorType === 'classification_error' ? t('error.classificationErrorMessage') :
+                 errorType === 'processing_error' ? t('error.processingErrorMessage') :
+                 error || t('error.noResultMessage')}
               </p>
-              
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 text-left">
-                <h4 className="font-semibold text-gray-700 mb-2">{t('error.debugInfo')}</h4>
-                <p className="text-sm text-gray-600">{t('error.dataSource')} {dataSource}</p>
-                <p className="text-sm text-gray-600">{t('error.expected')}</p>
-              </div>
 
-              <Button 
-                onClick={() => {
-                  localStorage.removeItem('analysisResult');
-                  localStorage.removeItem('analysisError');
-                  router.push('/');
-                }} 
-                className="bg-yellow-500 hover:bg-yellow-600 text-white"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                {t('error.goBackButton')}
-              </Button>
+              <div className="flex gap-3 justify-center">
+                <Button 
+                  onClick={() => {
+                    localStorage.removeItem('analysisResult');
+                    localStorage.removeItem('analysisError');
+                    localStorage.removeItem('analysisErrorType');
+                    router.push('/');
+                  }} 
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  {t('error.goBackButton')}
+                </Button>
+                
+                {(errorType === 'invalid_document_type' || errorType === 'insufficient_property_data') && (
+                  <Button 
+                    onClick={() => setShowUpload(true)} 
+                    variant="outline"
+                  >
+                    {t('error.tryAgainButton')}
+                  </Button>
+                )}
+              </div>
             </CardContent>
           </Card>
+          
+          {/* Show upload section when user clicks "Try Again" */}
+          {showUpload && (
+            <div className="mt-8 w-full">
+              <FileUploadSection 
+                showTitle={false}
+                containerWidth="full"
+                onAnalysisStart={() => {
+                  setShowUpload(false);
+                  setIsLoading(true);
+                }}
+                onAnalysisComplete={() => {
+                  setIsLoading(false);
+                }}
+              />
+            </div>
+          )}
         </div>
       </div>
     );
@@ -432,11 +470,20 @@ export default function AnalysisResultPage() {
               onClick={() => {
                 localStorage.removeItem('analysisResult');
                 localStorage.removeItem('analysisError');
+                localStorage.removeItem('analysisErrorType');
                 router.push('/');
               }} 
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
+              variant="outline"
+              className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
+              {t('analysis.goBackHomeButton')}
+            </Button>
+            <Button 
+              onClick={() => setShowAnalyzeUpload(true)} 
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
+            >
+              <Upload className="w-4 h-4 mr-2" />
               {t('analysis.analyzeAnotherButton')}
             </Button>
             <Button 
@@ -450,6 +497,24 @@ export default function AnalysisResultPage() {
           </div>
 
           <Separator className="my-8" />
+          
+          {/* Show upload section when user clicks "Analyze Another Document" */}
+          {showAnalyzeUpload && (
+            <div className="mb-8">
+              <FileUploadSection 
+                showTitle={false}
+                containerWidth="full"
+                onAnalysisStart={() => {
+                  setShowAnalyzeUpload(false);
+                  setIsLoading(true);
+                }}
+                onAnalysisComplete={() => {
+                  setIsLoading(false);
+                }}
+              />
+            </div>
+          )}
+          
           <Card className="border-red-200 bg-red-50" data-pdf-exclude="true">
             <CardHeader>
               <CardTitle className="text-red-700 text-lg">{t('analysis.debugTitle')}</CardTitle>
@@ -548,17 +613,30 @@ export default function AnalysisResultPage() {
               onClick={() => {
                 localStorage.removeItem('analysisResult');
                 localStorage.removeItem('analysisError');
+                localStorage.removeItem('analysisErrorType');
                 router.push('/');
               }} 
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
+              variant="outline"
+              className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              {t('summary.tryAgainButton')}
+              {t('summary.goBackHomeButton')}
+            </Button>
+            <Button 
+              onClick={() => setShowAnalyzeUpload(true)} 
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              {t('summary.analyzeAnotherButton')}
             </Button>
             <Button 
               variant="outline" 
               className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
-              onClick={() => analysisData && downloadAsPDF(analysisData, t)}
+              onClick={() => {
+                // For summary data, we can't generate a proper PDF since we don't have structured data
+                toast.error(t('summary.pdfNotAvailableMessage'));
+              }}
+              disabled={true}
             >
               <Download className="w-4 h-4 mr-2" />
               {t('summary.downloadPdfButton')}
@@ -566,6 +644,24 @@ export default function AnalysisResultPage() {
           </div>
 
           <Separator className="my-8" />
+          
+          {/* Show upload section when user clicks "Analyze Another Document" */}
+          {showAnalyzeUpload && (
+            <div className="mb-8">
+              <FileUploadSection 
+                showTitle={false}
+                containerWidth="full"
+                onAnalysisStart={() => {
+                  setShowAnalyzeUpload(false);
+                  setIsLoading(true);
+                }}
+                onAnalysisComplete={() => {
+                  setIsLoading(false);
+                }}
+              />
+            </div>
+          )}
+          
           <Card className="border-red-200 bg-red-50" data-pdf-exclude="true">
             <CardHeader>
               <CardTitle className="text-red-700 text-lg">{t('summary.debugTitle')}</CardTitle>

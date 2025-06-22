@@ -74,10 +74,16 @@
       "analysisFailedTitle": "Analysis Failed",
       "analysisNotFoundTitle": "Analysis Not Found",
       "noResultMessage": "No analysis result was found. This might happen if you navigated to this page directly or if there was an issue retrieving the result.",
-      "debugInfo": "Debug Information:",
-      "dataSource": "Data Source:",
-      "expected": "Expected: Structured JSON with PropertyAnalysis format",
-      "goBackButton": "Go Back to Upload"
+      "invalidDocumentTitle": "Invalid Document Type",
+      "invalidDocumentMessage": "This does not appear to be a property report. Please upload the correct document.",
+      "insufficientDataTitle": "Insufficient Property Data", 
+      "insufficientDataMessage": "Could not find enough property information in the document. Please ensure the document contains property details like address, price, and property description.",
+      "classificationErrorTitle": "Document Analysis Error",
+      "classificationErrorMessage": "There was an error analyzing your document. Please try uploading again.",
+      "processingErrorTitle": "Processing Error",
+      "processingErrorMessage": "There was an error processing your document. Please try again or contact support if the problem persists.",
+      "goBackButton": "Go Back Home",
+      "tryAgainButton": "Try Again"
     },
     "analysis": {
       "propertyAnalysisTitle": "Property Analysis",
@@ -92,6 +98,7 @@
       "areasOfConcern": "Areas of Concern",
       "bottomLine": "Bottom Line:",
       "analyzeAnotherButton": "Analyze Another Document",
+      "goBackHomeButton": "Go Back Home",
       "downloadPdfButton": "Download PDF",
       "pdfGeneratedSuccess": "PDF generated successfully!",
       "pdfGenerationError": "Failed to generate PDF. Please try again.",
@@ -107,8 +114,10 @@
       "propertySummaryTitle": "Property Analysis Summary",
       "tipTitle": "Tip:",
       "tipMessage": "For a more detailed analysis with specific strong points and areas of concern, try uploading your document again. Our AI will attempt to provide a more structured analysis.",
-      "tryAgainButton": "Try Analysis Again",
+      "goBackHomeButton": "Go Back Home",
+      "analyzeAnotherButton": "Analyze Another Document",
       "downloadPdfButton": "Download PDF",
+      "pdfNotAvailableMessage": "PDF download is not available for summary format. Please analyze your document again for a structured report.",
       "debugTitle": "🚧 Debug Data (Remove before deployment)",
       "rawSummaryData": "Raw Summary Data:"
     }
