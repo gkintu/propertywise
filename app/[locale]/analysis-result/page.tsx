@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from 'next/navigation';
@@ -27,7 +26,8 @@ import { PropertyAnalysis } from '@/lib/types';
 import { TranslationFunction } from '@/lib/i18n-types';
 import { AnalysisReportPDF } from '@/components/pdf/AnalysisReportPDF';
 import FileUploadSection from '@/components/upload/FileUploadSection';
-import { isFeatureEnabled } from '@/lib/feature-flags';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { PropertyListingBadge } from '@/components/ui/property-listing-badge';
 
 // Helper function to extract JSON from text that might be wrapped in markdown or have extra formatting
 function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
@@ -200,8 +200,8 @@ export default function AnalysisResultPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
-        <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
+      <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white dark:from-[#111827] dark:to-[#1F2937]">
+        <header className="sticky top-0 z-50 bg-white/85 dark:bg-[#111827]/85 backdrop-blur-sm border-b border-gray-200/30 dark:border-[#374151]/50 px-4 py-3">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <button 
               onClick={() => router.push('/')} 
@@ -210,24 +210,21 @@ export default function AnalysisResultPage() {
               <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
                 <HomeIcon className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">PropertyWise</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-[#F9FAFB]">PropertyWise</span>
             </button>
             <div className="flex items-center gap-4">
-              {isFeatureEnabled('PROPERTY_LISTING') && (
-                <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-                  {t('headerBadge')}
-                </Badge>
-              )}
+              <ThemeToggle />
+              <PropertyListingBadge />
             </div>
           </div>
         </header>
         
         <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
           <div className="text-center">
-            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-              <FileText className="w-12 h-12 text-yellow-600" />
+            <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-950/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+              <FileText className="w-12 h-12 text-yellow-600 dark:text-[#FBBF24]" />
             </div>
-            <p className="text-xl text-gray-600">{t('loading.loadingText')}</p>
+            <p className="text-xl text-gray-600 dark:text-[#D1D5DB]">{t('loading.loadingText')}</p>
           </div>
         </div>
       </div>
@@ -236,8 +233,8 @@ export default function AnalysisResultPage() {
 
   if (error || (!analysisData && !summaryData)) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
-        <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
+      <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white dark:from-[#111827] dark:to-[#1F2937]">
+        <header className="sticky top-0 z-50 bg-white/85 dark:bg-[#111827]/85 backdrop-blur-sm border-b border-gray-200/30 dark:border-[#374151]/50 px-4 py-3">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <button 
               onClick={() => router.push('/')} 
@@ -246,25 +243,22 @@ export default function AnalysisResultPage() {
               <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
                 <HomeIcon className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">PropertyWise</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-[#F9FAFB]">PropertyWise</span>
             </button>
             <div className="flex items-center gap-4">
-              {isFeatureEnabled('PROPERTY_LISTING') && (
-                <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-                  {t('headerBadge')}
-                </Badge>
-              )}
+              <ThemeToggle />
+              <PropertyListingBadge />
             </div>
           </div>
         </header>
 
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] p-4">
-          <Card className="w-full max-w-2xl border-2 border-yellow-200">
+          <Card className="w-full max-w-2xl border-2 border-yellow-200 dark:border-yellow-800/50 dark:bg-[#1F2937]">
             <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle className="w-8 h-8 text-red-600" />
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-950/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle className="w-8 h-8 text-red-600 dark:text-red-400" />
               </div>
-              <CardTitle className="text-2xl text-red-600">
+              <CardTitle className="text-2xl text-red-600 dark:text-red-400">
                 {errorType === 'invalid_document_type' ? t('error.invalidDocumentTitle') :
                  errorType === 'insufficient_property_data' ? t('error.insufficientDataTitle') :
                  errorType === 'classification_error' ? t('error.classificationErrorTitle') :
@@ -273,7 +267,7 @@ export default function AnalysisResultPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center">
-              <p className="text-gray-700 mb-6">
+              <p className="text-gray-700 dark:text-[#D1D5DB] mb-6">
                 {errorType === 'invalid_document_type' ? t('error.invalidDocumentMessage') :
                  errorType === 'insufficient_property_data' ? t('error.insufficientDataMessage') :
                  errorType === 'classification_error' ? t('error.classificationErrorMessage') :
@@ -289,7 +283,8 @@ export default function AnalysisResultPage() {
                     localStorage.removeItem('analysisErrorType');
                     router.push('/');
                   }} 
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                  size="lg"
+                  className="bg-yellow-500 hover:bg-[#FACC15] text-white dark:text-[#111827]"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   {t('error.goBackButton')}
@@ -298,7 +293,9 @@ export default function AnalysisResultPage() {
                 {(errorType === 'invalid_document_type' || errorType === 'insufficient_property_data') && (
                   <Button 
                     onClick={() => setShowUpload(true)} 
+                    size="lg"
                     variant="outline"
+                    className="border-yellow-200 dark:border-[#CA8A04] text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#374151]"
                   >
                     {t('error.tryAgainButton')}
                   </Button>
@@ -331,8 +328,8 @@ export default function AnalysisResultPage() {
   // Render structured data (preferred)
   if (analysisData) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
-        <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
+      <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white dark:from-[#111827] dark:to-[#1F2937]">
+        <header className="sticky top-0 z-50 bg-white/85 dark:bg-[#111827]/85 backdrop-blur-sm border-b border-gray-200/30 dark:border-[#374151]/50 px-4 py-3">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <button 
               onClick={() => router.push('/')} 
@@ -341,35 +338,34 @@ export default function AnalysisResultPage() {
               <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
                 <HomeIcon className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">PropertyWise</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-[#F9FAFB]">PropertyWise</span>
             </button>
             <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-                {t('headerBadge')}
-              </Badge>
+              <ThemeToggle />
+              <PropertyListingBadge />
             </div>
           </div>
         </header>
 
         <main className="max-w-5xl mx-auto px-4 py-8">
           <div className="mb-8 pt-4">
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <MapPin className="w-7 h-7 mr-3 text-yellow-600" />
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-[#F9FAFB] flex items-center">
+              <MapPin className="w-7 h-7 mr-3 text-yellow-600 dark:text-[#FBBF24]" />
               {analysisData?.propertyDetails?.address || t('analysis.propertyAnalysisTitle')}
             </h1>
           </div>
 
           {analysisData?.summary && (
-            <Card className="mb-6">
+            <Card className="mb-6 dark:bg-[#1F2937] dark:border-[#374151]">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 dark:text-[#F9FAFB]">
                   <FileText className="w-5 h-5" />
                   {t('analysis.analysisSummaryTitle')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="prose prose-gray max-w-none">
-                  <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                <div className="prose prose-gray dark:prose-invert max-w-none">
+                  <p className="text-gray-700 dark:text-[#D1D5DB] leading-relaxed whitespace-pre-wrap">
                     {analysisData.summary}
                   </p>
                 </div>
@@ -378,9 +374,9 @@ export default function AnalysisResultPage() {
           )}
 
           {analysisData?.propertyDetails && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-              <p className="text-sm font-medium text-blue-900 mb-2">{t('analysis.marketPosition')}</p>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-blue-800">
+            <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/50 rounded-lg p-4 mb-8">
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">{t('analysis.marketPosition')}</p>
+              <div className="flex flex-wrap items-center gap-4 text-sm text-blue-800 dark:text-blue-200">
                 <span className="font-medium">
                   {analysisData.propertyDetails.bedrooms}{t('analysis.roomPropertyPriced', {
                     propertyType: analysisData.propertyDetails.propertyType,
@@ -395,10 +391,10 @@ export default function AnalysisResultPage() {
             </div>
           )}
 
-          <Card className="mb-6 border-gray-200 bg-white">
+          <Card className="mb-6 border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1F2937]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Eye className="w-5 h-5 text-gray-600 flex-shrink-0" />
+              <CardTitle className="flex items-center gap-2 dark:text-[#F9FAFB]">
+                <Eye className="w-5 h-5 text-gray-600 dark:text-[#D1D5DB] flex-shrink-0" />
                 {t('analysis.keyFindingsTitle')}
               </CardTitle>
             </CardHeader>
@@ -406,21 +402,21 @@ export default function AnalysisResultPage() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <span className="text-green-700 text-lg font-semibold">{t('analysis.strongSellingPoints')}</span>
+                    <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                    <span className="text-green-700 dark:text-green-300 text-lg font-semibold">{t('analysis.strongSellingPoints')}</span>
                   </div>
                   <div className="space-y-2">
                     {analysisData?.strongPoints?.map((point, idx) => {
                       const spTitle = typeof point === 'string' ? point : point.title;
                       const spDescription = typeof point === 'string' ? '' : point.description;
                       return (
-                        <div key={idx} className="bg-green-50 p-3 rounded border border-green-200">
-                          <div className="flex items-start gap-2 text-green-800">
-                            <CheckCircle className="w-5 h-5 text-green-800 flex-shrink-0 mt-0.5" />
+                        <div key={idx} className="bg-green-50 dark:bg-green-950/20 p-3 rounded border border-green-200 dark:border-green-800/50">
+                          <div className="flex items-start gap-2 text-green-800 dark:text-green-200">
+                            <CheckCircle className="w-5 h-5 text-green-800 dark:text-green-400 flex-shrink-0 mt-0.5" />
                             <div className="flex-1">
-                              <div className="font-bold text-green-900">{spTitle}</div>
+                              <div className="font-bold text-green-900 dark:text-green-100">{spTitle}</div>
                               {spDescription && (
-                                <div className="text-black mt-1">{spDescription}</div>
+                                <div className="text-black dark:text-[#D1D5DB] mt-1">{spDescription}</div>
                               )}
                             </div>
                           </div>
@@ -432,21 +428,21 @@ export default function AnalysisResultPage() {
 
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
-                    <span className="text-red-700 text-lg font-semibold">{t('analysis.areasOfConcern')}</span>
+                    <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                    <span className="text-red-700 dark:text-red-300 text-lg font-semibold">{t('analysis.areasOfConcern')}</span>
                   </div>
                   <div className="space-y-2">
                     {analysisData?.concerns?.map((concern, idx) => {
                       const concernTitle = typeof concern === 'string' ? concern : concern.title;
                       const concernDescription = typeof concern === 'string' ? '' : concern.description;
                       return (
-                        <div key={idx} className="bg-red-50 p-3 rounded border border-red-200">
-                          <div className="flex items-start gap-2 text-red-800">
-                            <Info className="w-5 h-5 text-red-800 flex-shrink-0 mt-0.5" />
+                        <div key={idx} className="bg-red-50 dark:bg-red-950/20 p-3 rounded border border-red-200 dark:border-red-800/50">
+                          <div className="flex items-start gap-2 text-red-800 dark:text-red-200">
+                            <Info className="w-5 h-5 text-red-800 dark:text-red-400 flex-shrink-0 mt-0.5" />
                             <div className="flex-1">
-                              <div className="font-bold text-red-900">{concernTitle}</div>
+                              <div className="font-bold text-red-900 dark:text-red-100">{concernTitle}</div>
                               {concernDescription && (
-                                <div className="text-black mt-1">{concernDescription}</div>
+                                <div className="text-black dark:text-[#D1D5DB] mt-1">{concernDescription}</div>
                               )}
                             </div>
                           </div>
@@ -460,15 +456,16 @@ export default function AnalysisResultPage() {
           </Card>
 
           {analysisData?.bottomLine && (
-            <Alert className="mb-6 border-yellow-200 bg-yellow-50">
-              <AlertTriangle className="w-4 h-4 text-yellow-600" />
-              <AlertDescription className="text-yellow-800">
-                <strong>{t('analysis.bottomLine')}</strong> {analysisData.bottomLine}
+            <Alert className="mb-6 border-yellow-200 dark:border-yellow-800/50 bg-yellow-50 dark:bg-yellow-950/20">
+              <AlertTriangle className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+              <AlertDescription>
+                <strong className="text-yellow-700 dark:text-[#FBBF24]">{t('analysis.bottomLine')}</strong>{' '}
+                <span className="text-[#ffc657] dark:text-[#ffc657]">{analysisData.bottomLine}</span>
               </AlertDescription>
             </Alert>
           )}
 
-          <Separator className="my-8" />
+          <Separator className="my-8 dark:bg-[#374151]" />
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center" data-pdf-exclude="true">
             <Button 
@@ -478,22 +475,25 @@ export default function AnalysisResultPage() {
                 localStorage.removeItem('analysisErrorType');
                 router.push('/');
               }} 
+              size="lg"
               variant="outline"
-              className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
+              className="px-8 border-yellow-200 dark:border-[#CA8A04] text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#374151]"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               {t('analysis.goBackHomeButton')}
             </Button>
             <Button 
               onClick={() => setShowAnalyzeUpload(true)} 
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
+              size="lg"
+              className="bg-yellow-500 hover:bg-[#FACC15] text-white dark:text-[#111827] px-8"
             >
               <Upload className="w-4 h-4 mr-2" />
               {t('analysis.analyzeAnotherButton')}
             </Button>
             <Button 
+              size="lg"
               variant="outline" 
-              className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
+              className="px-8 border-yellow-200 dark:border-[#CA8A04] text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#374151]"
               onClick={() => analysisData && downloadAsPDF(analysisData, t)}
             >
               <Download className="w-4 h-4 mr-2" />
@@ -501,7 +501,7 @@ export default function AnalysisResultPage() {
             </Button>
           </div>
 
-          <Separator className="my-8" />
+          <Separator className="my-8 dark:bg-[#374151]" />
           
           {/* Show upload section when user clicks "Analyze Another Document" */}
           {showAnalyzeUpload && (
@@ -520,15 +520,15 @@ export default function AnalysisResultPage() {
             </div>
           )}
           
-          <Card className="border-red-200 bg-red-50" data-pdf-exclude="true">
+          <Card className="border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20" data-pdf-exclude="true">
             <CardHeader>
-              <CardTitle className="text-red-700 text-lg">{t('analysis.debugTitle')}</CardTitle>
+              <CardTitle className="text-red-700 dark:text-red-300 text-lg">{t('analysis.debugTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-red-700 mb-2">{t('analysis.rawAnalysisData')}</h4>
-                  <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
+                  <h4 className="font-semibold text-red-700 dark:text-red-300 mb-2">{t('analysis.rawAnalysisData')}</h4>
+                  <pre className="bg-white dark:bg-[#111827] p-3 rounded border text-xs overflow-x-auto max-h-60 dark:text-[#D1D5DB]">
                     {JSON.stringify(analysisData, null, 2)}
                   </pre>
                 </div>
@@ -543,8 +543,8 @@ export default function AnalysisResultPage() {
   // Render summary fallback (when AI didn't return structured JSON)
   if (summaryData) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white">
-        <header className="sticky top-0 z-50 bg-white/85 backdrop-blur-sm border-b border-gray-200/30 px-4 py-3">
+      <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white dark:from-[#111827] dark:to-[#1F2937]">
+        <header className="sticky top-0 z-50 bg-white/85 dark:bg-[#111827]/85 backdrop-blur-sm border-b border-gray-200/30 dark:border-[#374151]/50 px-4 py-3">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <button 
               onClick={() => router.push('/')} 
@@ -553,65 +553,64 @@ export default function AnalysisResultPage() {
               <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
                 <HomeIcon className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">PropertyWise</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-[#F9FAFB]">PropertyWise</span>
             </button>
             <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-200">
-                {t('headerBadge')}
-              </Badge>
+              <ThemeToggle />
+              <PropertyListingBadge />
             </div>
           </div>
         </header>
 
         <main className="max-w-5xl mx-auto px-4 py-8">
           <div className="mb-8 pt-4">
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-              <MapPin className="w-7 h-7 mr-3 text-yellow-600" />
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-[#F9FAFB] flex items-center">
+              <MapPin className="w-7 h-7 mr-3 text-yellow-600 dark:text-[#FBBF24]" />
               {t('summary.propertyAnalysisReportTitle')}
             </h1>
           </div>
 
-          <Alert className="mb-6 border-orange-200 bg-orange-50">
-            <AlertTriangle className="w-4 h-4 text-orange-600" />
-            <AlertDescription className="text-orange-800">
+          <Alert className="mb-6 border-orange-200 dark:border-orange-800/50 bg-orange-50 dark:bg-orange-950/20">
+            <AlertTriangle className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+            <AlertDescription className="text-orange-800 dark:text-orange-200">
               <strong>{t('summary.limitedAnalysisTitle')}</strong> {t('summary.limitedAnalysisMessage')}
             </AlertDescription>
           </Alert>
 
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
-            <div className="flex items-center gap-2 text-orange-800">
+          <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800/50 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-2 text-orange-800 dark:text-orange-200">
               <Info className="w-5 h-5" />
               <span className="font-medium">{t('summary.dataSourceLabel')} {dataSource}</span>
             </div>
-            <div className="text-sm text-orange-700 mt-1">
+            <div className="text-sm text-orange-700 dark:text-orange-300 mt-1">
               {t('summary.formatLabel')}
             </div>
           </div>
 
-          <Card className="mb-6">
+          <Card className="mb-6 dark:bg-[#1F2937] dark:border-[#374151]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 dark:text-[#F9FAFB]">
                 <FileText className="w-5 h-5" />
                 {t('summary.propertySummaryTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-gray max-w-none">
-                <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+              <div className="prose prose-gray dark:prose-invert max-w-none">
+                <div className="text-gray-700 dark:text-[#D1D5DB] leading-relaxed whitespace-pre-wrap">
                   {summaryData}
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Alert className="mb-6 border-blue-200 bg-blue-50">
-            <Info className="w-4 h-4 text-blue-600" />
-            <AlertDescription className="text-blue-800">
+          <Alert className="mb-6 border-blue-200 dark:border-blue-800/50 bg-blue-50 dark:bg-blue-950/20">
+            <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <AlertDescription className="text-blue-800 dark:text-blue-200">
               <strong>{t('summary.tipTitle')}</strong> {t('summary.tipMessage')}
             </AlertDescription>
           </Alert>
 
-          <Separator className="my-8" />
+          <Separator className="my-8 dark:bg-[#374151]" />
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center" data-pdf-exclude="true">
             <Button 
@@ -621,22 +620,25 @@ export default function AnalysisResultPage() {
                 localStorage.removeItem('analysisErrorType');
                 router.push('/');
               }} 
+              size="lg"
               variant="outline"
-              className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
+              className="px-8 border-yellow-200 dark:border-[#CA8A04] text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#374151]"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               {t('summary.goBackHomeButton')}
             </Button>
             <Button 
               onClick={() => setShowAnalyzeUpload(true)} 
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-8"
+              size="lg"
+              className="bg-yellow-500 hover:bg-[#FACC15] text-white dark:text-[#111827] px-8"
             >
               <Upload className="w-4 h-4 mr-2" />
               {t('summary.analyzeAnotherButton')}
             </Button>
             <Button 
+              size="lg"
               variant="outline" 
-              className="border-yellow-200 text-yellow-700 hover:bg-yellow-50 px-8"
+              className="px-8 border-yellow-200 dark:border-[#CA8A04] text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#374151] opacity-50 cursor-not-allowed"
               onClick={() => {
                 // For summary data, we can't generate a proper PDF since we don't have structured data
                 toast.error(t('summary.pdfNotAvailableMessage'));
@@ -648,7 +650,7 @@ export default function AnalysisResultPage() {
             </Button>
           </div>
 
-          <Separator className="my-8" />
+          <Separator className="my-8 dark:bg-[#374151]" />
           
           {/* Show upload section when user clicks "Analyze Another Document" */}
           {showAnalyzeUpload && (
@@ -667,15 +669,15 @@ export default function AnalysisResultPage() {
             </div>
           )}
           
-          <Card className="border-red-200 bg-red-50" data-pdf-exclude="true">
+          <Card className="border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20" data-pdf-exclude="true">
             <CardHeader>
-              <CardTitle className="text-red-700 text-lg">{t('summary.debugTitle')}</CardTitle>
+              <CardTitle className="text-red-700 dark:text-red-300 text-lg">{t('summary.debugTitle')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-semibold text-red-700 mb-2">{t('summary.rawSummaryData')}</h4>
-                  <pre className="bg-white p-3 rounded border text-xs overflow-x-auto max-h-60">
+                  <h4 className="font-semibold text-red-700 dark:text-red-300 mb-2">{t('summary.rawSummaryData')}</h4>
+                  <pre className="bg-white dark:bg-[#111827] p-3 rounded border text-xs overflow-x-auto max-h-60 dark:text-[#D1D5DB]">
                     {summaryData}
                   </pre>
                 </div>

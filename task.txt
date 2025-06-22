@@ -8,6 +8,7 @@ copy the function of this site and create a md file for my repo, leave out .env.
 - [x] **Fix PDF break points** - Take screenshot and ask Google AI Studio for possible solutions, include tech stack from package.json file
 - [x] **Restrict uploads to housing report PDFs only** - Users should only be able to upload and analyze housing report PDFs
 - [x] **Implement structured JSON output** - Current system prompt tells the model to output structured JSON format
+- [x] **Complete dark mode conversion** - Added dark mode support to analysis result page and privacy page, including theme toggle and locale switcher on all pages
 
 ## Pending Tasks 📋
 
@@ -22,3 +23,12 @@ copy the function of this site and create a md file for my repo, leave out .env.
 - Price: 1,950,000 NOK
 - Size: 51 sqm total
 - Built: 1971 
+
+-
+
+~~bli ferdig med dark mode conversion, sørg for at analysis page også har dark mode lagt til~~
+✅ **COMPLETED**: Dark mode has been fully implemented across all pages including:
+- Analysis result page with comprehensive dark mode styling
+- Privacy policy page with full dark mode support  
+- Theme toggle and locale switcher available on all pages (not just front page)
+- Consistent dark mode color scheme using Tailwind CSS dark mode classes

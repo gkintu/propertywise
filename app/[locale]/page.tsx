@@ -12,6 +12,7 @@ import { useTranslations } from 'next-intl'
 import LocaleSwitcher from '@/components/locale/LocaleSwitcher'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import FileUploadSection from '@/components/upload/FileUploadSection';
+import { PropertyListingBadge } from '@/components/ui/property-listing-badge';
 import { isFeatureEnabled } from '@/lib/feature-flags';
 
 interface PageProps {
@@ -37,11 +38,7 @@ export default function Home({ params }: PageProps) {
           <div className="flex items-center gap-4">
             <ThemeToggle />
             <LocaleSwitcher />
-            {isFeatureEnabled('PROPERTY_LISTING') && (
-              <Badge variant="secondary" className="bg-yellow-100 dark:bg-yellow-950/20 text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-200 dark:hover:bg-yellow-900/30">
-                {t('headerBadge')}
-              </Badge>
-            )}
+            <PropertyListingBadge />
           </div>
         </div>
       </header>
