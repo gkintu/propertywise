@@ -375,7 +375,7 @@ export default function Home({ params }: PageProps) {
         </div>
         
         {/* Footer */}
-        <footer className="py-8 border-t border-yellow-200/30 dark:border-[#374151] bg-gradient-to-b from-[#fffef2] to-yellow-50/30 dark:bg-gradient-to-b dark:from-[#1F2937] dark:to-[#111827]">
+        <footer className="py-8 border-t border-yellow-200/30 dark:border-[#374151] bg-gradient-to-b from-[#fffef2] to-yellow-50/30 dark:bg-gradient-to-b dark:from-[#1F2937]/20 dark:to-[#111827]/15">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
               <div className="text-sm text-gray-700 dark:text-[#D1D5DB]">
