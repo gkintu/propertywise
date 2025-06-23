@@ -1,11 +1,11 @@
 # Repository Digest: Playground Projects
 
-> **Generated on**: June 22, 2025  
+> **Generated on**: June 23, 2025  
 > **Purpose**: This document provides a comprehensive text digest of the entire codebase, making it easy to feed into LLMs for analysis, understanding, or development assistance.
 
 ## 📋 Project Overview
 
-This is a **Next.js 15** application with **TypeScript** that implements a property analysis system using **Google Gemini AI**. The project features **internationalization (i18n)** support with English and Norwegian locales, modern UI components built with **Radix UI** and **Tailwind CSS**, and PDF processing capabilities with structured AI analysis specifically designed for property documents.
+This is a **Next.js 15** application with **TypeScript** that implements a property analysis system using **Google Gemini AI**. The project features **internationalization (i18n)** support with English and Norwegian locales, modern UI components built with **Radix UI** and **Tailwind CSS**, PDF processing capabilities with structured AI analysis, and a **feature flag system** for toggling functionality.
 
 ### Key Features
 - 📄 PDF document upload and AI-powered property analysis using structured schema
@@ -15,6 +15,29 @@ This is a **Next.js 15** application with **TypeScript** that implements a prope
 - 🤖 Google Gemini AI integration with structured JSON output
 - 📱 Responsive design with Tailwind CSS
 - 🏠 Property analysis with categorized insights (strong points, concerns, recommendations)
+- 🚩 Feature flag system for enabling/disabling features via environment variables.
+
+### Feature Flag System (`lib/feature-flags.ts`)
+
+The application uses a static feature flag system where flags are evaluated at **build time**. This means that any changes to feature flags in `.env.local` require a **server restart** to take effect. This approach ensures consistent rendering between the server and client, preventing hydration errors.
+
+**Key Features**:
+- **Static Evaluation**: Flags are read from `process.env` once and stored in the `FEATURE_FLAGS` constant.
+- **Hydration Safety**: Because the values are consistent from build time, there is no risk of server-client mismatch for feature-flagged components.
+- **`ClientOnly` Wrapper**: For UI that is inherently client-side (like theme toggles or locale switchers), a `ClientOnly` component (`components/hydration/ClientOnly.tsx`) is used to defer rendering until after the initial server render, preventing hydration errors.
+
+**Available Flags**:
+- `PROPERTY_SEARCH`: Toggles the visibility of the property search bar.
+- `RECENT_ANALYSIS`: Toggles the "Recent Analysis" section.
+- `PROPERTY_LISTING`: Toggles the property listing badge.
+- `DARK_MODE_TOGGLE`: Toggles the dark mode theme switcher.
+
+To modify a feature flag, update its value in `.env.local` and restart the development server:
+```bash
+# .env.local
+NEXT_PUBLIC_ENABLE_PROPERTY_SEARCH=true
+NEXT_PUBLIC_ENABLE_DARK_MODE_TOGGLE=false
+```
 
 ---
 
@@ -40,6 +63,8 @@ playground-projects/
 ├── components/                  # React components
 │   ├── customized/             # Custom components
 │   │   └── spinner/            # Loading spinners
+│   ├── hydration/              # Components to manage client-side hydration
+│   │   └── ClientOnly.tsx      # Renders components only on the client-side
 │   ├── locale/                 # Internationalization components
 │   │   └── LocaleSwitcher.tsx  # Language switcher
 │   ├── pdf/                    # PDF-related components
@@ -57,6 +82,7 @@ playground-projects/
 │   ├── request.ts              # Server-side i18n config
 │   └── routing.ts              # Route configuration
 ├── lib/                        # Utility libraries
+│   ├── feature-flags.ts        # Feature flag management
 │   ├── navigation.ts           # Internationalized navigation
 │   ├── types.ts                # TypeScript type definitions
 │   └── utils.ts                # Utility functions
@@ -435,7 +461,7 @@ export async function POST(request: NextRequest) {
         responseMimeType: 'application/json',
         responseSchema: propertyAnalysisSchema,
         thinkingConfig: {
-          thinkingBudget: 0, // Disables thinking for faster response
+          thinkingBudget: 0 // Disables thinking for faster response
         },
       },
     });
@@ -682,6 +708,8 @@ npm run lint     # Run ESLint
 │       └── 📁 analyze-pdf/ (Gemini AI integration)
 ├── 📁 components/
 │   ├── 📁 customized/ (custom components)
+│   ├── 📁 hydration/ (client-side hydration)
+│   │   └── 📄 ClientOnly.tsx
 │   ├── 📁 locale/ (i18n components)
 │   ├── 📁 pdf/ (PDF components)
 │   └── 📁 ui/ (shadcn/ui components)
@@ -691,6 +719,7 @@ npm run lint     # Run ESLint
 │   ├── 📄 request.ts
 │   └── 📄 routing.ts
 ├── 📁 lib/ (utilities)
+│   └── 📄 feature-flags.ts (feature flag logic)
 ├── 📁 messages/ (translations)
 │   ├── 📄 en.json
 │   └── 📄 no.json
@@ -714,8 +743,9 @@ npm run lint     # Run ESLint
 5. **Type Safety**: Comprehensive TypeScript implementation
 6. **Modern UI**: shadcn/ui components with Radix UI primitives
 7. **File Handling**: Drag-and-drop PDF upload with validation
-8. **Error Handling**: Comprehensive error management throughout the app
+8. **Error Handling**: Comprehensive error management throughout the app, including hydration error prevention.
 9. **Responsive Design**: Mobile-first approach with Tailwind CSS
 10. **Structured AI Output**: Uses Gemini's responseSchema for consistent JSON responses
+11. **Feature Flags**: A static feature flag system that reads from environment variables at build time to prevent hydration errors.
 
 This digest represents the complete codebase structure and key functionality, optimized for LLM consumption and development assistance.

@@ -1,27 +1,21 @@
 export const FEATURE_FLAGS = {
-  PROPERTY_SEARCH: false,
-  RECENT_ANALYSIS: false,
-  PROPERTY_LISTING: false, // 🏡 List your property? Get instant valuation
+  PROPERTY_SEARCH: (process.env.NEXT_PUBLIC_ENABLE_PROPERTY_SEARCH ?? 'false') === 'true',
+  RECENT_ANALYSIS: (process.env.NEXT_PUBLIC_ENABLE_RECENT_ANALYSIS ?? 'false') === 'true',
+  PROPERTY_LISTING: (process.env.NEXT_PUBLIC_ENABLE_PROPERTY_LISTING ?? 'false') === 'true',
+  DARK_MODE_TOGGLE: (process.env.NEXT_PUBLIC_ENABLE_DARK_MODE_TOGGLE ?? 'true') === 'true',
   // Add more feature flags as needed in the future
 } as const;
 
 export type FeatureFlag = keyof typeof FEATURE_FLAGS;
 
 /**
- * Check if a feature is enabled
+ * Check if a feature is enabled.
+ * The values are based on environment variables at build time.
+ * To see changes from `.env.local`, you need to restart the development server.
  * @param feature - The feature flag name
  * @returns boolean indicating if the feature is enabled
  */
 export function isFeatureEnabled(feature: FeatureFlag): boolean {
-  // Check environment variables first (for override capability)
-  const envKey = `NEXT_PUBLIC_ENABLE_${feature}`;
-  const envValue = process.env[envKey];
-  
-  if (envValue !== undefined) {
-    return envValue === 'true';
-  }
-  
-  // Fall back to default configuration
   return FEATURE_FLAGS[feature];
 }
 
