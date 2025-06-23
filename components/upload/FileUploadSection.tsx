@@ -144,7 +144,7 @@ export default function FileUploadSection({
             : 'border-yellow-200 hover:border-yellow-400 dark:border-gray-600 dark:hover:border-yellow-500/50 dark:bg-gray-800/50'
         }`}>
           <CardContent 
-            className="p-12"
+            className="p-12 cursor-default"
             role="region"
             aria-label={t('upload.dropText')}
             tabIndex={0}
