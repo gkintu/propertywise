@@ -58,6 +58,16 @@ export default function Home({ params }: PageProps) {
           <p className="text-xl text-gray-600 dark:text-[#D1D5DB] max-w-2xl mx-auto">
             {t('description')}
           </p>
+          
+          {/* Decorative Separation Line */}
+          <div className="flex items-center justify-center my-8">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent max-w-md"></div>
+            <div className="mx-4">
+              <div className="w-2 h-2 bg-yellow-500 dark:bg-yellow-400 rounded-full"></div>
+            </div>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent max-w-md"></div>
+          </div>
+          
           <div className="mt-8">
             <h2 className="text-3xl font-semibold text-gray-800 dark:text-[#F9FAFB] mb-4">
               {t('greeting')}
@@ -115,13 +125,6 @@ export default function Home({ params }: PageProps) {
         <section className="text-left">
           <FileUploadSection />
         </section>
-
-        {/* Disclaimer */}
-        <div className="text-center mb-16 mt-8">
-          <p className="text-sm text-gray-500 dark:text-[#9CA3AF] max-w-lg mx-auto">
-            {t('disclaimer')}
-          </p>
-        </div>
 
         {/* Recent Analysis Section */}
         <ClientOnly>
@@ -363,6 +366,13 @@ export default function Home({ params }: PageProps) {
             </div>
           </div>
         </section>
+
+                {/* Disclaimer */}
+        <div className="text-center mb-16 mt-8">
+          <p className="text-sm text-gray-500 dark:text-[#9CA3AF] max-w-lg mx-auto">
+            {t('disclaimer')}
+          </p>
+        </div>
         
         {/* Footer */}
         <footer className="py-8 border-t border-yellow-200/30 dark:border-[#374151] bg-gradient-to-b from-[#fffef2] to-yellow-50/30 dark:bg-gradient-to-b dark:from-[#1F2937] dark:to-[#111827]">
