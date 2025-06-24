@@ -149,13 +149,6 @@
     cursor: pointer;
   }
 
-  /* Card elements with hover effects */
-  .card:hover,
-  [class*="card"]:hover,
-  [class*="hover:shadow"] {
-    cursor: pointer;
-  }
-
   /* File input triggers */
   input[type="file"] + label,
   [data-file-trigger] {
