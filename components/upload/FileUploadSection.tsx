@@ -7,8 +7,10 @@ import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { toast } from "sonner"
 import { useFileUpload } from '@/hooks/useFileUpload'
-import { useState } from 'react'
+import { useState, forwardRef, useImperativeHandle } from 'react'
 import Spinner from "@/components/customized/spinner/spinner-05";
+import { ShakeMotion, ShakeMotionHandle } from '@/components/motion'
+import { useRef } from 'react'
 
 interface FileUploadSectionProps {
   onAnalysisStart?: () => void;
@@ -18,18 +20,23 @@ interface FileUploadSectionProps {
   containerWidth?: 'normal' | 'full';
 }
 
-export default function FileUploadSection({ 
+export interface FileUploadSectionHandle {
+  shake: () => void;
+}
+
+const FileUploadSection = forwardRef<FileUploadSectionHandle, FileUploadSectionProps>(({ 
   onAnalysisStart, 
   onAnalysisComplete, 
   className = "",
   showTitle = true,
   containerWidth = 'normal'
-}: FileUploadSectionProps) {
+}, ref) => {
   const t = useTranslations('HomePage');
   const params = useParams();
   const locale = params.locale as string;
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const shakeRef = useRef<ShakeMotionHandle>(null)
   
   const {
     dragActive,
@@ -42,6 +49,12 @@ export default function FileUploadSection({
     removeFile,
     openFileDialog,
   } = useFileUpload();
+
+  useImperativeHandle(ref, () => ({
+    shake: () => {
+      shakeRef.current?.shake();
+    }
+  }));
 
   const handleAnalyzeDocuments = async () => {
     if (uploadedFiles.length === 0) {
@@ -138,11 +151,12 @@ export default function FileUploadSection({
           </>
         )}
         
-        <Card className={`max-w-2xl mx-auto border-2 border-dashed transition-colors ${
-          dragActive 
-            ? 'border-yellow-400 bg-yellow-50 dark:border-yellow-500/50 dark:bg-gray-800/50' 
-            : 'border-yellow-200 hover:border-yellow-400 dark:border-gray-600 dark:hover:border-yellow-500/50 dark:bg-gray-800/50'
-        }`}>
+        <ShakeMotion ref={shakeRef} duration={600} intensity={8}>
+          <Card className={`max-w-2xl mx-auto border-2 border-dashed transition-colors ${
+            dragActive 
+              ? 'border-yellow-400 bg-yellow-50 dark:border-yellow-500/50 dark:bg-gray-800/50' 
+              : 'border-yellow-200 hover:border-yellow-400 dark:border-gray-600 dark:hover:border-yellow-500/50 dark:bg-gray-800/50'
+          }`}>
           <CardContent 
             className="p-12 cursor-default"
             role="region"
@@ -195,6 +209,7 @@ export default function FileUploadSection({
             </div>
           </CardContent>
         </Card>
+        </ShakeMotion>
 
         {/* Uploaded files display */}
         {uploadedFiles.length > 0 && (
@@ -266,4 +281,8 @@ export default function FileUploadSection({
       </div>
     </div>
   )
-}
+});
+
+FileUploadSection.displayName = 'FileUploadSection';
+
+export default FileUploadSection;

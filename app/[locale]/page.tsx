@@ -7,11 +7,11 @@ import { Badge } from "@/components/ui/badge"
 import { Search, Home as HomeIcon, AlertTriangle, CheckCircle, Clock, MapPin, Bed, Bath, Car } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { use } from "react"
+import { use, useRef } from "react"
 import { useTranslations } from 'next-intl'
 import LocaleSwitcher from '@/components/locale/LocaleSwitcher'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
-import FileUploadSection from '@/components/upload/FileUploadSection';
+import FileUploadSection, { FileUploadSectionHandle } from '@/components/upload/FileUploadSection';
 import { PropertyListingBadge } from '@/components/ui/property-listing-badge';
 import { isFeatureEnabled } from '@/lib/feature-flags';
 import { ClientOnly } from '@/components/hydration/ClientOnly';
@@ -24,6 +24,18 @@ export default function Home({ params }: PageProps) {
   const { locale } = use(params);
   const t = useTranslations('HomePage');
   const f = useTranslations('Footer');
+  const fileUploadRef = useRef<FileUploadSectionHandle>(null);
+
+  const handleStartAnalysis = () => {
+    // Shake the upload component to draw attention
+    fileUploadRef.current?.shake();
+    
+    // Scroll to the upload section
+    const uploadSection = document.getElementById('upload-section');
+    if (uploadSection) {
+      uploadSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white dark:from-[#111827] dark:to-[#1F2937]">
@@ -122,8 +134,8 @@ export default function Home({ params }: PageProps) {
         </div>
 
         {/* PDF Upload Section */}
-        <section className="text-left">
-          <FileUploadSection />
+        <section id="upload-section" className="text-left">
+          <FileUploadSection ref={fileUploadRef} />
         </section>
 
         {/* Recent Analysis Section */}
@@ -357,7 +369,11 @@ export default function Home({ params }: PageProps) {
               {t('cta.description')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-yellow-500 hover:bg-[#FACC15] text-white dark:text-[#111827] px-8">
+              <Button 
+                size="lg" 
+                className="bg-yellow-500 hover:bg-[#FACC15] text-white dark:text-[#111827] px-8"
+                onClick={handleStartAnalysis}
+              >
                 {t('cta.startButton')}
               </Button>
               <Button size="lg" variant="outline" className="px-8 border-yellow-200 dark:border-[#CA8A04] text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#374151]">

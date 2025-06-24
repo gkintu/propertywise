@@ -197,17 +197,17 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
           {/* Action Buttons */}
           <SlideIn direction="up" delay={0.8}>
             <div className="flex flex-col sm:flex-row gap-4 mt-8">
-              <Button asChild className="flex-1 bg-yellow-500 hover:bg-[#FACC15] text-white dark:text-[#111827]">
-                <a href="mailto:privacy@propertywise.no">
-                  <Mail className="h-4 w-4 mr-2" />
-                  {t('actions.contactUs')}
-                </a>
-              </Button>
               <Button variant="outline" asChild className="flex-1 dark:border-[#374151] dark:text-[#F9FAFB] dark:hover:bg-[#374151]">
                 <Link href={`/${locale}`}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   {t('actions.backToHome')}
                 </Link>
+              </Button>
+              <Button asChild className="flex-1 bg-yellow-500 hover:bg-[#FACC15] text-white dark:text-[#111827]">
+                <a href="mailto:privacy@propertywise.no">
+                  <Mail className="h-4 w-4 mr-2" />
+                  {t('actions.contactUs')}
+                </a>
               </Button>
             </div>
           </SlideIn>
