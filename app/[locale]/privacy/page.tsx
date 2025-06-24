@@ -47,7 +47,7 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
           {/* Header */}
           <SlideIn direction="up" delay={0.2}>
             <div className="mb-8">
-              <Link href={`/${locale}`} className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 mb-4">
+              <Link href={`/${locale}`} className="inline-flex items-center text-yellow-700 dark:text-[#FBBF24] hover:text-yellow-800 dark:hover:text-yellow-300 mb-4">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 {t('backToHome')}
               </Link>
@@ -62,7 +62,7 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
               <Card className="mb-8 dark:bg-[#1F2937] dark:border-[#374151]">
                 <CardHeader>
                   <CardTitle className="flex items-center dark:text-[#F9FAFB]">
-                    <Shield className="h-5 w-5 mr-2 text-blue-600 dark:text-blue-400" />
+                    <Shield className="h-5 w-5 mr-2 text-yellow-700 dark:text-[#FBBF24]" />
                     {t('introduction.title')}
                   </CardTitle>
                 </CardHeader>
@@ -127,12 +127,12 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
                     <div className="space-y-3">
                       <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-[#374151] rounded-lg">
                         <span className="font-medium dark:text-[#F9FAFB]">{t('dataRetention.documentData')}</span>
-                        <span className="text-blue-600 dark:text-blue-400">{t('dataRetention.documentDataPeriod')}</span>
+                        <span className="text-yellow-700 dark:text-[#FBBF24]">{t('dataRetention.documentDataPeriod')}</span>
                       </div>
                       
                       <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-[#374151] rounded-lg">
                         <span className="font-medium dark:text-[#F9FAFB]">{t('dataRetention.localStorage')}</span>
-                        <span className="text-blue-600 dark:text-blue-400">{t('dataRetention.localStoragePeriod')}</span>
+                        <span className="text-yellow-700 dark:text-[#FBBF24]">{t('dataRetention.localStoragePeriod')}</span>
                       </div>
                     </div>
                   </div>
