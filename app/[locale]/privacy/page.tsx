@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Mail, Shield, Lock, ArrowLeft, Home as HomeIcon } from "lucide-react"
+import { Mail, Shield, ArrowLeft, Home as HomeIcon } from "lucide-react"
 import Link from "next/link"
 import { use } from "react"
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
@@ -93,58 +93,11 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
                   <li>{t('dataCollection.preferences.localStorage')}</li>
                 </ul>
               </div>
-
-              <div>
-                <h3 className="font-semibold text-lg mb-3 dark:text-[#F9FAFB]">{t('dataCollection.technicalData.title')}</h3>
-                <ul className="list-disc pl-6 space-y-2 text-gray-700 dark:text-[#D1D5DB]">
-                  <li>{t('dataCollection.technicalData.ipAddress')}</li>
-                  <li>{t('dataCollection.technicalData.browserData')}</li>
-                  <li>{t('dataCollection.technicalData.usageData')}</li>
-                  <li>{t('dataCollection.technicalData.errorLogs')}</li>
-                </ul>
-              </div>
               
               <div className="mt-6">
                 <p className="text-gray-700 dark:text-[#D1D5DB] leading-relaxed">
                   <span className="font-medium">{t('dataCollection.notice.title')}:</span> {t('dataCollection.notice.description')}
                 </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Data Security */}
-        <Card className="mb-8 dark:bg-[#1F2937] dark:border-[#374151]">
-          <CardHeader>
-            <CardTitle className="flex items-center dark:text-[#F9FAFB]">
-              <Lock className="h-5 w-5 mr-2 text-green-600 dark:text-green-400" />
-              {t('dataSecurity.title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-gray-700 dark:text-[#D1D5DB] mb-4">{t('dataSecurity.description')}</p>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <h4 className="font-semibold dark:text-[#F9FAFB]">{t('dataSecurity.technical.title')}</h4>
-                  <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-[#D1D5DB] text-sm">
-                    <li>{t('dataSecurity.technical.encryption')}</li>
-                    <li>{t('dataSecurity.technical.secureTransmission')}</li>
-                    <li>{t('dataSecurity.technical.accessControls')}</li>
-                    <li>{t('dataSecurity.technical.monitoring')}</li>
-                  </ul>
-                </div>
-                
-                <div className="space-y-2">
-                  <h4 className="font-semibold dark:text-[#F9FAFB]">{t('dataSecurity.organizational.title')}</h4>
-                  <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-[#D1D5DB] text-sm">
-                    <li>{t('dataSecurity.organizational.staffTraining')}</li>
-                    <li>{t('dataSecurity.organizational.limitedAccess')}</li>
-                    <li>{t('dataSecurity.organizational.regularAudits')}</li>
-                    <li>{t('dataSecurity.organizational.incidentResponse')}</li>
-                  </ul>
-                </div>
               </div>
             </div>
           </CardContent>
@@ -169,16 +122,6 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
                   <span className="font-medium dark:text-[#F9FAFB]">{t('dataRetention.localStorage')}</span>
                   <span className="text-blue-600 dark:text-blue-400">{t('dataRetention.localStoragePeriod')}</span>
                 </div>
-                
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-[#374151] rounded-lg">
-                  <span className="font-medium dark:text-[#F9FAFB]">{t('dataRetention.analysisResults')}</span>
-                  <span className="text-blue-600 dark:text-blue-400">{t('dataRetention.analysisResultsPeriod')}</span>
-                </div>
-                
-                <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-[#374151] rounded-lg">
-                  <span className="font-medium dark:text-[#F9FAFB]">{t('dataRetention.technicalLogs')}</span>
-                  <span className="text-blue-600 dark:text-blue-400">{t('dataRetention.technicalLogsPeriod')}</span>
-                </div>
               </div>
             </div>
           </CardContent>
@@ -202,11 +145,6 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
                 <div>
                   <h4 className="font-semibold dark:text-[#F9FAFB]">{t('cookies.functional.title')}</h4>
                   <p className="text-gray-600 dark:text-[#D1D5DB] text-sm">{t('cookies.functional.description')}</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-semibold dark:text-[#F9FAFB]">{t('cookies.analytics.title')}</h4>
-                  <p className="text-gray-600 dark:text-[#D1D5DB] text-sm">{t('cookies.analytics.description')}</p>
                 </div>
               </div>
               
