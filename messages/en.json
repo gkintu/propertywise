@@ -15,11 +15,11 @@
       },
       "marketAnalysis": {
         "title": "Market Analysis", 
-        "description": "Compare prices and trends with similar properties in the area"
+        "description": "See if you're paying a fair price for the property"
       },
       "investmentInsights": {
         "title": "Investment Insights",
-        "description": "Understand potential returns and long-term value appreciation"
+        "description": "Understand if this property is a good investment for your goals"
       }
     },
     "upload": {
@@ -60,9 +60,8 @@
     },
     "cta": {
       "title": "Ready to make informed property decisions?",
-      "description": "Join thousands of smart buyers who use PropertyWise to avoid costly mistakes and find great deals.",
-      "startButton": "Start Free Analysis",
-      "sampleButton": "See Sample Report"
+      "description": "Turn your property PDFs into actionable insights with intelligent analysis that reveals hidden risks and opportunities.",
+      "startButton": "Start Free Analysis"
     }
   },
   "AnalysisResult": {

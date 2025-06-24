@@ -15,11 +15,11 @@
       },
       "marketAnalysis": {
         "title": "Markedsanalyse",
-        "description": "Sammenlign priser og trender med lignende eiendommer i området"
+        "description": "Se om du betaler en rettferdig pris for eiendommen"
       },
       "investmentInsights": {
         "title": "Investeringsinnsikt",
-        "description": "Forstå potensiell avkastning og langsiktig verdistigning"
+        "description": "Forstå om denne eiendommen er en god investering for dine mål"
       }
     },
     "upload": {
@@ -60,9 +60,8 @@
     },
     "cta": {
       "title": "Klar til å ta informerte eiendomsbeslutninger?",
-      "description": "Bli med tusenvis av smarte kjøpere som bruker PropertyWise for å unngå kostbare feil og finne gode tilbud.",
-      "startButton": "Start gratis analyse",
-      "sampleButton": "Se eksempelrapport"
+      "description": "Gjør dine eiendoms-PDFer om til handlingsrettede innsikter med intelligent analyse som avslører skjulte risikoer og muligheter.",
+      "startButton": "Start gratis analyse"
     }
   },
   "AnalysisResult": {

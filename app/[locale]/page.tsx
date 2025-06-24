@@ -376,9 +376,6 @@ export default function Home({ params }: PageProps) {
               >
                 {t('cta.startButton')}
               </Button>
-              <Button size="lg" variant="outline" className="px-8 border-yellow-200 dark:border-[#CA8A04] text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#374151]">
-                {t('cta.sampleButton')}
-              </Button>
             </div>
           </div>
         </section>
