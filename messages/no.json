@@ -147,70 +147,68 @@
     },
     "dataCollection": {
       "title": "Hvilke data vi samler inn",
-      "personalData": {
-        "title": "Personlig informasjon",
-        "contactInfo": "Navn, e-postadresse, telefonnummer",
-        "accountInfo": "Kontoinformasjon og preferanser",
-        "paymentInfo": "Betalingsinformasjon (behandles sikkert gjennom tredjepartsleverandører)",
-        "communicationData": "Kommunikasjon med vårt supportteam"
+      "documentData": {
+        "title": "Dokumentbehandlingsdata",
+        "pdfFiles": "Eiendoms-PDF-dokumenter du laster opp for analyse (behandles midlertidig)",
+        "propertyInfo": "Eiendomsinformasjon ekstrahert fra dokumentene dine",
+        "analysisResults": "AI-genererte analyserapporter og innsikt",
+        "temporaryProcessing": "Filbehandlingsdata (ikke permanent lagret på våre servere)"
       },
-      "propertyData": {
-        "title": "Eiendomsrelatert informasjon",
-        "documents": "Eiendomsdokumenter du laster opp (boligrapporter, kontrakter, etc.)",
-        "addresses": "Eiendomsadresser og stedsdata",
-        "analysisResults": "AI-analyseresultater og rapporter vi genererer",
-        "uploadedFiles": "PDF-filer og andre dokumenter du sender inn for analyse"
+      "preferences": {
+        "title": "Brukerpreferanser",
+        "language": "Ditt språkvalg (engelsk eller norsk)",
+        "theme": "Visningstemal preferanse (lys eller mørk modus)",
+        "localStorage": "Analyseresultater lagret lokalt i nettleseren din"
       },
       "technicalData": {
         "title": "Teknisk informasjon",
-        "ipAddress": "IP-adresse og enhetsinformasjon",
-        "browserData": "Nettlesertype, versjon og innstillinger",
-        "usageData": "Hvordan du samhandler med tjenesten vår",
-        "cookies": "Informasjonskapsler og lignende sporingsteknologier"
+        "ipAddress": "IP-adresse (for sikkerhet og analyse)",
+        "browserData": "Nettlesertype og versjon (for kompatibilitet)",
+        "usageData": "Grunnleggende bruksstatistikk (hvis analyse er aktivert)",
+        "errorLogs": "Feillogger og feilsøkingsinformasjon"
+      },
+      "notice": {
+        "title": "Viktig merknad",
+        "description": "Vi samler ikke personlig informasjon, oppretter ikke brukerkontoer eller lagrer dokumentene dine permanent. Mesteparten av dataene behandles midlertidig og lagres lokalt i nettleseren din."
       }
     },
     "dataUsage": {
       "title": "Hvordan vi bruker dine data",
       "legalBasis": "Rettslig grunnlag",
       "propertyAnalysis": {
-        "title": "Eiendomsanalysetjenester",
-        "description": "Vi behandler eiendomsdokumentene dine ved hjelp av AI for å gi analyse, risikovurdering og markedsinnsikt.",
-        "legalBasis": "Kontraktsoppfyllelse og berettiget interesse"
+        "title": "Dokumentanalysetjenester",
+        "description": "Vi behandler PDF-dokumentene dine ved hjelp av Google Gemini AI for å ekstrahere eiendomsinformasjon og gi strukturert analyse med innsikt om sterke sider, bekymringer og anbefalinger.",
+        "legalBasis": "Berettiget interesse for dokumentbehandling"
       },
       "serviceProvision": {
-        "title": "Tjenesteyting",
-        "description": "For å levere, vedlikeholde og forbedre våre tjenester, inkludert kundestøtte og kontoadministrasjon.",
-        "legalBasis": "Kontraktsoppfyllelse"
-      },
-      "communication": {
-        "title": "Kommunikasjon",
-        "description": "For å sende deg tjenesteoppdateringer, analyseresultater og svare på dine henvendelser.",
-        "legalBasis": "Kontraktsoppfyllelse og berettiget interesse"
+        "title": "Tjenestefunksjonalitet",
+        "description": "For å levere kjernefunksjonalitet inkludert filopplasting, AI-behandling, resultatvisning og språk-/temapreferanser.",
+        "legalBasis": "Berettiget interesse for tjenesteyting"
       },
       "improvement": {
         "title": "Tjenesteforbedring",
-        "description": "For å analysere bruksmønstre og forbedre våre AI-algoritmer og brukeropplevelse (kun anonymiserte data).",
+        "description": "For å forbedre vår AI-analysenøyaktighet og brukeropplevelse gjennom anonymiserte bruksmønstre (ingen persondata involvert).",
         "legalBasis": "Berettiget interesse"
       },
       "legal": {
-        "title": "Lovpålagte forpliktelser",
-        "description": "For å overholde juridiske forpliktelser og beskytte våre rettigheter og interesser.",
+        "title": "Juridisk og sikkerhet",
+        "description": "For å opprettholde sikkerhet, forhindre misbruk og overholde juridiske forpliktelser inkludert feillogging og grunnleggende sikkerhetsovervåking.",
         "legalBasis": "Juridisk forpliktelse og berettiget interesse"
       }
     },
     "dataSharing": {
       "title": "Datadeling og tredjeparter",
-      "description": "Vi selger ikke dine personopplysninger. Vi deler kun informasjonen din under følgende begrensede omstendigheter:",
+      "description": "Vi deler minimale data kun med essensielle tjenesteleverandører for kjernefunksjonalitet:",
       "serviceProviders": {
-        "title": "Tjenesteleverandører",
-        "aiProcessing": "AI-behandlingsleverandører (for dokumentanalyse)",
-        "cloudStorage": "Skylagerløsninger (for sikker datalagring)",
-        "analytics": "Analyseleverandører (kun anonymiserte data)",
-        "payment": "Betalingsbehandlere (for faktureringsformål)"
+        "title": "Essensielle tjenesteleverandører",
+        "aiProcessing": "Google Gemini AI (kun for midlertidig dokumentanalyse)",
+        "cloudStorage": "Vercel/vertsleverandører (for applikasjonsdrift)",
+        "analytics": "Grunnleggende webanalyse (hvis aktivert via funksjonsflagg)",
+        "payment": "Ingen betalingsbehandlere - tjenesten er for øyeblikket gratis"
       },
       "legal": {
         "title": "Juridiske krav",
-        "description": "Vi kan avsløre informasjonen din hvis det kreves av loven, rettskjennelse, eller for å beskytte våre rettigheter eller andres sikkerhet."
+        "description": "Vi kan avsløre informasjon hvis det kreves av norsk lov, rettskjennelse, eller for å beskytte mot sikkerhetstrusler."
       }
     },
     "dataSecurity": {
@@ -233,15 +231,15 @@
     },
     "dataRetention": {
       "title": "Datalagring",
-      "description": "Vi oppbevarer dine data kun så lenge som nødvendig for formålene beskrevet i denne erklæringen:",
-      "accountData": "Kontodata",
-      "accountDataPeriod": "Til kontosletting + 30 dager",
-      "propertyDocuments": "Eiendomsdokumenter",
-      "propertyDocumentsPeriod": "2 år etter siste analyse",
+      "description": "Siden vi ikke lagrer persondata permanent, håndteres mesteparten av datalagringen av nettleseren din:",
+      "documentData": "Dokumentbehandling",
+      "documentDataPeriod": "Behandles kun midlertidig under analyse",
+      "localStorage": "Nettleser lokal lagring",
+      "localStoragePeriod": "Til du sletter nettleserdata",
       "analysisResults": "Analyseresultater",
-      "analysisResultsPeriod": "5 år (for forbedringsformål)",
-      "marketingData": "Markedsføringsdata",
-      "marketingDataPeriod": "Til samtykke trekkes tilbake"
+      "analysisResultsPeriod": "Lagret lokalt i nettleseren din",
+      "technicalLogs": "Tekniske logger",
+      "technicalLogsPeriod": "Maksimalt 30 dager (for feilsøking)"
     },
     "yourRights": {
       "title": "Dine personvernrettigheter",
@@ -291,6 +289,22 @@
         "description": "Hjelper oss å forstå hvordan du bruker tjenesten vår (med ditt samtykke)"
       },
       "management": "Du kan administrere informasjonskapsel-preferanser i nettleserinnstillingene eller gjennom vårt informasjonskapsel-banner."
+    },
+    "featureFlags": {
+      "title": "Funksjonsflagg og funksjonalitet",
+      "description": "Vår applikasjon bruker funksjonsflagg for å kontrollere hvilke funksjoner som er aktivert eller deaktivert. Disse flaggene evalueres ved byggektid og påvirker hvilken funksjonalitet som er tilgjengelig for deg:",
+      "staticEvaluation": {
+        "title": "Statisk evaluering",
+        "description": "Funksjonsflagg leses fra miljøvariabler én gang under byggeprosessen og forblir konsistente gjennom hele økten din."
+      },
+      "availableFlags": {
+        "title": "Tilgjengelige funksjonsflagg",
+        "propertySearch": "Eiendomssøk-felt synlighet",
+        "recentAnalysis": "Nylig analyse-seksjon visning",
+        "propertyListing": "Eiendomsliste-merke synlighet",
+        "darkModeToggle": "Mørk modus tema-veksler tilgjengelighet"
+      },
+      "noPersonalData": "Funksjonsflagg-innstillinger involverer ikke innsamling av persondata og bestemmes av applikasjonskonfigurasjonen, ikke brukerpreferanser."
     },
     "internationalTransfers": {
       "title": "Internasjonale dataoverføringer",

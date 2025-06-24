@@ -26,9 +26,14 @@ copy the function of this site and create a md file for my repo, leave out .env.
 
 -
 
-~~bli ferdig med dark mode conversion, sørg for at analysis page også har dark mode lagt til~~
 ✅ **COMPLETED**: Dark mode has been fully implemented across all pages including:
 - Analysis result page with comprehensive dark mode styling
 - Privacy policy page with full dark mode support  
 - Theme toggle and locale switcher available on all pages (not just front page)
 - Consistent dark mode color scheme using Tailwind CSS dark mode classes
+
+-  legg til en default test pdf som sjefer kan bruke for å teste appen slik at de selv ikke trenger
+å laste ned salgsoppgave fra finn, 2 stykk skal holde
+
+-- hva skal denne gjøre Ready to make informed property decisions? ta kunder til en artikkel om feller man kan gå på kanksje ? vise eksempel på en analyse ? må ikke
+være en av de to eksemplene man har, når k trykker på Start Free Analysis så burde upload section riste kankjse ? 

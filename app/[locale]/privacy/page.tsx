@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Mail, Phone, MapPin, Shield, Lock, Eye, Download, Trash2, Edit, ArrowLeft, X, Home as HomeIcon } from "lucide-react"
+import { Mail, Shield, Lock, ArrowLeft, Home as HomeIcon } from "lucide-react"
 import Link from "next/link"
 import { use } from "react"
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
@@ -19,7 +19,7 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
   const t = useTranslations('PrivacyPolicy');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 dark:from-[#111827] dark:via-[#1F2937] dark:to-[#065F46]">
+    <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white dark:from-[#111827] dark:to-[#1F2937]">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/85 dark:bg-[#111827]/85 backdrop-blur-sm border-b border-gray-200/30 dark:border-[#374151]/50 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -68,35 +68,6 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
           </CardContent>
         </Card>
 
-        {/* Data Controller Information */}
-        <Card className="mb-8 dark:bg-[#1F2937] dark:border-[#374151]">
-          <CardHeader>
-            <CardTitle className="dark:text-[#F9FAFB]">{t('dataController.title')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <MapPin className="h-5 w-5 text-gray-500 dark:text-[#9CA3AF] mt-1" />
-                <div>
-                  <p className="font-semibold dark:text-[#F9FAFB]">{t('dataController.company')}</p>
-                  <p className="text-gray-600 dark:text-[#D1D5DB]">{t('dataController.address')}</p>
-                  <p className="text-gray-600 dark:text-[#D1D5DB]">{t('dataController.organizationNumber')}</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Mail className="h-5 w-5 text-gray-500 dark:text-[#9CA3AF]" />
-                <a href="mailto:privacy@propertywise.no" className="text-blue-600 dark:text-blue-400 hover:underline">
-                  privacy@propertywise.no
-                </a>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="h-5 w-5 text-gray-500 dark:text-[#9CA3AF]" />
-                <span className="text-gray-600 dark:text-[#D1D5DB]">+47 XX XX XX XX</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Data We Collect */}
         <Card className="mb-8 dark:bg-[#1F2937] dark:border-[#374151]">
           <CardHeader>
@@ -105,22 +76,21 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
           <CardContent>
             <div className="space-y-6">
               <div>
-                <h3 className="font-semibold text-lg mb-3 dark:text-[#F9FAFB]">{t('dataCollection.personalData.title')}</h3>
+                <h3 className="font-semibold text-lg mb-3 dark:text-[#F9FAFB]">{t('dataCollection.documentData.title')}</h3>
                 <ul className="list-disc pl-6 space-y-2 text-gray-700 dark:text-[#D1D5DB]">
-                  <li>{t('dataCollection.personalData.contactInfo')}</li>
-                  <li>{t('dataCollection.personalData.accountInfo')}</li>
-                  <li>{t('dataCollection.personalData.paymentInfo')}</li>
-                  <li>{t('dataCollection.personalData.communicationData')}</li>
+                  <li>{t('dataCollection.documentData.pdfFiles')}</li>
+                  <li>{t('dataCollection.documentData.propertyInfo')}</li>
+                  <li>{t('dataCollection.documentData.analysisResults')}</li>
+                  <li>{t('dataCollection.documentData.temporaryProcessing')}</li>
                 </ul>
               </div>
               
               <div>
-                <h3 className="font-semibold text-lg mb-3 dark:text-[#F9FAFB]">{t('dataCollection.propertyData.title')}</h3>
+                <h3 className="font-semibold text-lg mb-3 dark:text-[#F9FAFB]">{t('dataCollection.preferences.title')}</h3>
                 <ul className="list-disc pl-6 space-y-2 text-gray-700 dark:text-[#D1D5DB]">
-                  <li>{t('dataCollection.propertyData.documents')}</li>
-                  <li>{t('dataCollection.propertyData.addresses')}</li>
-                  <li>{t('dataCollection.propertyData.analysisResults')}</li>
-                  <li>{t('dataCollection.propertyData.uploadedFiles')}</li>
+                  <li>{t('dataCollection.preferences.language')}</li>
+                  <li>{t('dataCollection.preferences.theme')}</li>
+                  <li>{t('dataCollection.preferences.localStorage')}</li>
                 </ul>
               </div>
 
@@ -130,75 +100,13 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
                   <li>{t('dataCollection.technicalData.ipAddress')}</li>
                   <li>{t('dataCollection.technicalData.browserData')}</li>
                   <li>{t('dataCollection.technicalData.usageData')}</li>
-                  <li>{t('dataCollection.technicalData.cookies')}</li>
+                  <li>{t('dataCollection.technicalData.errorLogs')}</li>
                 </ul>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* How We Use Your Data */}
-        <Card className="mb-8 dark:bg-[#1F2937] dark:border-[#374151]">
-          <CardHeader>
-            <CardTitle className="dark:text-[#F9FAFB]">{t('dataUsage.title')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-semibold mb-2 dark:text-[#F9FAFB]">{t('dataUsage.propertyAnalysis.title')}</h3>
-                <p className="text-gray-700 dark:text-[#D1D5DB]">{t('dataUsage.propertyAnalysis.description')}</p>
-                <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">{t('dataUsage.legalBasis')}: {t('dataUsage.propertyAnalysis.legalBasis')}</p>
-              </div>
               
-              <div>
-                <h3 className="font-semibold mb-2 dark:text-[#F9FAFB]">{t('dataUsage.serviceProvision.title')}</h3>
-                <p className="text-gray-700 dark:text-[#D1D5DB]">{t('dataUsage.serviceProvision.description')}</p>
-                <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">{t('dataUsage.legalBasis')}: {t('dataUsage.serviceProvision.legalBasis')}</p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2 dark:text-[#F9FAFB]">{t('dataUsage.communication.title')}</h3>
-                <p className="text-gray-700 dark:text-[#D1D5DB]">{t('dataUsage.communication.description')}</p>
-                <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">{t('dataUsage.legalBasis')}: {t('dataUsage.communication.legalBasis')}</p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2 dark:text-[#F9FAFB]">{t('dataUsage.improvement.title')}</h3>
-                <p className="text-gray-700 dark:text-[#D1D5DB]">{t('dataUsage.improvement.description')}</p>
-                <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">{t('dataUsage.legalBasis')}: {t('dataUsage.improvement.legalBasis')}</p>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2 dark:text-[#F9FAFB]">{t('dataUsage.legal.title')}</h3>
-                <p className="text-gray-700 dark:text-[#D1D5DB]">{t('dataUsage.legal.description')}</p>
-                <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">{t('dataUsage.legalBasis')}: {t('dataUsage.legal.legalBasis')}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Data Sharing */}
-        <Card className="mb-8 dark:bg-[#1F2937] dark:border-[#374151]">
-          <CardHeader>
-            <CardTitle className="dark:text-[#F9FAFB]">{t('dataSharing.title')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-gray-700 dark:text-[#D1D5DB] mb-4">{t('dataSharing.description')}</p>
-              
-              <div>
-                <h3 className="font-semibold mb-2 dark:text-[#F9FAFB]">{t('dataSharing.serviceProviders.title')}</h3>
-                <ul className="list-disc pl-6 space-y-1 text-gray-700 dark:text-[#D1D5DB]">
-                  <li>{t('dataSharing.serviceProviders.aiProcessing')}</li>
-                  <li>{t('dataSharing.serviceProviders.cloudStorage')}</li>
-                  <li>{t('dataSharing.serviceProviders.analytics')}</li>
-                  <li>{t('dataSharing.serviceProviders.payment')}</li>
-                </ul>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-2 dark:text-[#F9FAFB]">{t('dataSharing.legal.title')}</h3>
-                <p className="text-gray-700 dark:text-[#D1D5DB]">{t('dataSharing.legal.description')}</p>
+              <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg">
+                <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">{t('dataCollection.notice.title')}</h4>
+                <p className="text-yellow-700 dark:text-yellow-300">{t('dataCollection.notice.description')}</p>
               </div>
             </div>
           </CardContent>
@@ -252,13 +160,13 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
               
               <div className="space-y-3">
                 <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-[#374151] rounded-lg">
-                  <span className="font-medium dark:text-[#F9FAFB]">{t('dataRetention.accountData')}</span>
-                  <span className="text-blue-600 dark:text-blue-400">{t('dataRetention.accountDataPeriod')}</span>
+                  <span className="font-medium dark:text-[#F9FAFB]">{t('dataRetention.documentData')}</span>
+                  <span className="text-blue-600 dark:text-blue-400">{t('dataRetention.documentDataPeriod')}</span>
                 </div>
                 
                 <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-[#374151] rounded-lg">
-                  <span className="font-medium dark:text-[#F9FAFB]">{t('dataRetention.propertyDocuments')}</span>
-                  <span className="text-blue-600 dark:text-blue-400">{t('dataRetention.propertyDocumentsPeriod')}</span>
+                  <span className="font-medium dark:text-[#F9FAFB]">{t('dataRetention.localStorage')}</span>
+                  <span className="text-blue-600 dark:text-blue-400">{t('dataRetention.localStoragePeriod')}</span>
                 </div>
                 
                 <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-[#374151] rounded-lg">
@@ -267,80 +175,9 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
                 </div>
                 
                 <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-[#374151] rounded-lg">
-                  <span className="font-medium dark:text-[#F9FAFB]">{t('dataRetention.marketingData')}</span>
-                  <span className="text-blue-600 dark:text-blue-400">{t('dataRetention.marketingDataPeriod')}</span>
+                  <span className="font-medium dark:text-[#F9FAFB]">{t('dataRetention.technicalLogs')}</span>
+                  <span className="text-blue-600 dark:text-blue-400">{t('dataRetention.technicalLogsPeriod')}</span>
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Your Rights */}
-        <Card className="mb-8 dark:bg-[#1F2937] dark:border-[#374151]">
-          <CardHeader>
-            <CardTitle className="flex items-center dark:text-[#F9FAFB]">
-              <Eye className="h-5 w-5 mr-2 text-purple-600 dark:text-purple-400" />
-              {t('yourRights.title')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-gray-700 dark:text-[#D1D5DB] mb-6">{t('yourRights.description')}</p>
-              
-              <div className="grid gap-4">
-                <div className="flex items-start space-x-3 p-4 border dark:border-[#374151] rounded-lg">
-                  <Download className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-1" />
-                  <div>
-                    <h3 className="font-semibold dark:text-[#F9FAFB]">{t('yourRights.access.title')}</h3>
-                    <p className="text-gray-600 dark:text-[#D1D5DB] text-sm">{t('yourRights.access.description')}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3 p-4 border dark:border-[#374151] rounded-lg">
-                  <Edit className="h-5 w-5 text-green-600 dark:text-green-400 mt-1" />
-                  <div>
-                    <h3 className="font-semibold dark:text-[#F9FAFB]">{t('yourRights.rectification.title')}</h3>
-                    <p className="text-gray-600 dark:text-[#D1D5DB] text-sm">{t('yourRights.rectification.description')}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3 p-4 border dark:border-[#374151] rounded-lg">
-                  <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400 mt-1" />
-                  <div>
-                    <h3 className="font-semibold dark:text-[#F9FAFB]">{t('yourRights.erasure.title')}</h3>
-                    <p className="text-gray-600 dark:text-[#D1D5DB] text-sm">{t('yourRights.erasure.description')}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3 p-4 border dark:border-[#374151] rounded-lg">
-                  <Shield className="h-5 w-5 text-orange-600 dark:text-orange-400 mt-1" />
-                  <div>
-                    <h3 className="font-semibold dark:text-[#F9FAFB]">{t('yourRights.restriction.title')}</h3>
-                    <p className="text-gray-600 dark:text-[#D1D5DB] text-sm">{t('yourRights.restriction.description')}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3 p-4 border dark:border-[#374151] rounded-lg">
-                  <Download className="h-5 w-5 text-purple-600 dark:text-purple-400 mt-1" />
-                  <div>
-                    <h3 className="font-semibold dark:text-[#F9FAFB]">{t('yourRights.portability.title')}</h3>
-                    <p className="text-gray-600 dark:text-[#D1D5DB] text-sm">{t('yourRights.portability.description')}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3 p-4 border dark:border-[#374151] rounded-lg">
-                  <X className="h-5 w-5 text-gray-600 dark:text-[#9CA3AF] mt-1" />
-                  <div>
-                    <h3 className="font-semibold dark:text-[#F9FAFB]">{t('yourRights.objection.title')}</h3>
-                    <p className="text-gray-600 dark:text-[#D1D5DB] text-sm">{t('yourRights.objection.description')}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                <p className="text-blue-800 dark:text-blue-200">
-                  <strong>{t('yourRights.exercising.title')}:</strong> {t('yourRights.exercising.description')}
-                </p>
               </div>
             </div>
           </CardContent>
@@ -385,53 +222,6 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
           <CardContent>
             <p className="text-gray-700 dark:text-[#D1D5DB] mb-4">{t('internationalTransfers.description')}</p>
             <p className="text-gray-700 dark:text-[#D1D5DB]">{t('internationalTransfers.safeguards')}</p>
-          </CardContent>
-        </Card>
-
-        {/* Contact Information */}
-        <Card className="mb-8 dark:bg-[#1F2937] dark:border-[#374151]">
-          <CardHeader>
-            <CardTitle className="dark:text-[#F9FAFB]">{t('contact.title')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <p className="text-gray-700 dark:text-[#D1D5DB]">{t('contact.description')}</p>
-              
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-semibold mb-3 dark:text-[#F9FAFB]">{t('contact.privacy.title')}</h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <Mail className="h-4 w-4 text-gray-500 dark:text-[#9CA3AF]" />
-                      <a href="mailto:privacy@propertywise.no" className="text-blue-600 dark:text-blue-400 hover:underline">
-                        privacy@propertywise.no
-                      </a>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Phone className="h-4 w-4 text-gray-500 dark:text-[#9CA3AF]" />
-                      <span className="text-gray-600 dark:text-[#D1D5DB]">+47 XX XX XX XX</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-semibold mb-3 dark:text-[#F9FAFB]">{t('contact.authority.title')}</h4>
-                  <div className="space-y-2">
-                    <p className="text-gray-700 dark:text-[#D1D5DB]">{t('contact.authority.name')}</p>
-                    <div className="flex items-center space-x-2">
-                      <Mail className="h-4 w-4 text-gray-500 dark:text-[#9CA3AF]" />
-                      <a href="mailto:postkasse@datatilsynet.no" className="text-blue-600 dark:text-blue-400 hover:underline">
-                        postkasse@datatilsynet.no
-                      </a>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Phone className="h-4 w-4 text-gray-500 dark:text-[#9CA3AF]" />
-                      <span className="text-gray-600 dark:text-[#D1D5DB]">+47 22 39 69 00</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </CardContent>
         </Card>
 
