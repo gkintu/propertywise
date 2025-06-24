@@ -19,3 +19,10 @@ This is a Next.js 15 property analysis application that uses Google Gemini AI to
 - When creating new components or adding visual elements, implement styling for both light and dark themes
 - Use CSS variables and theme-aware classes to ensure proper contrast and visibility in both modes
 - Test all visual changes in both light and dark theme modes
+
+### Yellow Button Styling
+- Every time you create a button that is yellow, use the following className for proper light/dark mode and hover support:
+  
+  `className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8"`
+
+- This ensures consistent yellow button appearance across themes and states.

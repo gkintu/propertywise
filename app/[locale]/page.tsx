@@ -369,13 +369,13 @@ export default function Home({ params }: PageProps) {
               {t('cta.description')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                className="bg-yellow-500 hover:bg-[#FACC15] text-white dark:text-[#111827] px-8"
-                onClick={handleStartAnalysis}
-              >
-                {t('cta.startButton')}
-              </Button>
+                <Button 
+                  size="lg" 
+                  className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8"
+                  onClick={handleStartAnalysis}
+                >
+                  {t('cta.startButton')}
+                </Button>
             </div>
           </div>
         </section>

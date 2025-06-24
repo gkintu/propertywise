@@ -261,21 +261,21 @@ const FileUploadSection = forwardRef<FileUploadSectionHandle, FileUploadSectionP
             </div>
             
             <div className="mt-6 text-center">
-              <Button
-                className="bg-yellow-500 hover:bg-yellow-600 dark:bg-[#EAB308] dark:hover:bg-[#D97706] text-white dark:text-black font-medium px-8 relative flex items-center justify-center"
+                <Button
+                className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8 font-medium relative flex items-center justify-center"
                 onClick={handleAnalyzeDocuments}
                 disabled={isLoading || uploadedFiles.length === 0}
-              >
+                >
                 {isLoading ? (
                   <span className="flex items-center gap-2">
-                    <Spinner size="sm" />
-                    {t('upload.analyzing')}
+                  <Spinner size="sm" />
+                  {t('upload.analyzing')}
                   </span>
                 ) : (
                   <>{t('upload.analyzeButton')}</>
                 )}
                 <Search className="ml-2 w-5 h-5" />
-              </Button>
+                </Button>
             </div>
           </div>
         )}
