@@ -217,13 +217,14 @@ const FileUploadSection = forwardRef<FileUploadSectionHandle, FileUploadSectionP
             <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('upload.uploadedFiles')}</h4>
             <div className="space-y-3">
               {uploadedFiles.map((file, index) => (
-                <Card key={index} className="border border-gray-200 dark:border-gray-600 dark:bg-gray-800/50">
+                <Card key={index} className="border border-gray-200 dark:border-gray-600 dark:bg-gray-800/0">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center">
+                          {/* Document/PDF icon for uploaded files */}
                           <svg
-                            className="w-6 h-6 text-red-600 dark:text-red-400"
+                            className="w-6 h-6 text-red-600 dark:text-red-400/50"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
