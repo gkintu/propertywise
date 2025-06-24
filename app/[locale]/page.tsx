@@ -351,16 +351,16 @@ export default function Home({ params }: PageProps) {
 
         {/* CTA Section */}
         <section className="py-16 text-center">
-          <div className="relative bg-gradient-to-br from-yellow-50 via-yellow-25 to-white dark:from-gray-800/80 dark:via-gray-700/60 dark:to-gray-800/40 rounded-2xl p-12 max-w-4xl mx-auto border border-yellow-200/60 dark:border-yellow-500/20 shadow-lg dark:shadow-yellow-500/5 before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-br before:from-yellow-400/5 before:to-transparent before:pointer-events-none dark:before:from-yellow-400/10">
-            <h2 className="relative text-3xl font-bold text-gray-900 dark:text-white mb-4">{t('cta.title')}</h2>
-            <p className="relative text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+          <div className="bg-yellow-50 dark:bg-gray-800/50 rounded-2xl p-12 max-w-4xl mx-auto border border-yellow-100 dark:border-gray-600/40">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-[#F9FAFB] mb-4">{t('cta.title')}</h2>
+            <p className="text-lg text-gray-600 dark:text-[#D1D5DB] mb-8 max-w-2xl mx-auto">
               {t('cta.description')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="relative bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-600 hover:to-yellow-500 text-white dark:text-black px-8 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
+              <Button size="lg" className="bg-yellow-500 hover:bg-[#FACC15] text-white dark:text-[#111827] px-8">
                 {t('cta.startButton')}
               </Button>
-              <Button size="lg" variant="outline" className="relative px-8 border-yellow-300 dark:border-yellow-400/40 text-yellow-700 dark:text-yellow-300 hover:bg-yellow-100 dark:hover:bg-yellow-400/10 hover:border-yellow-400 dark:hover:border-yellow-300 transition-all duration-200 transform hover:-translate-y-0.5 shadow-sm hover:shadow-md">
+              <Button size="lg" variant="outline" className="px-8 border-yellow-200 dark:border-[#CA8A04] text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#374151]">
                 {t('cta.sampleButton')}
               </Button>
             </div>
