@@ -179,7 +179,7 @@ const FileUploadSection = forwardRef<FileUploadSectionHandle, FileUploadSectionP
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t('upload.dropText')}</h3>
               <p className="text-gray-500 dark:text-[#6B7280] mb-4">
-                or <span 
+                {t('upload.or')} <span 
                   className="text-yellow-600 dark:text-[#FBBF24] font-medium cursor-pointer hover:text-yellow-700 dark:hover:text-[#F59E0B] underline"
                   onClick={openFileDialog}
                 >{t('upload.browseText')}</span>

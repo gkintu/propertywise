@@ -26,6 +26,7 @@
       "title": "Upload Property Documents",
       "subtitle": "Drag and drop your property PDF documents for AI analysis",
       "dropText": "Drop your PDF here",
+      "or": "or",
       "browseText": "browse files",
       "supportText": "Supports PDF files up to 50MB",
       "selectButton": "Select PDF Files",
