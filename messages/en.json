@@ -308,8 +308,8 @@
     },
     "internationalTransfers": {
       "title": "International Data Transfers",
-      "description": "Your PDF documents are temporarily processed by Google Gemini AI, which may involve data transfer to Google's servers outside the EU/EEA for analysis purposes only.",
-      "safeguards": "Google provides appropriate safeguards under their privacy framework. Documents are processed temporarily and not stored permanently by us or Google for analysis purposes."
+      "description": "Some of our service providers may be located outside the EU/EEA. When we transfer data internationally, we ensure appropriate safeguards are in place.",
+      "safeguards": "We use secure agreements, approved frameworks, and other protective measures to keep your data safe during international transfers."
     },
     "contact": {
       "title": "Contact Information",

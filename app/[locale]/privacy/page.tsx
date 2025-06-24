@@ -104,9 +104,10 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
                 </ul>
               </div>
               
-              <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-950/20 rounded-lg">
-                <h4 className="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">{t('dataCollection.notice.title')}</h4>
-                <p className="text-yellow-700 dark:text-yellow-300">{t('dataCollection.notice.description')}</p>
+              <div className="mt-6">
+                <p className="text-gray-700 dark:text-[#D1D5DB] leading-relaxed">
+                  <span className="font-medium">{t('dataCollection.notice.title')}:</span> {t('dataCollection.notice.description')}
+                </p>
               </div>
             </div>
           </CardContent>

@@ -308,8 +308,8 @@
     },
     "internationalTransfers": {
       "title": "Internasjonale dataoverføringer",
-      "description": "Noen av våre tjenesteleverandører kan være lokalisert utenfor EU/EØS. When vi overfører data internasjonalt, sørger vi for at passende sikringstiltak er på plass.",
-      "safeguards": "Vi bruker standard kontraktsklausuler, tilstrekkelighetsbeslutninger eller andre godkjente overføringsmekanismer for å beskytte dine data under internasjonale overføringer."
+      "description": "Noen av våre tjenesteleverandører kan være lokalisert utenfor EU/EØS. Når vi overfører data internasjonalt, sørger vi for at passende sikringstiltak er på plass.",
+      "safeguards": "Vi bruker sikre avtaler, godkjente rammeverk og andre beskyttelsestiltak for å holde dataene dine trygge under internasjonale overføringer."
     },
     "contact": {
       "title": "Kontaktinformasjon",
