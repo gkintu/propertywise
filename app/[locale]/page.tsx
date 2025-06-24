@@ -81,7 +81,7 @@ export default function Home({ params }: PageProps) {
           </div>
           
           <div className="mt-8">
-            <h2 className="text-3xl font-semibold text-gray-800 dark:text-[#F9FAFB] mb-4">
+            <h2 className="text-3xl font-semibold text-yellow-600 dark:text-[#FBBF24] mb-4">
               {t('greeting')}
             </h2>
           </div>
@@ -364,7 +364,7 @@ export default function Home({ params }: PageProps) {
         {/* CTA Section */}
         <section className="py-16 text-center">
           <div className="bg-yellow-50 dark:bg-gray-800/50 rounded-2xl p-12 max-w-4xl mx-auto border border-yellow-100 dark:border-gray-600/40">
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-[#F9FAFB] mb-4">{t('cta.title')}</h2>
+            <h2 className="text-3xl font-bold text-yellow-600 dark:text-[#FBBF24] mb-4">{t('cta.title')}</h2>
             <p className="text-lg text-gray-600 dark:text-[#D1D5DB] mb-8 max-w-2xl mx-auto">
               {t('cta.description')}
             </p>
