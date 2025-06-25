@@ -7,10 +7,24 @@ import { useRouter, useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { toast } from "sonner"
 import { useFileUpload } from '@/hooks/useFileUpload'
-import { useState, forwardRef, useImperativeHandle } from 'react'
+import { useState, forwardRef, useImperativeHandle, useRef, useCallback } from 'react'
 import Spinner from "@/components/customized/spinner/spinner-05";
 import { ShakeMotion, ShakeMotionHandle } from '@/components/motion'
-import { useRef } from 'react'
+
+const DEMO_PDFS = [
+  {
+    key: 'alvJohnsensVei',
+    url: '/demo-pdfs/Alv Johnsens vei 1 - Drammen - Salgsoppgave.pdf',
+  },
+  {
+    key: 'boletteBrygge',
+    url: '/demo-pdfs/Bolette brygge 5 - Oslo - salgsoppgave.pdf',
+  },
+  {
+    key: 'sanengveien',
+    url: '/demo-pdfs/Sanengveien 1 - Fredrikstad - salgsoppgave.pdf',
+  },
+] as const
 
 interface FileUploadSectionProps {
   onAnalysisStart?: () => void;
@@ -37,7 +51,7 @@ const FileUploadSection = forwardRef<FileUploadSectionHandle, FileUploadSectionP
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const shakeRef = useRef<ShakeMotionHandle>(null)
-  
+
   const {
     dragActive,
     uploadedFiles,
