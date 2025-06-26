@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import Spinner from "@/components/customized/spinner/spinner-05";
 import { ShakeMotion, ShakeMotionHandle } from "@/components/motion";
+import { DemoFilesSection } from "./DemoFilesSection";
 
 interface FileUploadSectionProps {
   onAnalysisStart?: () => void;
@@ -62,13 +63,14 @@ const FileUploadSection = forwardRef<
       },
     }));
 
-    const handleAnalyzeDocuments = async () => {
-      if (uploadedFiles.length === 0) {
+    const handleAnalyzeDocuments = async (fileToAnalyze?: File) => {
+      const finalFile = fileToAnalyze || uploadedFiles[0];
+
+      if (!finalFile) {
         toast.error(t("upload.validation.noFileSelected"));
         return;
       }
 
-      // Clear any previous analysis results when starting a new analysis
       localStorage.removeItem("analysisResult");
       localStorage.removeItem("analysisError");
       localStorage.removeItem("analysisErrorType");
@@ -77,7 +79,7 @@ const FileUploadSection = forwardRef<
       onAnalysisStart?.();
 
       const formData = new FormData();
-      formData.append("file", uploadedFiles[0]);
+      formData.append("file", finalFile);
       formData.append("language", locale);
 
       try {
@@ -96,22 +98,18 @@ const FileUploadSection = forwardRef<
             errorMessage = errorData.error || errorMessage;
             errorType = errorData.errorType || errorType;
 
-            // Store both error message and type for the analysis result page
             localStorage.setItem("analysisError", errorMessage);
             localStorage.setItem("analysisErrorType", errorType);
           } catch {
-            // If response is not JSON, use the text as error message
             errorMessage = errorText || errorMessage;
             localStorage.setItem("analysisError", errorMessage);
             localStorage.setItem("analysisErrorType", "processing_error");
           }
 
-          // Don't show toast for specific error types that will be handled on the result page
           if (
             errorType === "invalid_document_type" ||
             errorType === "insufficient_property_data"
           ) {
-            // Navigate to result page to show specific error UI
             router.push(`/${locale}/analysis-result`);
             return;
           }
@@ -121,7 +119,6 @@ const FileUploadSection = forwardRef<
 
         const data = await response.json();
 
-        // Validate that we have actual data before storing
         if (data && (data.analysis || data.summary)) {
           localStorage.setItem("analysisResult", JSON.stringify(data));
           toast.success(t("upload.success"));
@@ -143,9 +140,31 @@ const FileUploadSection = forwardRef<
       }
     };
 
+    const handleDemoFileSelect = async (filePath: string, fileName: string) => {
+      setIsLoading(true);
+      toast.info(t("demo.loadingMessage"));
+
+      try {
+        const response = await fetch(filePath);
+        if (!response.ok) {
+          throw new Error(`Could not fetch demo file: ${response.statusText}`);
+        }
+        const blob = await response.blob();
+
+        const demoFile = new File([blob], fileName, { type: "application/pdf" });
+
+        await handleAnalyzeDocuments(demoFile);
+      } catch (error) {
+        console.error("Failed to process demo file:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "An unknown error occurred.";
+        toast.error(`${t("demo.errorMessage")}: ${errorMessage}`);
+        setIsLoading(false);
+      }
+    };
+
     return (
       <div className={`${className}`}>
-        {/* Screen reader status announcements */}
         <div aria-live="polite" aria-atomic="true" className="sr-only">
           {statusMessage}
         </div>
@@ -210,7 +229,6 @@ const FileUploadSection = forwardRef<
                     {t("upload.supportText")}
                   </div>
 
-                  {/* Hidden file input */}
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -219,7 +237,6 @@ const FileUploadSection = forwardRef<
                     onChange={handleFileSelect}
                   />
 
-                  {/* Upload button */}
                   <Button
                     variant="outline"
                     className="mt-6 border-yellow-200 dark:border-[#FBBF24] text-yellow-600 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#FBBF24] dark:hover:text-black font-medium"
@@ -233,14 +250,19 @@ const FileUploadSection = forwardRef<
             </Card>
           </ShakeMotion>
 
-          {/* Uploaded file display (single file only) */}
+          {uploadedFiles.length === 0 && (
+            <DemoFilesSection
+              onDemoFileSelect={handleDemoFileSelect}
+              isLoading={isLoading}
+            />
+          )}
+
           {uploadedFiles.length > 0 && (
             <div className="max-w-2xl mx-auto mt-6">
               <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 {t("upload.uploadedFile")}
               </h4>
               <div className="space-y-3">
-                {/* Only show the first file, since only one is supported */}
                 <Card
                   className="border border-gray-200 dark:border-gray-600 dark:bg-gray-800/0"
                 >
@@ -248,7 +270,6 @@ const FileUploadSection = forwardRef<
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center">
-                          {/* Document/PDF icon for uploaded file */}
                           <svg
                             className="w-6 h-6 text-red-600 dark:text-red-400/50"
                             fill="none"
@@ -289,7 +310,7 @@ const FileUploadSection = forwardRef<
               <div className="mt-6 text-center">
                 <Button
                   className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8 font-medium relative flex items-center justify-center"
-                  onClick={handleAnalyzeDocuments}
+                  onClick={() => handleAnalyzeDocuments()}
                   disabled={isLoading || uploadedFiles.length === 0}
                 >
                   {isLoading ? (

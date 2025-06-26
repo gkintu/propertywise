@@ -63,6 +63,12 @@
       "title": "Ready to make informed property decisions?",
       "description": "Turn your property PDFs into actionable insights with intelligent analysis that reveals hidden risks and opportunities.",
       "startButton": "Start Free Analysis"
+    },
+    "demo": {
+      "title": "Or try an example",
+      "analyzeButton": "Analyze demo",
+      "loadingMessage": "Loading demo file...",
+      "errorMessage": "Failed to load demo"
     }
   },
   "AnalysisResult": {

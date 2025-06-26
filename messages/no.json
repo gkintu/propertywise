@@ -63,6 +63,12 @@
       "title": "Klar til å ta informerte eiendomsbeslutninger?",
       "description": "Gjør dine eiendoms-PDFer om til handlingsrettede innsikter med intelligent analyse som avslører skjulte risikoer og muligheter.",
       "startButton": "Start gratis analyse"
+    },
+    "demo": {
+      "title": "Eller prøv et eksempel",
+      "analyzeButton": "Analyser demo",
+      "loadingMessage": "Laster demo-fil...",
+      "errorMessage": "Kunne ikke laste demo"
     }
   },
   "AnalysisResult": {
