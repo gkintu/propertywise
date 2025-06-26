@@ -31,6 +31,7 @@
       "supportText": "Supports PDF files up to 50MB",
       "selectButton": "Select PDF Files",
       "uploadedFiles": "Uploaded Files",
+      "uploadedFile": "Uploaded File",
       "analyzing": "Analyzing...",
       "analyzeButton": "Analyze Document",
       "validation": {
