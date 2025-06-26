@@ -32,8 +32,10 @@ copy the function of this site and create a md file for my repo, leave out .env.
 - Theme toggle and locale switcher available on all pages (not just front page)
 - Consistent dark mode color scheme using Tailwind CSS dark mode classes
 
--  legg til en default test pdf som sjefer kan bruke for å teste appen slik at de selv ikke trenger
-å laste ned salgsoppgave fra finn, 2 stykk skal holde
+✅ **COMPLETED**: legg til en default test pdf som sjefer kan bruke for å teste appen slik at de selv ikke trenger å laste ned salgsoppgave fra finn, 2 stykk skal holde
 
--- hva skal denne gjøre Ready to make informed property decisions? ta kunder til en artikkel om feller man kan gå på kanksje ? vise eksempel på en analyse ? må ikke
-være en av de to eksemplene man har, når k trykker på Start Free Analysis så burde upload section riste kankjse ? 
+Akkurat nå er teksten  Upload Property Documents - Drag and drop your property PDF documents for AI analysis select pdf files osv
+er veldig generisk, bruk språk som får bruker til å forstå at vi er ute etter salgs oppgave
+anotehr edge case du måt teste er hva som skjer vis k laster opp kun egenerklæring osv
+folk er dumme og de kommer til å gjøre det også
+

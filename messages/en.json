@@ -68,7 +68,8 @@
       "title": "Or try an example",
       "analyzeButton": "Analyze demo",
       "loadingMessage": "Loading demo file...",
-      "errorMessage": "Failed to load demo"
+      "errorMessage": "Failed to load demo",
+      "tooltip": "Every document is an authentic Norwegian sales report – select one and click on the Analyze Document-button to reveal key highlights and insights of the home!"
     }
   },
   "AnalysisResult": {

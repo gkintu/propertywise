@@ -33,7 +33,7 @@
       "uploadedFiles": "Opplastede filer",
       "uploadedFile": "Opplastet fil",
       "analyzing": "Analyserer...",
-      "analyzeButton": "Analyser dokument",
+      "analyzeButton": "Analyser Dokument",
       "validation": {
         "multipleFilesDrop": "Vennligst slipp bare én PDF-fil om gangen.",
         "multipleFilesSelect": "Vennligst velg bare én PDF-fil om gangen.",
@@ -68,7 +68,8 @@
       "title": "Eller prøv et eksempel",
       "analyzeButton": "Analyser demo",
       "loadingMessage": "Laster demo-fil...",
-      "errorMessage": "Kunne ikke laste demo"
+      "errorMessage": "Kunne ikke laste demo",
+      "tooltip": "Hvert dokument er en ekte norsk salgsrapport – velg ett og klikk på Analyser Dokument-knappen for å se viktige høydepunkter og innsikt om boligen!"
     }
   },
   "AnalysisResult": {
