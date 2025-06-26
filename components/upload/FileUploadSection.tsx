@@ -32,7 +32,7 @@ const FileUploadSection = forwardRef<
     {
       onAnalysisStart,
       onAnalysisComplete,
-      className = "",
+      className,
       showTitle = true,
       containerWidth = "normal",
     },
@@ -64,11 +64,13 @@ const FileUploadSection = forwardRef<
       },
     }));
 
-    const handleAnalyzeDocuments = async (fileToAnalyze?: File) => {
-      const finalFile = fileToAnalyze || uploadedFiles[0];
+    const handleAnalyzeDocuments = async () => {
+      // Simplified to always use the file from the state. The optional 'fileToAnalyze' parameter is no longer needed since the conflicting demo file logic was removed. This creates a single, consistent path for analysis.
+      const fileToAnalyze = uploadedFiles[0];
 
-      if (!finalFile) {
+      if (!fileToAnalyze) {
         toast.error(t("upload.validation.noFileSelected"));
+        shakeRef.current?.shake();
         return;
       }
 
@@ -80,7 +82,7 @@ const FileUploadSection = forwardRef<
       onAnalysisStart?.();
 
       const formData = new FormData();
-      formData.append("file", finalFile);
+      formData.append("file", fileToAnalyze);
       formData.append("language", locale);
 
       try {
@@ -98,19 +100,19 @@ const FileUploadSection = forwardRef<
             const errorData = JSON.parse(errorText);
             errorMessage = errorData.error || errorMessage;
             errorType = errorData.errorType || errorType;
-
-            localStorage.setItem("analysisError", errorMessage);
-            localStorage.setItem("analysisErrorType", errorType);
           } catch {
             errorMessage = errorText || errorMessage;
-            localStorage.setItem("analysisError", errorMessage);
-            localStorage.setItem("analysisErrorType", "processing_error");
           }
+
+          localStorage.setItem("analysisError", errorMessage);
+          localStorage.setItem("analysisErrorType", errorType);
 
           if (
             errorType === "invalid_document_type" ||
             errorType === "insufficient_property_data"
           ) {
+            // Call the 'onAnalysisComplete' callback before navigating to ensure any parent component cleanup logic runs predictably before the user is moved to a new page.
+            onAnalysisComplete?.();
             router.push(`/${locale}/analysis-result`);
             return;
           }
@@ -134,38 +136,18 @@ const FileUploadSection = forwardRef<
         toast.error(`${t("upload.error")}: ${errorMessage}`);
         localStorage.setItem("analysisError", errorMessage);
         localStorage.setItem("analysisErrorType", "processing_error");
+        // Also call the 'onAnalysisComplete' callback here before navigation for consistency.
+        onAnalysisComplete?.();
         router.push(`/${locale}/analysis-result`);
       } finally {
         setIsLoading(false);
+        // This callback will still run, ensuring completion is always signaled.
         onAnalysisComplete?.();
       }
     };
 
-    const handleDemoFileSelect = async (filePath: string, fileName: string) => {
-      setIsLoading(true);
-      toast.info(t("demo.loadingMessage"));
-
-      try {
-        const response = await fetch(filePath);
-        if (!response.ok) {
-          throw new Error(`Could not fetch demo file: ${response.statusText}`);
-        }
-        const blob = await response.blob();
-
-        const demoFile = new File([blob], fileName, { type: "application/pdf" });
-
-        await handleAnalyzeDocuments(demoFile);
-      } catch (error) {
-        console.error("Failed to process demo file:", error);
-        const errorMessage =
-          error instanceof Error ? error.message : "An unknown error occurred.";
-        toast.error(`${t("demo.errorMessage")}: ${errorMessage}`);
-        setIsLoading(false);
-      }
-    };
-
     return (
-      <div className={`${className}`}>
+      <div className={className}>
         <div aria-live="polite" aria-atomic="true" className="sr-only">
           {statusMessage}
         </div>
@@ -251,69 +233,62 @@ const FileUploadSection = forwardRef<
             </Card>
           </ShakeMotion>
 
-          {uploadedFiles.length === 0 && (
+          {/* Use a single ternary operator to conditionally render either the demo file section or the uploaded file info section. This approach makes the logic cleaner and more explicit: if there are no files, show demos; otherwise, show the uploaded file info. */}
+          {uploadedFiles.length === 0 ? (
             <DemoFilesSection
-              onDemoFileUpload={(file) => {
-                setUploadedFiles([file]);
-              }}
+              onDemoFileUpload={(file) => setUploadedFiles([file])}
               isLoading={isLoading}
             />
-          )}
-
-          {uploadedFiles.length > 0 && (
+          ) : (
             <div className="max-w-2xl mx-auto mt-6">
               <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 {t("upload.uploadedFile")}
               </h4>
-              <div className="space-y-3">
-                <Card
-                  className="border border-gray-200 dark:border-gray-600 dark:bg-gray-800/0"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center">
-                          <svg
-                            className="w-6 h-6 text-red-600 dark:text-red-400/50"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                            />
-                          </svg>
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {uploadedFiles[0].name}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-[#9CA3AF]">
-                            {(uploadedFiles[0].size / 1024 / 1024).toFixed(2)} MB
-                          </p>
-                        </div>
+              <Card className="border border-gray-200 dark:border-gray-600 dark:bg-gray-800/0">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center">
+                        <svg
+                          className="w-6 h-6 text-red-600 dark:text-red-400/50"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeFile()}
-                        className="text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 dark:border-gray-600"
-                        aria-label={`Remove ${uploadedFiles[0].name}`}
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {uploadedFiles[0].name}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-[#9CA3AF]">
+                          {(uploadedFiles[0].size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                      </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeFile()}
+                      className="text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 dark:border-gray-600"
+                      aria-label={`Remove ${uploadedFiles[0].name}`}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
               <div className="mt-6 text-center">
                 <Button
                   className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8 font-medium relative flex items-center justify-center"
-                  onClick={() => handleAnalyzeDocuments()}
+                  onClick={handleAnalyzeDocuments}
                   disabled={isLoading || uploadedFiles.length === 0}
                 >
                   {isLoading ? (

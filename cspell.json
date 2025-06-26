@@ -1,0 +1,39 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "salgsoppgave",
+    "Fredrikstad",
+    "Sanengveien",
+    "brygge",
+    "pdfs",
+    "eiendomsinnsikter",
+    "eiendomsanalyse",
+    "innsikter",
+    "analyse",
+    "eiendomsdokumenter",
+    "eiendomsadresse",
+    "oppførings",
+    "NØKKELFUNN",
+    "analysefil",
+    "analysefiler",
+    "analyseinnsikt",
+    "analyseknappen",
+    "analyseoppsummering",
+    "analyseprosess",
+    "analyseverktøy",
+    "analysevisning",
+    "analyseytelse",
+    "analyseytelser",
+    "analyseytelses",
+    "analyseytelsesdata",
+    "analyseytelsesrapport",
+    "analyseytelsesrapporter",
+    "analyseytelsesresultat",
+    "analyseytelsesresultater"
+  ],
+  "ignorePaths": [
+    "messages/no.json",
+    "messages/en.json"
+  ]
+}

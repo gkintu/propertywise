@@ -39,3 +39,7 @@ er veldig generisk, bruk språk som får bruker til å forstå at vi er ute ette
 anotehr edge case du måt teste er hva som skjer vis k laster opp kun egenerklæring osv
 folk er dumme og de kommer til å gjøre det også
 
+
+-- add movement to demo cards
+-- if user clicks anaalyze document the x button should be greyed out slik at de ikke kan avbryte
+alså add a more informative loading state like visning.ai har
