@@ -119,5 +119,6 @@ export function useFileUpload() {
     handleFileSelect,
     removeFile,
     openFileDialog,
+    setUploadedFiles, // Expose setter
   }
 }

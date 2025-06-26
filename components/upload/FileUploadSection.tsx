@@ -55,6 +55,7 @@ const FileUploadSection = forwardRef<
       handleFileSelect,
       removeFile,
       openFileDialog,
+      setUploadedFiles, // Add this setter from useFileUpload
     } = useFileUpload();
 
     useImperativeHandle(ref, () => ({
@@ -252,7 +253,9 @@ const FileUploadSection = forwardRef<
 
           {uploadedFiles.length === 0 && (
             <DemoFilesSection
-              onDemoFileSelect={handleDemoFileSelect}
+              onDemoFileUpload={(file) => {
+                setUploadedFiles([file]);
+              }}
               isLoading={isLoading}
             />
           )}
