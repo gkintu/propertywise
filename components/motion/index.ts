@@ -7,4 +7,3 @@ export { default as CardMotion } from './CardMotion';
 export { default as StaggerContainer } from './StaggerContainer';
 export { default as ShakeMotion } from './ShakeMotion';
 export type { ShakeMotionHandle } from './ShakeMotion';
-export * from './HoverLiftMotion';

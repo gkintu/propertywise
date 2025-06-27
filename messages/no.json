@@ -23,8 +23,8 @@
       }
     },
     "upload": {
-      "title": "Last opp eiendomsdokumenter",
-      "subtitle": "Dra og slipp PDF-dokumentene dine for AI-analyse",
+      "title": "Last opp Salgsoppgave / prospekt",
+      "subtitle": "Dra og slipp PDF-dokumentet for AI-analyse",
       "dropText": "Slipp PDF-en din her",
       "or": "eller",
       "browseText": "bla gjennom filer",
@@ -61,7 +61,7 @@
     },
     "cta": {
       "title": "Klar til å ta informerte eiendomsbeslutninger?",
-      "description": "Gjør dine eiendoms-PDFer om til handlingsrettede innsikter med intelligent analyse som avslører skjulte risikoer og muligheter.",
+      "description": "Gjør dine salgsoppgaver / prospekter om til handlingsrettede innsikter med intelligent analyse som avslører skjulte risikoer og muligheter raskt",
       "startButton": "Start gratis analyse"
     },
     "demo": {

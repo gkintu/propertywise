@@ -23,8 +23,8 @@
       }
     },
     "upload": {
-      "title": "Upload Property Documents",
-      "subtitle": "Drag and drop your property PDF documents for AI analysis",
+      "title": "Upload Sales Prospectus / Brochure",
+      "subtitle": "Drag and drop the PDF document for AI analysis",
       "dropText": "Drop your PDF here",
       "or": "or",
       "browseText": "browse files",
@@ -61,7 +61,7 @@
     },
     "cta": {
       "title": "Ready to make informed property decisions?",
-      "description": "Turn your property PDFs into actionable insights with intelligent analysis that reveals hidden risks and opportunities.",
+      "description": "Turn your sales prospectuses / brochures into actionable insights with intelligent analysis that uncovers hidden risks and opportunities.",
       "startButton": "Start Free Analysis"
     },
     "demo": {
@@ -69,7 +69,7 @@
       "analyzeButton": "Analyze demo",
       "loadingMessage": "Loading demo file...",
       "errorMessage": "Failed to load demo",
-      "tooltip": "Every document is an authentic Norwegian sales report – select one and click on the Analyze Document-button to reveal key highlights and insights of the home!"
+      "tooltip": "Every document is an authentic Norwegian sales report – select one and click on the Analyze Document-button to reveal key highlights and insights of the home fast"
     }
   },
   "AnalysisResult": {
