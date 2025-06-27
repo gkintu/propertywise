@@ -277,7 +277,10 @@ const FileUploadSection = forwardRef<
                       variant="outline"
                       size="sm"
                       onClick={() => removeFile()}
-                      className="text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 dark:border-gray-600"
+                      disabled={isLoading}
+                      className={`text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 dark:border-gray-600 ${
+                        isLoading ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
+                      }`}
                       aria-label={`Remove ${uploadedFiles[0].name}`}
                     >
                       <X className="w-4 h-4" />

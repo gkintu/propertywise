@@ -19,7 +19,7 @@ export const HoverLiftMotion: React.FC<HoverLiftMotionProps> = ({
     <motion.div
       className={className}
       // The core hover animation preset
-      whileHover={{ y: -5, scale: 1.03 }}
+      whileHover={{ y: -1, scale: 1.01 }}
       // A nice springy transition to make it feel responsive
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       {...props}
