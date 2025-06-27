@@ -6,6 +6,7 @@ import { Info } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import Spinner from "@/components/customized/spinner/spinner-05";
+import { HoverLiftMotion } from "@/components/motion";
 
 const demoFiles = [
 	{
@@ -85,57 +86,58 @@ export function DemoFilesSection({
 			</div>
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 				{demoFiles.map((file) => (
-					<Card
-						key={file.path}
-						className={`dark:bg-gray-800/50 transition-colors ${
-							isAnyActionInProgress
-								? "cursor-not-allowed opacity-50"
-								: "cursor-pointer hover:border-yellow-400 dark:hover:border-yellow-500/50"
-						}`} // CHANGE: Added dynamic classes to disable the card visually.
-						onClick={() => handleCardClick(file.path, file.name)}
-						// CHANGE: Added onKeyDown for better accessibility.
-						// WHY: This makes the component fully keyboard-navigable, behaving like a true button for users who can't use a mouse.
-						onKeyDown={(e) => {
-							if (e.key === "Enter" || e.key === " ") {
-								e.preventDefault();
-								handleCardClick(file.path, file.name);
-							}
-						}}
-						tabIndex={isAnyActionInProgress ? -1 : 0} // CHANGE: Card is not focusable when disabled.
-						role="button"
-						aria-label={file.name}
-						aria-disabled={isAnyActionInProgress} // CHANGE: Semantically disable the button for screen readers.
-					>
-						<CardContent className="p-4 flex flex-col items-start justify-between h-full">
-							<div className="flex items-start gap-3">
-								<div className="flex-shrink-0 mt-1 w-6 h-6 flex items-center justify-center">
-									{/* CHANGE: Show a spinner on the specific card being fetched. */}
-									{/* WHY: This provides clear, targeted feedback about which action is in progress. */}
-									{fetchingPath === file.path ? (
-										<Spinner size="sm" />
-									) : (
-										<svg
-											className="w-6 h-6 text-red-600 dark:text-red-400/50"
-											fill="none"
-											stroke="currentColor"
-											viewBox="0 0 24 24"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-											/>
-										</svg>
-									)}
+					<HoverLiftMotion key={file.path}>
+						<Card
+							className={`dark:bg-gray-800/50 transition-colors w-full ${
+								isAnyActionInProgress
+									? "cursor-not-allowed opacity-50"
+									: "cursor-pointer hover:border-yellow-400 dark:hover:border-yellow-500/50"
+							}`} // CHANGE: Added dynamic classes to disable the card visually.
+							onClick={() => handleCardClick(file.path, file.name)}
+							// CHANGE: Added onKeyDown for better accessibility.
+							// WHY: This makes the component fully keyboard-navigable, behaving like a true button for users who can't use a mouse.
+							onKeyDown={(e) => {
+								if (e.key === "Enter" || e.key === " ") {
+									e.preventDefault();
+									handleCardClick(file.path, file.name);
+								}
+							}}
+							tabIndex={isAnyActionInProgress ? -1 : 0} // CHANGE: Card is not focusable when disabled.
+							role="button"
+							aria-label={file.name}
+							aria-disabled={isAnyActionInProgress} // CHANGE: Semantically disable the button for screen readers.
+						>
+							<CardContent className="p-4 flex flex-col items-start justify-between h-full">
+								<div className="flex items-start gap-3">
+									<div className="flex-shrink-0 mt-1 w-6 h-6 flex items-center justify-center">
+										{/* CHANGE: Show a spinner on the specific card being fetched. */}
+										{/* WHY: This provides clear, targeted feedback about which action is in progress. */}
+										{fetchingPath === file.path ? (
+											<Spinner size="sm" />
+										) : (
+											<svg
+												className="w-6 h-6 text-red-600 dark:text-red-400/50"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+												/>
+											</svg>
+										)}
+									</div>
+									<p className="font-medium text-gray-900 dark:text-white mb-0">
+										{file.name}
+									</p>
 								</div>
-								<p className="font-medium text-gray-900 dark:text-white mb-0">
-									{file.name}
-								</p>
-							</div>
-						</CardContent>
-					</Card>
+							</CardContent>
+						</Card>
+					</HoverLiftMotion>
 				))}
 			</div>
 		</div>
