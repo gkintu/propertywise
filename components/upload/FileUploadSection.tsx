@@ -8,9 +8,9 @@ import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useFileUpload } from "@/hooks/useFileUpload";
-import Spinner from "@/components/customized/spinner/spinner-05";
 import { ShakeMotion, ShakeMotionHandle } from "@/components/motion";
 import { DemoFilesSection } from "./DemoFilesSection";
+import AnalysisProgressBar from "./AnalysisProgressBar";
 
 interface FileUploadSectionProps {
   onAnalysisStart?: () => void;
@@ -289,21 +289,18 @@ const FileUploadSection = forwardRef<
                 </CardContent>
               </Card>
               <div className="mt-6 text-center">
-                <Button
-                  className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8 font-medium relative flex items-center justify-center"
-                  onClick={handleAnalyzeDocuments}
-                  disabled={isLoading || uploadedFiles.length === 0}
-                >
-                  {isLoading ? (
-                    <span className="flex items-center gap-2">
-                      <Spinner size="sm" />
-                      {t("upload.analyzing")}
-                    </span>
-                  ) : (
+                {isLoading ? (
+                  <AnalysisProgressBar complete={false} />
+                ) : (
+                  <Button
+                    className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8 font-medium relative flex items-center justify-center"
+                    onClick={handleAnalyzeDocuments}
+                    disabled={isLoading || uploadedFiles.length === 0}
+                  >
                     <>{t("upload.analyzeButton")}</>
-                  )}
-                  <Search className="ml-2 w-5 h-5" />
-                </Button>
+                    <Search className="ml-2 w-5 h-5" />
+                  </Button>
+                )}
               </div>
             </div>
           )}

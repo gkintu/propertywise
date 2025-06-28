@@ -47,7 +47,12 @@
       "fileUploaded": "File uploaded: {fileName}",
       "fileSelected": "File selected: {fileName}",
       "fileRemoved": "File removed",
-      "releaseToUpload": "Release to upload file"
+      "releaseToUpload": "Release to upload file",
+      "progressStages": {
+        "extractingDetails": "Extracting Property Details",
+        "analyzingPrice": "Analyzing Price & Market Data",
+        "checkingRisks": "Checking for Hidden Risks"
+      }
     },
     "recentAnalysis": {
       "title": "Recent Property Analysis",
@@ -111,7 +116,12 @@
       "pdfGeneratedSuccess": "PDF generated successfully!",
       "pdfGenerationError": "Failed to generate PDF. Please try again.",
       "debugTitle": "🚧 Debug Data (Remove before deployment)",
-      "rawAnalysisData": "Raw Analysis Data:"
+      "rawAnalysisData": "Raw Analysis Data:",
+      "progressStages": {
+        "extractingDetails": "Extracting Property Details",
+        "analyzingPrice": "Analyzing Price & Market Data",
+        "checkingRisks": "Checking for Hidden Risks"
+      }
     },
     "summary": {
       "propertyAnalysisReportTitle": "Property Analysis Report",

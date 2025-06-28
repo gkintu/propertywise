@@ -47,7 +47,12 @@
       "fileUploaded": "Fil lastet opp: {fileName}",
       "fileSelected": "Fil valgt: {fileName}",
       "fileRemoved": "Fil fjernet",
-      "releaseToUpload": "Slipp for å laste opp fil"
+      "releaseToUpload": "Slipp for å laste opp fil",
+      "progressStages": {
+        "extractingDetails": "Henter eiendomsdetaljer",
+        "analyzingPrice": "Analyserer pris og marked",
+        "checkingRisks": "Sjekker skjulte risikoer"
+      }
     },
     "recentAnalysis": {
       "title": "Nylig eiendomsanalyse",
@@ -111,7 +116,12 @@
       "pdfGeneratedSuccess": "PDF generert!",
       "pdfGenerationError": "Kunne ikke generere PDF. Prøv igjen.",
       "debugTitle": "🚧 Feilsøkingsdata (Fjern før distribusjon)",
-      "rawAnalysisData": "Rådata for analyse:"
+      "rawAnalysisData": "Rådata for analyse:",
+      "progressStages": {
+        "extractingDetails": "Henter eiendomsdetaljer",
+        "analyzingPrice": "Analyserer pris og marked",
+        "checkingRisks": "Sjekker skjulte risikoer"
+      }
     },
     "summary": {
       "propertyAnalysisReportTitle": "Eiendomsanalyserapport",
