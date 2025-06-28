@@ -19,7 +19,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         } as React.CSSProperties
       }
       icons={{
-        success: <CircleCheck className="w-4 h-4 text-green-600" />,
+        success: <CircleCheck className="w-4 h-4 text-yellow-600 dark:text-[#FBBF24]" />,
         error: <TriangleAlert className="w-4 h-4 text-red-600" />,
       }}
       {...props}
