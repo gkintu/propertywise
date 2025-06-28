@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useImperativeHandle, forwardRef, useCallback, useTransition, useEffect } from "react";
+import React, { useState, useRef, useImperativeHandle, forwardRef, useCallback, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, X, Search } from "lucide-react";
@@ -54,7 +54,6 @@ const FileUploadSection = forwardRef<
     // Modern state management
     const [analysisState, setAnalysisState] = useState<AnalysisState>(AnalysisState.IDLE);
     const [isPending, startTransition] = useTransition();
-    const [progressComplete, setProgressComplete] = useState(false);
     const shakeRef = useRef<ShakeMotionHandle>(null);
 
     const {
@@ -90,16 +89,17 @@ const FileUploadSection = forwardRef<
       console.error("Analysis error:", error);
       toast.error(`${t("upload.error")}: ${errorMessage}`);
       
+      // Store error info for results page
       localStorage.setItem("analysisError", errorMessage);
       localStorage.setItem("analysisErrorType", errorType);
       
       setAnalysisState(AnalysisState.ERROR);
       
-      // Navigate immediately on error
+      // Brief delay to show completion, then navigate
       setTimeout(() => {
         navigateToResults();
         onAnalysisComplete?.();
-      }, 1000);
+      }, 500);
     }, [t, navigateToResults, onAnalysisComplete]);
 
     // Modern success handling
@@ -113,27 +113,13 @@ const FileUploadSection = forwardRef<
       toast.success(t("upload.success"));
       
       setAnalysisState(AnalysisState.COMPLETED);
-      onAnalysisComplete?.();
-      // Let progress bar finish naturally, then navigate
+      
+      // Brief delay to show 100% completion, then navigate
       setTimeout(() => {
         navigateToResults();
-      }, 3000); // Give time for final progress animation (95% to 100% takes ~2s)
+        onAnalysisComplete?.();
+      }, 500);
     }, [t, navigateToResults, onAnalysisComplete]);
-
-    // Effect to handle navigation after progress completes
-    useEffect(() => {
-      if (analysisState === AnalysisState.COMPLETED) {
-        // Wait for progress bar to finish animating to 100%
-        const timeout = setTimeout(() => {
-          setProgressComplete(true);
-          // Navigate after showing completion
-          setTimeout(() => {
-            navigateToResults();
-          }, 800); // Allow time to see 100% completion
-        }, 100);
-        return () => clearTimeout(timeout);
-      }
-    }, [analysisState, navigateToResults]);
 
     // Main analysis handler with modern async patterns
     const handleAnalyzeDocuments = useCallback(async () => {
@@ -344,7 +330,7 @@ const FileUploadSection = forwardRef<
                 </CardContent>
               </Card>
               <div className="mt-6 text-center">
-                {(isAnalyzing || isCompleted) ? (
+                {isAnalyzing ? (
                   <AnalysisProgressBar complete={isCompleted} />
                 ) : (
                   <Button
@@ -363,13 +349,6 @@ const FileUploadSection = forwardRef<
                   </Button>
                 )}
               </div>
-              {isCompleted && (
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-green-600 dark:text-green-400">
-                    {t("upload.analysisComplete")}
-                  </p>
-                </div>
-              )}
             </div>
           )}
         </div>

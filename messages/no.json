@@ -51,7 +51,9 @@
       "progressStages": {
         "extractingDetails": "Henter eiendomsdetaljer",
         "analyzingPrice": "Analyserer pris og marked",
-        "checkingRisks": "Sjekker skjulte risikoer"
+        "checkingRisks": "Sjekker skjulte risikoer",
+        "finalizing": "Fullfører analyse…",
+        "analysisComplete": "Analyse fullført"
       }
     },
     "recentAnalysis": {

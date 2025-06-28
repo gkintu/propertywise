@@ -18,40 +18,46 @@ export default function AnalysisProgressBar({ complete = false }: AnalysisProgre
   const startTimeRef = useRef<number>();
   const lastProgressRef = useRef<number>(0);
 
-  // Animation configuration - same as your original for realistic progression
+  // --- CHANGE 1: UPDATE THE ANIMATION CONFIGURATION ---
+  // We split the old stage3 into two parts to control the 80-95% speed specifically.
   const config = useMemo(
     () => ({
-      stage1: { start: 0, end: 35, duration: 8000 },
-      stage2: { start: 35, end: 75, duration: 15000 },
-      stage3: { start: 75, end: 95, duration: 12000 },
-      completion: { start: 95, end: 100, duration: 2000 },
+      stage1: { start: 0, end: 35, duration: 8000 },       // 35% over 8s
+      stage2: { start: 35, end: 75, duration: 15000 },      // 40% over 15s
+      stage3: { start: 75, end: 80, duration: 3000 },       // First 5% of this phase over 3s
+      stage3_slow: { start: 80, end: 95, duration: 30000 }, // The requested 15% over 30s
+      completion: { start: 95, end: 100, duration: 2000 },   // Final 5% over 2s
     }),
     []
   );
 
-  // Stage text labels
+  // Stage text labels - updated for new logic.
   const stages = useMemo(
     () => [
       t("upload.progressStages.extractingDetails"),
       t("upload.progressStages.analyzingPrice"),
       t("upload.progressStages.checkingRisks"),
+      t("upload.progressStages.finalizing"), // 90-99%
+      t("upload.progressStages.analysisComplete") // 100%
     ],
     [t]
   );
 
-  // The main animation effect, runs once and manages its own loop
+  // The main animation effect
   useEffect(() => {
-    // Helper to determine which stage config to use
+    // --- CHANGE 2: UPDATE THE STAGE CONFIG HELPER ---
+    // Add logic to check for our new 'stage3_slow'.
     const getCurrentStageConfig = (currentProgress: number) => {
-      if (complete && currentProgress >= config.stage3.end) {
+      if (complete && currentProgress >= config.stage3_slow.end) {
         return config.completion;
       }
       if (currentProgress < config.stage1.end) return config.stage1;
       if (currentProgress < config.stage2.end) return config.stage2;
-      return config.stage3;
+      if (currentProgress < config.stage3.end) return config.stage3; // Covers 75-8 0%
+      if (currentProgress < config.stage3_slow.end) return config.stage3_slow; // Covers 80-95%
+      return config.completion; // fallback, should not be hit
     };
     
-    // The animation loop function
     const animate = (timestamp: number) => {
       if (!startTimeRef.current) {
         startTimeRef.current = timestamp;
@@ -60,10 +66,9 @@ export default function AnalysisProgressBar({ complete = false }: AnalysisProgre
       const elapsed = timestamp - startTimeRef.current;
       const stageConfig = getCurrentStageConfig(lastProgressRef.current);
 
-      // Reset timer if we've completed a stage and need to move to the next
       if (elapsed > stageConfig.duration) {
-        lastProgressRef.current = stageConfig.end; // Lock to the end of the stage
-        startTimeRef.current = timestamp; // Reset timer for the next stage
+        lastProgressRef.current = stageConfig.end;
+        startTimeRef.current = timestamp;
       }
 
       const stageElapsed = Math.min(elapsed, stageConfig.duration);
@@ -71,44 +76,42 @@ export default function AnalysisProgressBar({ complete = false }: AnalysisProgre
 
       const progressRange = stageConfig.end - stageConfig.start;
       const newProgress = stageConfig.start + progressRange * stageProgressPercent;
+      
+      const clampedProgress = Math.max(0, Math.min(100, newProgress));
 
-      // Update React state for UI
-      setProgress(newProgress);
-      lastProgressRef.current = newProgress; // Update ref for the next frame's calculation
+      setProgress(clampedProgress);
+      lastProgressRef.current = clampedProgress;
 
-      // Update the stage text
-      if (newProgress < config.stage1.end) setStage(0);
-      else if (newProgress < config.stage2.end) setStage(1);
-      else setStage(2);
+      // --- CHANGE 3: UPDATE THE STAGE TEXT LOGIC ---
+      if (clampedProgress < config.stage1.end) setStage(0);
+      else if (clampedProgress < config.stage2.end) setStage(1);
+      else if (clampedProgress < 90) setStage(2); // checkingRisks
+      else if (clampedProgress < 100) setStage(3); // finalizing
+      else setStage(4); // analysisComplete
 
-      // Determine the final target
-      const targetProgress = complete ? 100 : config.stage3.end;
+      // --- CHANGE 4: UPDATE THE TARGET PROGRESS LOGIC ---
+      const targetProgress = complete ? 100 : config.stage3_slow.end;
 
-      // Continue the animation if not complete
-      if (newProgress < targetProgress) {
+      if (clampedProgress < targetProgress) {
         animationFrameRef.current = requestAnimationFrame(animate);
       } else {
-         // Ensure it lands exactly on the final value
-        setProgress(targetProgress);
+         const finalClampedProgress = Math.max(0, Math.min(100, targetProgress));
+         setProgress(finalClampedProgress);
       }
     };
     
-    // If 'complete' is triggered early, jump to the start of the final animation
     if (complete && lastProgressRef.current < config.completion.start) {
         lastProgressRef.current = config.completion.start;
-        startTimeRef.current = undefined; // Reset timer for completion animation
+        startTimeRef.current = undefined;
     }
 
-    // Start the animation loop
     animationFrameRef.current = requestAnimationFrame(animate);
 
-    // Cleanup function to cancel the animation when the component unmounts
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-    // The effect depends on `complete` to restart the animation loop for the final step.
   }, [complete, config, t]);
 
   return (
@@ -118,14 +121,12 @@ export default function AnalysisProgressBar({ complete = false }: AnalysisProgre
           <div className="space-y-6">
             <div className="text-center mb-4">
               <p className="text-lg font-medium text-gray-900 dark:text-white">
-                {/* When progress is 100, show a final message */}
-                {progress >= 100 ? t("upload.progressStages.complete") : stages[stage]}
+                {stages[stage]}
               </p>
             </div>
             <div className="space-y-4">
               <Progress
                 value={progress}
-                // THE FIX IS HERE: `[&>div]:transition-none`
                 className="h-3 bg-yellow-100 dark:bg-yellow-900 [&>div]:bg-yellow-500 [&>div]:dark:bg-yellow-400 [&>div]:transition-none"
               />
               <div className="text-right text-sm text-gray-500 dark:text-gray-400">

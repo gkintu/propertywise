@@ -51,7 +51,9 @@
       "progressStages": {
         "extractingDetails": "Extracting Property Details",
         "analyzingPrice": "Analyzing Price & Market Data",
-        "checkingRisks": "Checking for Hidden Risks"
+        "checkingRisks": "Checking for Hidden Risks",
+        "finalizing": "Finalizing analysis…",
+        "analysisComplete": "Analysis Complete"
       }
     },
     "recentAnalysis": {
