@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useImperativeHandle, forwardRef } from "react";
+import React, { useState, useRef, useImperativeHandle, forwardRef, useCallback, useTransition, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, X, Search } from "lucide-react";
@@ -24,6 +24,14 @@ export interface FileUploadSectionHandle {
   shake: () => void;
 }
 
+// Analysis states enum for better type safety
+enum AnalysisState {
+  IDLE = 'idle',
+  ANALYZING = 'analyzing',
+  COMPLETED = 'completed',
+  ERROR = 'error'
+}
+
 const FileUploadSection = forwardRef<
   FileUploadSectionHandle,
   FileUploadSectionProps
@@ -42,7 +50,11 @@ const FileUploadSection = forwardRef<
     const params = useParams();
     const locale = params.locale as string;
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
+    
+    // Modern state management
+    const [analysisState, setAnalysisState] = useState<AnalysisState>(AnalysisState.IDLE);
+    const [isPending, startTransition] = useTransition();
+    const [progressComplete, setProgressComplete] = useState(false);
     const shakeRef = useRef<ShakeMotionHandle>(null);
 
     const {
@@ -55,7 +67,7 @@ const FileUploadSection = forwardRef<
       handleFileSelect,
       removeFile,
       openFileDialog,
-      setUploadedFiles, // Add this setter from useFileUpload
+      setUploadedFiles,
     } = useFileUpload();
 
     useImperativeHandle(ref, () => ({
@@ -64,8 +76,67 @@ const FileUploadSection = forwardRef<
       },
     }));
 
-    const handleAnalyzeDocuments = async () => {
-      // Simplified to always use the file from the state. The optional 'fileToAnalyze' parameter is no longer needed since the conflicting demo file logic was removed. This creates a single, consistent path for analysis.
+    // Memoized navigation handler
+    const navigateToResults = useCallback(() => {
+      startTransition(() => {
+        router.push(`/${locale}/analysis-result`);
+      });
+    }, [router, locale]);
+
+    // Modern error handling
+    const handleAnalysisError = useCallback((error: unknown, errorType: string = "processing_error") => {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      
+      console.error("Analysis error:", error);
+      toast.error(`${t("upload.error")}: ${errorMessage}`);
+      
+      localStorage.setItem("analysisError", errorMessage);
+      localStorage.setItem("analysisErrorType", errorType);
+      
+      setAnalysisState(AnalysisState.ERROR);
+      
+      // Navigate immediately on error
+      setTimeout(() => {
+        navigateToResults();
+        onAnalysisComplete?.();
+      }, 1000);
+    }, [t, navigateToResults, onAnalysisComplete]);
+
+    // Modern success handling
+    interface AnalysisResult {
+      analysis?: unknown;
+      summary?: unknown;
+      [key: string]: unknown;
+    }
+    const handleAnalysisSuccess = useCallback((data: AnalysisResult) => {
+      localStorage.setItem("analysisResult", JSON.stringify(data));
+      toast.success(t("upload.success"));
+      
+      setAnalysisState(AnalysisState.COMPLETED);
+      onAnalysisComplete?.();
+      // Let progress bar finish naturally, then navigate
+      setTimeout(() => {
+        navigateToResults();
+      }, 3000); // Give time for final progress animation (95% to 100% takes ~2s)
+    }, [t, navigateToResults, onAnalysisComplete]);
+
+    // Effect to handle navigation after progress completes
+    useEffect(() => {
+      if (analysisState === AnalysisState.COMPLETED) {
+        // Wait for progress bar to finish animating to 100%
+        const timeout = setTimeout(() => {
+          setProgressComplete(true);
+          // Navigate after showing completion
+          setTimeout(() => {
+            navigateToResults();
+          }, 800); // Allow time to see 100% completion
+        }, 100);
+        return () => clearTimeout(timeout);
+      }
+    }, [analysisState, navigateToResults]);
+
+    // Main analysis handler with modern async patterns
+    const handleAnalyzeDocuments = useCallback(async () => {
       const fileToAnalyze = uploadedFiles[0];
 
       if (!fileToAnalyze) {
@@ -74,11 +145,13 @@ const FileUploadSection = forwardRef<
         return;
       }
 
-      localStorage.removeItem("analysisResult");
-      localStorage.removeItem("analysisError");
-      localStorage.removeItem("analysisErrorType");
-
-      setIsLoading(true);
+      // Clear previous results
+      ['analysisResult', 'analysisError', 'analysisErrorType'].forEach(key => {
+        localStorage.removeItem(key);
+      });
+      
+      // Start analysis
+      setAnalysisState(AnalysisState.ANALYZING);
       onAnalysisStart?.();
 
       const formData = new FormData();
@@ -90,61 +163,44 @@ const FileUploadSection = forwardRef<
           method: "POST",
           body: formData,
         });
-
+        
         if (!response.ok) {
           const errorText = await response.text();
           let errorMessage = "Failed to analyze document";
-          let errorType = "processing_error";
 
           try {
             const errorData = JSON.parse(errorText);
             errorMessage = errorData.error || errorMessage;
-            errorType = errorData.errorType || errorType;
           } catch {
             errorMessage = errorText || errorMessage;
-          }
-
-          localStorage.setItem("analysisError", errorMessage);
-          localStorage.setItem("analysisErrorType", errorType);
-
-          if (
-            errorType === "invalid_document_type" ||
-            errorType === "insufficient_property_data"
-          ) {
-            // Call the 'onAnalysisComplete' callback before navigating to ensure any parent component cleanup logic runs predictably before the user is moved to a new page.
-            onAnalysisComplete?.();
-            router.push(`/${locale}/analysis-result`);
-            return;
           }
 
           throw new Error(errorMessage);
         }
 
-        const data = await response.json();
+        const data: AnalysisResult = await response.json();
 
         if (data && (data.analysis || data.summary)) {
-          localStorage.setItem("analysisResult", JSON.stringify(data));
-          toast.success(t("upload.success"));
-          router.push(`/${locale}/analysis-result`);
+          handleAnalysisSuccess(data);
         } else {
           throw new Error("No analysis data received from server");
         }
       } catch (error) {
-        console.error("Error analyzing document:", error);
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown error occurred";
-        toast.error(`${t("upload.error")}: ${errorMessage}`);
-        localStorage.setItem("analysisError", errorMessage);
-        localStorage.setItem("analysisErrorType", "processing_error");
-        // Also call the 'onAnalysisComplete' callback here before navigation for consistency.
-        onAnalysisComplete?.();
-        router.push(`/${locale}/analysis-result`);
-      } finally {
-        setIsLoading(false);
-        // This callback will still run, ensuring completion is always signaled.
-        onAnalysisComplete?.();
+        handleAnalysisError(error);
       }
-    };
+    }, [
+      uploadedFiles,
+      locale,
+      t,
+      onAnalysisStart,
+      handleAnalysisSuccess,
+      handleAnalysisError
+    ]);
+
+    // Computed values
+    const isAnalyzing = analysisState === AnalysisState.ANALYZING;
+    const isCompleted = analysisState === AnalysisState.COMPLETED;
+    const hasFiles = uploadedFiles.length > 0;
 
     return (
       <div className={className}>
@@ -233,11 +289,10 @@ const FileUploadSection = forwardRef<
             </Card>
           </ShakeMotion>
 
-          {/* Use a single ternary operator to conditionally render either the demo file section or the uploaded file info section. This approach makes the logic cleaner and more explicit: if there are no files, show demos; otherwise, show the uploaded file info. */}
-          {uploadedFiles.length === 0 ? (
+          {!hasFiles ? (
             <DemoFilesSection
               onDemoFileUpload={(file) => setUploadedFiles([file])}
-              isLoading={isLoading}
+              isLoading={isAnalyzing}
             />
           ) : (
             <div className="max-w-2xl mx-auto mt-6">
@@ -277,9 +332,9 @@ const FileUploadSection = forwardRef<
                       variant="outline"
                       size="sm"
                       onClick={() => removeFile()}
-                      disabled={isLoading}
+                      disabled={isAnalyzing || isPending}
                       className={`text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 dark:border-gray-600 ${
-                        isLoading ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
+                        (isAnalyzing || isPending) ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
                       }`}
                       aria-label={`Remove ${uploadedFiles[0].name}`}
                     >
@@ -289,19 +344,32 @@ const FileUploadSection = forwardRef<
                 </CardContent>
               </Card>
               <div className="mt-6 text-center">
-                {isLoading ? (
-                  <AnalysisProgressBar complete={false} />
+                {(isAnalyzing || isCompleted) ? (
+                  <AnalysisProgressBar complete={isCompleted} />
                 ) : (
                   <Button
-                    className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8 font-medium relative flex items-center justify-center"
+                    className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8 font-medium relative flex items-center justify-center disabled:opacity-50"
                     onClick={handleAnalyzeDocuments}
-                    disabled={isLoading || uploadedFiles.length === 0}
+                    disabled={!hasFiles || isPending}
                   >
-                    <>{t("upload.analyzeButton")}</>
-                    <Search className="ml-2 w-5 h-5" />
+                    {isPending ? (
+                      "Processing..."
+                    ) : (
+                      <>
+                        {t("upload.analyzeButton")}
+                        <Search className="ml-2 w-5 h-5" />
+                      </>
+                    )}
                   </Button>
                 )}
               </div>
+              {isCompleted && (
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-green-600 dark:text-green-400">
+                    {t("upload.analysisComplete")}
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </div>
