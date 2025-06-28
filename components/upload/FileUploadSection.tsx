@@ -330,7 +330,7 @@ const FileUploadSection = forwardRef<
                 </CardContent>
               </Card>
               <div className="mt-6 text-center">
-                {isAnalyzing ? (
+                {(isAnalyzing || isCompleted) ? (
                   <AnalysisProgressBar complete={isCompleted} />
                 ) : (
                   <Button
