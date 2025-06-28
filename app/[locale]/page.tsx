@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Search, Home as HomeIcon, AlertTriangle, CheckCircle, Clock, MapPin, Bed, Bath, Car } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { use, useRef } from "react"
+import { use, useRef, useState } from "react"
 import { useTranslations } from 'next-intl'
 import LocaleSwitcher from '@/components/locale/LocaleSwitcher'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
@@ -25,6 +25,7 @@ export default function Home({ params }: PageProps) {
   const t = useTranslations('HomePage');
   const f = useTranslations('Footer');
   const fileUploadRef = useRef<FileUploadSectionHandle>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const handleStartAnalysis = () => {
     // Shake the upload component to draw attention
@@ -36,6 +37,10 @@ export default function Home({ params }: PageProps) {
       uploadSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  // Callback for FileUploadSection to notify when analysis starts/ends
+  const handleAnalysisStart = () => setIsAnalyzing(true);
+  const handleAnalysisComplete = () => setIsAnalyzing(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#fffef2] to-white dark:from-[#111827] dark:to-[#1F2937]">
@@ -51,7 +56,7 @@ export default function Home({ params }: PageProps) {
           <div className="flex items-center gap-4">
             <ClientOnly>
               {isFeatureEnabled('DARK_MODE_TOGGLE') && <ThemeToggle />}
-              <LocaleSwitcher />
+              <LocaleSwitcher isDisabled={isAnalyzing} />
               <PropertyListingBadge />
             </ClientOnly>
           </div>
@@ -135,7 +140,7 @@ export default function Home({ params }: PageProps) {
 
         {/* PDF Upload Section */}
         <section id="upload-section" className="text-left">
-          <FileUploadSection ref={fileUploadRef} />
+          <FileUploadSection ref={fileUploadRef} onAnalysisStart={handleAnalysisStart} onAnalysisComplete={handleAnalysisComplete} />
         </section>
 
         {/* Recent Analysis Section */}
@@ -373,6 +378,7 @@ export default function Home({ params }: PageProps) {
                   size="lg" 
                   className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8"
                   onClick={handleStartAnalysis}
+                  disabled={isAnalyzing}
                 >
                   {t('cta.startButton')}
                 </Button>

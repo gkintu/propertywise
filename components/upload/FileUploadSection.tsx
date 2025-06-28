@@ -216,18 +216,18 @@ const FileUploadSection = forwardRef<
                 dragActive
                   ? "border-yellow-400 bg-yellow-50 dark:border-yellow-500/50 dark:bg-gray-800/50"
                   : "border-yellow-200 hover:border-yellow-400 dark:border-gray-600 dark:hover:border-yellow-500/50 dark:bg-gray-800/50"
-              }`}
+              } ${isAnalyzing ? 'opacity-50 pointer-events-none select-none' : ''}`}
             >
               <CardContent
                 className="p-12 cursor-default"
                 role="region"
                 aria-label={t("upload.dropText")}
                 tabIndex={0}
-                onDragEnter={handleDrag}
-                onDragLeave={handleDrag}
-                onDragOver={handleDrag}
-                onDrop={handleDrop}
-                onKeyDown={(e) => {
+                onDragEnter={isAnalyzing ? undefined : handleDrag}
+                onDragLeave={isAnalyzing ? undefined : handleDrag}
+                onDragOver={isAnalyzing ? undefined : handleDrag}
+                onDrop={isAnalyzing ? undefined : handleDrop}
+                onKeyDown={isAnalyzing ? undefined : (e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     openFileDialog();
@@ -238,15 +238,11 @@ const FileUploadSection = forwardRef<
                   <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Upload className="w-8 h-8 text-yellow-600 dark:text-[#FBBF24]" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                     {t("upload.dropText")}
-                  </h3>
-                  <p className="text-gray-500 dark:text-[#6B7280] mb-4">
-                    {t("upload.or")}{" "}
-                    <span
-                      className="text-yellow-600 dark:text-[#FBBF24] font-medium cursor-pointer hover:text-yellow-700 dark:hover:text-[#F59E0B] underline"
-                      onClick={openFileDialog}
-                    >
+                  </p>
+                  <p className="text-sm text-gray-500 dark:text-[#9CA3AF] mb-4">
+                    <span className="font-medium text-yellow-600 dark:text-[#FBBF24]">
                       {t("upload.browseText")}
                     </span>
                   </p>
@@ -260,13 +256,15 @@ const FileUploadSection = forwardRef<
                     accept=".pdf"
                     className="hidden"
                     onChange={handleFileSelect}
+                    disabled={isAnalyzing}
                   />
 
                   <Button
                     variant="outline"
                     className="mt-6 border-yellow-200 dark:border-[#FBBF24] text-yellow-600 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#FBBF24] dark:hover:text-black font-medium"
-                    onClick={openFileDialog}
+                    onClick={isAnalyzing ? undefined : openFileDialog}
                     aria-label={t("upload.selectButton")}
+                    disabled={isAnalyzing}
                   >
                     {t("upload.selectButton")}
                   </Button>
