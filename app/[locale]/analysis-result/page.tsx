@@ -104,6 +104,7 @@ async function downloadAsPDF(analysisData: PropertyAnalysis, t: TranslationFunct
 }
 
 export default function AnalysisResultPage() {
+  const isDev = process.env.NODE_ENV === 'development';
   const t = useTranslations('AnalysisResult');
   const [analysisData, setAnalysisData] = useState<PropertyAnalysis | null>(null);
   const [summaryData, setSummaryData] = useState<string | null>(null);
@@ -123,12 +124,10 @@ export default function AnalysisResultPage() {
     if (storedAnalysis && storedAnalysis !== 'undefined' && storedAnalysis !== 'null') {
       try {
         const parsed = JSON.parse(storedAnalysis);
-        console.log('📊 Parsed data structure:', parsed);
-        
+        if (isDev) console.log('📊 Parsed data structure:', parsed);
         // Check if it's an AnalysisResponse wrapper or direct PropertyAnalysis
         if (parsed.analysis && typeof parsed.analysis === 'object') {
-          // It's wrapped in AnalysisResponse from API - PREFERRED FORMAT
-          console.log('✅ Loading wrapped AnalysisResponse data', {
+          if (isDev) console.log('✅ Loading wrapped AnalysisResponse data', {
             strongPoints: parsed.analysis.strongPoints?.length || 0,
             concerns: parsed.analysis.concerns?.length || 0,
             hasPropertyDetails: !!parsed.analysis.propertyDetails
@@ -136,8 +135,7 @@ export default function AnalysisResultPage() {
           setAnalysisData(parsed.analysis);
           setDataSource('API Response (structured JSON)');
         } else if (parsed.propertyDetails && (parsed.strongPoints || parsed.concerns)) {
-          // It's a direct PropertyAnalysis object - PREFERRED FORMAT
-          console.log('✅ Loading direct PropertyAnalysis data', {
+          if (isDev) console.log('✅ Loading direct PropertyAnalysis data', {
             strongPoints: parsed.strongPoints?.length || 0,
             concerns: parsed.concerns?.length || 0,
             hasPropertyDetails: !!parsed.propertyDetails
@@ -145,13 +143,11 @@ export default function AnalysisResultPage() {
           setAnalysisData(parsed);
           setDataSource('Direct PropertyAnalysis (structured JSON)');
         } else if (parsed.summary && typeof parsed.summary === 'string') {
-          // It's a summary fallback from API when AI didn't return JSON - FALLBACK FORMAT
-          console.log('⚠️ Loading summary fallback data (AI did not return structured JSON)');
-          
+          if (isDev) console.log('⚠️ Loading summary fallback data (AI did not return structured JSON)');
           // Try to extract JSON from the summary if it contains structured data
           const cleanedSummary = tryExtractJsonFromText(parsed.summary);
           if (cleanedSummary) {
-            console.log('✅ Successfully extracted structured data from summary text');
+            if (isDev) console.log('✅ Successfully extracted structured data from summary text');
             setAnalysisData(cleanedSummary);
             setDataSource('Extracted from summary text (structured JSON)');
           } else {
@@ -162,23 +158,21 @@ export default function AnalysisResultPage() {
           // Try to parse the raw stored analysis as JSON if it looks like structured data
           const directParsed = tryExtractJsonFromText(storedAnalysis);
           if (directParsed) {
-            console.log('✅ Successfully extracted structured data from raw stored analysis');
+            if (isDev) console.log('✅ Successfully extracted structured data from raw stored analysis');
             setAnalysisData(directParsed);
             setDataSource('Extracted from raw analysis (structured JSON)');
           } else {
-            // No valid data found
-            console.log('❌ No structured data found in:', parsed);
+            if (isDev) console.log('❌ No structured data found in:', parsed);
             setError('No valid analysis data found. The API may have returned an unexpected format.');
             setDataSource('Unknown format');
           }
         }
       } catch (parseError) {
-        console.error('❌ Error parsing analysis result:', parseError);
-        
+        if (isDev) console.error('❌ Error parsing analysis result:', parseError);
         // If parsing fails, try to extract JSON directly from the stored analysis
         const directParsed = tryExtractJsonFromText(storedAnalysis);
         if (directParsed) {
-          console.log('✅ Successfully extracted structured data from unparseable stored analysis');
+          if (isDev) console.log('✅ Successfully extracted structured data from unparseable stored analysis');
           setAnalysisData(directParsed);
           setDataSource('Extracted from raw text (structured JSON)');
         } else {
@@ -519,22 +513,23 @@ export default function AnalysisResultPage() {
               />
             </div>
           )}
-          
-          <Card className="border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20" data-pdf-exclude="true">
-            <CardHeader>
-              <CardTitle className="text-red-700 dark:text-red-300 text-lg">{t('analysis.debugTitle')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-red-700 dark:text-red-300 mb-2">{t('analysis.rawAnalysisData')}</h4>
-                  <pre className="bg-white dark:bg-[#111827] p-3 rounded border text-xs overflow-x-auto max-h-60 dark:text-[#D1D5DB]">
-                    {JSON.stringify(analysisData, null, 2)}
-                  </pre>
+          {isDev && (
+            <Card className="border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20" data-pdf-exclude="true">
+              <CardHeader>
+                <CardTitle className="text-red-700 dark:text-red-300 text-lg">{t('analysis.debugTitle')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-red-700 dark:text-red-300 mb-2">{t('analysis.rawAnalysisData')}</h4>
+                    <pre className="bg-white dark:bg-[#111827] p-3 rounded border text-xs overflow-x-auto max-h-60 dark:text-[#D1D5DB]">
+                      {JSON.stringify(analysisData, null, 2)}
+                    </pre>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </main>
       </div>
     );
@@ -668,22 +663,23 @@ export default function AnalysisResultPage() {
               />
             </div>
           )}
-          
-          <Card className="border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20" data-pdf-exclude="true">
-            <CardHeader>
-              <CardTitle className="text-red-700 dark:text-red-300 text-lg">{t('summary.debugTitle')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold text-red-700 dark:text-red-300 mb-2">{t('summary.rawSummaryData')}</h4>
-                  <pre className="bg-white dark:bg-[#111827] p-3 rounded border text-xs overflow-x-auto max-h-60 dark:text-[#D1D5DB]">
-                    {summaryData}
-                  </pre>
+          {isDev && (
+            <Card className="border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20" data-pdf-exclude="true">
+              <CardHeader>
+                <CardTitle className="text-red-700 dark:text-red-300 text-lg">{t('summary.debugTitle')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold text-red-700 dark:text-red-300 mb-2">{t('summary.rawSummaryData')}</h4>
+                    <pre className="bg-white dark:bg-[#111827] p-3 rounded border text-xs overflow-x-auto max-h-60 dark:text-[#D1D5DB]">
+                      {summaryData}
+                    </pre>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </main>
       </div>
     );
