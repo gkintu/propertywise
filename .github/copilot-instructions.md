@@ -26,3 +26,6 @@ This is a Next.js 15 property analysis application that uses Google Gemini AI to
   `className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8"`
 
 - This ensures consistent yellow button appearance across themes and states.
+
+- Never expose secret keys or sensitive information in the codebase, especially in public repositories.
+- never make changes to .env files without confirming with me first.

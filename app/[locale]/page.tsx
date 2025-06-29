@@ -404,7 +404,7 @@ export default function Home({ params }: PageProps) {
                 <Link href={`/${locale}/privacy`} className="text-yellow-600 dark:text-[#FBBF24] hover:text-yellow-700 dark:hover:text-[#FEF3C7] hover:underline transition-colors">
                   {f('privacy')}
                 </Link>
-                <a href="mailto:support@propertywise.no" className="text-gray-700 dark:text-[#D1D5DB] hover:text-gray-900 dark:hover:text-[#F9FAFB] transition-colors">
+                <a href="mailto:kbolig47@gmail.com" className="text-gray-700 dark:text-[#D1D5DB] hover:text-gray-900 dark:hover:text-[#F9FAFB] transition-colors">
                   {f('contact')}
                 </a>
               </div>

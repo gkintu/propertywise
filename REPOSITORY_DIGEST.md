@@ -2,24 +2,29 @@
 
 ## User Flow (Executive Summary)
 
-1. **Visit Site**: User lands on the homepage, which adapts to their language and theme preferences.
-2. **Upload PDF**: User uploads a property report PDF.
+1. **Visit Site**: User lands on the homepage, which adapts to their language and theme preferences (light/dark, English/Norwegian).
+2. **Upload PDF**: User uploads a property report PDF (only housing reports, max 50MB, PDF only).
 3. **AI Analysis**: The app extracts text and sends it to Google Gemini AI for analysis.
-4. **Results**: User receives a clear summary with key findings and recommendations.
+4. **Results**: User receives a clear summary with key findings and recommendations, structured as JSON.
 5. **Localization & Theming**: All content is available in English/Norwegian and supports light/dark mode.
 
 **Outcome:**
 - Fast, AI-powered property document analysis
 - Consistent, accessible, and localized user experience
+- Robust error handling and user feedback
 
 ## 🚀 Features
 
-- Analyze property PDF documents using Google Gemini AI
-- Supports English and Norwegian with next-intl i18n
-- Theme support for light and dark modes
+- Analyze property PDF documents using Google Gemini AI (migrated from OpenAI/OpenRouter)
+- Strict PDF validation: housing reports only, max 50MB
+- File upload with drag-and-drop, validation, and toast notifications (sonner)
+- Supports English and Norwegian with next-intl i18n (all user-facing text localized)
+- Theme support for light and dark modes (Tailwind CSS)
 - Yellow button styling for consistent UI
-- File upload and PDF parsing
-- Actionable property analysis with AI-generated summaries
+- Actionable property analysis with AI-generated summaries (JSON output)
+- Default test PDFs included for demo/testing
+- Modern motion/animation components (motion package)
+- Accessibility and mobile responsiveness
 
 ## 📚 Requirements
 
@@ -46,7 +51,7 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### PDF Analysis
-- Upload a property PDF
+- Upload a property PDF (housing report)
 - The app extracts text and sends it to Gemini AI
 - Get a summary with key findings, risks, and recommendations
 
@@ -191,3 +196,17 @@ MIT
 ---
 
 > Replace 'hub' with 'ingest' in any GitHub URL to get a prompt-friendly extract of a codebase (see [gitingest](https://github.com/cyclotruc/gitingest)).
+
+---
+
+## 🆕 Recent Changes
+
+- Migrated backend from OpenAI/OpenRouter to Google Gemini API (`@google/genai`)
+- Improved file upload: PDF only, max 50MB, housing reports only, robust validation
+- All user-facing text localized (English/Norwegian) via `next-intl`
+- Full dark mode support and theme toggle on all pages
+- Toast notifications for user feedback (sonner)
+- Default test PDFs included for demo/testing
+- Modernized motion/animation components (motion package)
+- Accessibility and mobile responsiveness improvements
+- Pending: Rate limiting, security features, further style and accessibility refinements

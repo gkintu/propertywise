@@ -294,7 +294,7 @@ export default function PrivacyPolicy({ params }: PrivacyPageProps) {
                 asChild
                 className="flex-1 bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8"
               >
-                <a href="mailto:privacy@propertywise.no">
+                <a href="mailto:kbolig47@gmail.com">
                   <Mail className="h-4 w-4 mr-2" />
                   {t("actions.contactUs")}
                 </a>

@@ -46,13 +46,6 @@ folk er ivrige og de kommer til å gjøre det også
 
 ✅ **COMPLETED**: -- if user clicks analyze document the x button should be greyed out slik at de ikke kan avbryte
 
--- add a more informative loading state like visning.ai har 
-when user clicks analyize document, replace the button with 
-https://v0.dev/chat/progress-bar-animation-73uxzsbprN3
-lim inn koden og forklar til gpt 4.1 at fargene skal tilpasses
-siden og at analyze button bør forsvinne når den trykkes og husk 
-å be den ta hensyn til begge språka, og progress bar bør baseres
-på actuall progress fra gemini api call
 
 --contact us på forsiden og analysis result page bør være dummy for n¨å, altså ingenting skjer n¨r man trykker  på det eller
 opprett en 
