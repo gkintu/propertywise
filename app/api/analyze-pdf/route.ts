@@ -160,9 +160,12 @@ Focus on actionable insights for a potential buyer. If you cannot extract struct
       }, { status: 400 });
     }
     
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    const genericErrorMessage = validatedLanguage === 'no'
+      ? 'En feil oppstod under behandling av filen. Vennligst prøv igjen senere.'
+      : 'An error occurred while processing the file. Please try again later.';
+    
     return NextResponse.json({ 
-      error: `Failed to process file: ${errorMessage}`,
+      error: genericErrorMessage,
       errorType: 'processing_error'
     }, { status: 500 });
   }
