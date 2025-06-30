@@ -4,7 +4,11 @@ import { useTheme } from "next-themes"
 import { Toaster as Sonner, ToasterProps } from "sonner"
 import { CircleCheck, TriangleAlert } from "lucide-react"
 
-const Toaster = ({ ...props }: ToasterProps) => {
+type CustomToasterProps = ToasterProps & {
+  nonce?: string;
+};
+
+const Toaster = ({ ...props }: CustomToasterProps) => {
   const { theme = "system" } = useTheme()
 
   return (
