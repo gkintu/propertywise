@@ -1,8 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
-export default function middleware(request: NextRequest) {
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "60 s"),
+  analytics: true,
+  prefix: "@upstash/ratelimit",
+});
+
+export default async function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/api/analyze-pdf")) {
+    const ip = (request.headers.get("x-forwarded-for") ?? "127.0.0.1").split(",")[0];
+    const { success } = await ratelimit.limit(
+      `ratelimit_middleware_${ip}`
+    );
+
+    if (!success) {
+      return new NextResponse("Rate limit exceeded", { status: 429 });
+    }
+  }
+
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const cspHeader = `
     default-src 'self';
@@ -32,5 +52,5 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
+  matcher: ["/((?!trpc|_next|_vercel|.*\..*).*)", "/api/analyze-pdf"],
 };

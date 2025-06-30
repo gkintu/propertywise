@@ -1,69 +1,37 @@
-# Playground Projects
+# Playground Projects: Repository Digest
 
-## User Flow (Executive Summary)
+---
 
-1. **Visit Site**: User lands on the homepage, which adapts to their language and theme preferences (light/dark, English/Norwegian).
-2. **Upload PDF**: User uploads a property report PDF (only housing reports, max 50MB, PDF only).
-3. **AI Analysis**: The app extracts text and sends it to Google Gemini AI for analysis.
-4. **Results**: User receives a clear summary with key findings and recommendations, structured as JSON.
-5. **Localization & Theming**: All content is available in English/Norwegian and supports light/dark mode.
+## Executive Summary
 
-**Outcome:**
-- Fast, AI-powered property document analysis
-- Consistent, accessible, and localized user experience
-- Robust error handling and user feedback
+This repository is a Next.js 15 application for AI-powered property document analysis. It enables users to upload Norwegian or English housing report PDFs, which are processed using Google Gemini AI to extract actionable insights. The app is fully localized (English/Norwegian), supports light/dark themes, and provides a modern, accessible UI.
 
-## 🚀 Features
+---
 
-- Analyze property PDF documents using Google Gemini AI (migrated from OpenAI/OpenRouter)
-- Strict PDF validation: housing reports only, max 50MB
-- File upload with drag-and-drop, validation, and toast notifications (sonner)
-- Supports English and Norwegian with next-intl i18n (all user-facing text localized)
-- Theme support for light and dark modes (Tailwind CSS)
-- Yellow button styling for consistent UI
-- Actionable property analysis with AI-generated summaries (JSON output)
-- Default test PDFs included for demo/testing
-- Modern motion/animation components (motion package)
-- Accessibility and mobile responsiveness
+## Key Features
 
-## 📚 Requirements
+- **PDF Upload & Validation**: Drag-and-drop upload, strict PDF validation (housing reports only, max 50MB), robust error handling.
+- **AI Analysis**: Extracts text from PDFs and analyzes them with Google Gemini AI, returning structured JSON summaries (key findings, risks, recommendations).
+- **Internationalization (i18n)**: All user-facing text is localized using `next-intl` (English/Norwegian). Language switcher included.
+- **Theming**: Full support for light and dark modes with a theme toggle. UI adapts using CSS variables and Tailwind CSS.
+- **Consistent UI**: Yellow button styling and shadcn/ui components for a cohesive look.
+- **Accessibility & Responsiveness**: Mobile-friendly, keyboard accessible, and visually consistent across themes.
+- **Feature Flags**: Static feature flag system (set via `.env.local`, requires server restart).
+- **Demo PDFs**: Default test PDFs included for demonstration and testing.
 
-- Node.js (v18+ recommended)
-- npm or yarn
-- For AI features: Google Gemini API key (set as environment variable)
+---
 
-## 📦 Installation
+## User Flow
 
-```bash
-git clone <this-repo-url>
-cd playground-projects
-npm install
-```
+1. **Visit Site**: Homepage adapts to language and theme preferences.
+2. **Upload PDF**: User uploads a property report (PDF, max 50MB).
+3. **AI Analysis**: Text is extracted and analyzed by Gemini AI.
+4. **Results**: User receives a structured summary with actionable insights.
+5. **Localization & Theming**: All content is available in both supported languages and themes.
 
-## 💡 Usage
+---
 
-### Development
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### PDF Analysis
-- Upload a property PDF (housing report)
-- The app extracts text and sends it to Gemini AI
-- Get a summary with key findings, risks, and recommendations
-
-### Internationalization
-- Switch between English and Norwegian
-- All user-facing text is localized
-
-### Theming
-- Toggle between light and dark mode
-- UI adapts using CSS variables
-
-## 📁 Folder Structure
+## Project Structure
 
 ```
 playground-projects/
@@ -176,37 +144,69 @@ playground-projects/
 ├── tsconfig.json
 ```
 
-## 🛠️ Stack
+---
 
-- [Next.js 15](https://nextjs.org/)
-- [next-intl](https://github.com/amannn/next-intl)
-- [Tailwind CSS](https://tailwindcss.com/)
-- Google Gemini API
+## Stack
 
-## 📝 License
+- **Next.js 15** (App Router, TypeScript)
+- **next-intl** (i18n)
+- **Tailwind CSS** (theming, utility classes)
+- **shadcn/ui** (UI components)
+- **Google Gemini API** (AI analysis)
+
+---
+
+## Environment & Feature Flags
+
+- **Feature Flags**: Set in `.env.local` (e.g., `NEXT_PUBLIC_ENABLE_PROPERTY_SEARCH`). Changes require a server restart.
+- **Sensitive Data**: Never commit API keys or secrets. See `.env.example` for configuration.
+
+---
+
+## Usage
+
+### Development
+
+```bash
+npm install
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000)
+
+### PDF Analysis
+- Upload a property PDF (housing report)
+- The app extracts text and analyzes it with Gemini AI
+- Get a summary with key findings, risks, and recommendations
+
+### Internationalization
+- Switch between English and Norwegian
+- All user-facing text is localized
+
+### Theming
+- Toggle between light and dark mode
+- UI adapts using CSS variables
+
+---
+
+## Best Practices (Inspired by Gitingest)
+
+- **Keep digests concise and structured**: Use clear sections (summary, features, structure, usage, stack).
+- **Show folder tree**: Provide a high-level directory tree for fast codebase orientation.
+- **Highlight unique flows**: Summarize the main user journey and technical flow.
+- **Document environment/config**: Note how to set up and run the project, and how to handle secrets/flags.
+- **Update regularly**: Keep the digest in sync with major codebase changes.
+
+---
+
+## License
 
 MIT
 
-## 🌐 Links
+---
 
+## References
 - [Next.js Documentation](https://nextjs.org/docs)
 - [next-intl Documentation](https://github.com/amannn/next-intl)
 - [Google Gemini API](https://ai.google.dev/)
-
----
-
-> Replace 'hub' with 'ingest' in any GitHub URL to get a prompt-friendly extract of a codebase (see [gitingest](https://github.com/cyclotruc/gitingest)).
-
----
-
-## 🆕 Recent Changes
-
-- Migrated backend from OpenAI/OpenRouter to Google Gemini API (`@google/genai`)
-- Improved file upload: PDF only, max 50MB, housing reports only, robust validation
-- All user-facing text localized (English/Norwegian) via `next-intl`
-- Full dark mode support and theme toggle on all pages
-- Toast notifications for user feedback (sonner)
-- Default test PDFs included for demo/testing
-- Modernized motion/animation components (motion package)
-- Accessibility and mobile responsiveness improvements
-- Pending: Rate limiting, security features, further style and accessibility refinements
+- [Gitingest](https://github.com/cyclotruc/gitingest)
