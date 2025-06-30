@@ -76,7 +76,7 @@ export default function Home({ params }: PageProps) {
             {t('description')}
           </p>
           
-          {/* Decorative Separation Line */}
+          {/* Decorative Separation-Line */}
           <div className="flex items-center justify-center my-8">
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent max-w-md"></div>
             <div className="mx-4">
