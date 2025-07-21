@@ -48,16 +48,16 @@ export default function AnalysisProgressBar({ complete = false }: AnalysisProgre
     // --- CHANGE 2: UPDATE THE STAGE CONFIG HELPER ---
     // Add logic to check for our new 'stage3_slow'.
     const getCurrentStageConfig = (currentProgress: number) => {
-      if (complete && currentProgress >= config.completion.start) {
+      if (complete && currentProgress >= config.stage3_slow.end) {
         return config.completion;
       }
       if (currentProgress < config.stage1.end) return config.stage1;
       if (currentProgress < config.stage2.end) return config.stage2;
-      if (currentProgress < config.stage3.end) return config.stage3; // Covers 75-80%
+      if (currentProgress < config.stage3.end) return config.stage3; // Covers 75-8 0%
       if (currentProgress < config.stage3_slow.end) return config.stage3_slow; // Covers 80-95%
       return config.completion; // fallback, should not be hit
     };
-
+    
     const animate = (timestamp: number) => {
       if (!startTimeRef.current) {
         startTimeRef.current = timestamp;
@@ -95,15 +95,11 @@ export default function AnalysisProgressBar({ complete = false }: AnalysisProgre
       if (clampedProgress < targetProgress) {
         animationFrameRef.current = requestAnimationFrame(animate);
       } else {
-        // If complete, ensure we animate to 100% and show the final stage
-        if (complete && clampedProgress < 100) {
-          setProgress(100);
-          setStage(4);
-        }
+         const finalClampedProgress = Math.max(0, Math.min(100, targetProgress));
+         setProgress(finalClampedProgress);
       }
     };
     
-    // If complete is set, jump to completion phase if not already there
     if (complete && lastProgressRef.current < config.completion.start) {
         lastProgressRef.current = config.completion.start;
         startTimeRef.current = undefined;

@@ -11,6 +11,22 @@ const nextConfig: NextConfig = {
     '172.19.186.198', // WSL network IP
     '*.local-origin.dev' // Wildcard example from docs
   ],
+  // Configure server actions to support 50MB PDF uploads
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb',
+    },
+  },
+  // Suppress hydration warnings in development
+  reactStrictMode: true,
+  swcMinify: true,
+  // Reduce error overlay verbosity
+  onDemandEntries: {
+    // period (in ms) where the server will keep pages in the buffer
+    maxInactiveAge: 25 * 1000,
+    // number of pages that should be kept simultaneously without being disposed
+    pagesBufferLength: 2,
+  },
   turbopack: {
     resolveExtensions: [
       '.mdx',
