@@ -4,32 +4,36 @@
 
 ## Executive Summary
 
-This repository is a Next.js 15 application for AI-powered property document analysis. It enables users to upload Norwegian or English housing report PDFs, which are processed using Google Gemini AI to extract actionable insights. The app is fully localized (English/Norwegian), supports light/dark themes, and provides a modern, accessible UI.
+This repository is a Next.js 15 application for AI-powered property document analysis. Users can upload Norwegian or English housing report PDFs, which are processed using Google Gemini AI to extract actionable insights. The app is fully localized (English/Norwegian), supports light/dark themes, and provides a modern, accessible UI. The backend is fully migrated to Gemini API, with robust PDF validation, rate limiting, and structured JSON output. Demo PDFs are included for testing, and all user-facing text is internationalized.
 
 ---
+
 
 ## Key Features
 
-- **PDF Upload & Validation**: Drag-and-drop upload, strict PDF validation (housing reports only, max 50MB), robust error handling.
-- **AI Analysis**: Extracts text from PDFs and analyzes them with Google Gemini AI, returning structured JSON summaries (key findings, risks, recommendations).
-- **Internationalization (i18n)**: All user-facing text is localized using `next-intl` (English/Norwegian). Language switcher included.
-- **Theming**: Full support for light and dark modes with a theme toggle. UI adapts using CSS variables and Tailwind CSS.
-- **Consistent UI**: Yellow button styling and shadcn/ui components for a cohesive look.
+- **AI-Powered PDF Analysis**: Upload property documents in PDF format and receive a comprehensive analysis powered by the Google Gemini AI model. The backend is fully migrated to Gemini, with direct PDF-to-Gemini processing and structured JSON output.
+- **Strict PDF Validation**: Only housing report PDFs are accepted (max 50MB). Robust client and server-side validation using Zod schemas. Non-housing PDFs are rejected with clear error messages.
+- **Internationalization (i18n)**: All user-facing text is localized using `next-intl` (English/Norwegian). Language switcher included. Both `messages/en.json` and `messages/no.json` are always updated for new features.
+- **Light & Dark Mode**: Full support for both themes, with a theme toggle and hydration-safe components. Consistent color scheme using Tailwind CSS and `next-themes`.
+- **Modern UI & UX**: Uses shadcn/ui components, yellow button styling, and motion/animation for a polished experience. All visual changes are tested in both light and dark modes.
 - **Accessibility & Responsiveness**: Mobile-friendly, keyboard accessible, and visually consistent across themes.
-- **Feature Flags**: Static feature flag system (set via `.env.local`, requires server restart).
-- **Demo PDFs**: Default test PDFs included for demonstration and testing.
+- **Feature Flags**: Static feature flag system (set via `.env.local`, requires server restart) controls UI features like property search and recent analysis.
+- **Demo PDFs**: Two default test PDFs included in `public/demo-pdfs/` for demonstration and testing.
+- **Security & Rate Limiting**: Upstash Redis-based rate limiting (5 requests/60s), CSP headers, and robust error handling. API routes are excluded from i18n middleware for reliability.
 
 ---
+
 
 ## User Flow
 
-1. **Visit Site**: Homepage adapts to language and theme preferences.
-2. **Upload PDF**: User uploads a property report (PDF, max 50MB).
-3. **AI Analysis**: Text is extracted and analyzed by Gemini AI.
-4. **Results**: User receives a structured summary with actionable insights.
-5. **Localization & Theming**: All content is available in both supported languages and themes.
+1. **Visit Site**: Homepage adapts to language and theme preferences. Theme and locale switchers are available on all pages.
+2. **Upload PDF**: User uploads a housing report PDF (max 50MB, only valid property reports accepted). Demo PDFs are available for quick testing.
+3. **AI Analysis**: PDF is sent directly to Gemini API for analysis. The backend handles conversion, validation, and structured JSON output.
+4. **Results**: User receives a structured summary with actionable insights (key findings, risks, recommendations, market position, etc.).
+5. **Localization & Theming**: All content is available in both supported languages and themes. UI adapts instantly to user preferences.
 
 ---
+
 
 ## Project Structure
 
@@ -38,113 +42,41 @@ playground-projects/
 ├── app/
 │   ├── [locale]/
 │   │   ├── analysis-result/
-│   │   │   └── page.tsx
 │   │   ├── privacy/
-│   │   │   └── page.tsx
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── api/
 │   │   └── analyze-pdf/
-│   │       └── route.ts
 │   ├── favicon.ico
 │   ├── globals.css
 │   ├── layout.tsx
 │   └── page.tsx
 ├── components/
 │   ├── customized/
-│   │   └── spinner/
-│   │       └── spinner-05.tsx
 │   ├── hydration/
-│   │   ├── ClientOnly.tsx
-│   │   ├── HydrationSafe.tsx
-│   │   └── index.ts
 │   ├── locale/
-│   │   └── LocaleSwitcher.tsx
 │   ├── motion/
-│   │   ├── CardMotion.tsx
-│   │   ├── FadeIn.tsx
-│   │   ├── PageTransition.tsx
-│   │   ├── ScaleIn.tsx
-│   │   ├── ShakeMotion.tsx
-│   │   ├── ShakeMotionAlternative.tsx
-│   │   ├── SlideIn.tsx
-│   │   ├── StaggerContainer.tsx
-│   │   ├── examples/
-│   │   │   └── AnimatedFeatureCard.tsx
-│   │   └── index.ts
 │   ├── pdf/
-│   │   ├── AnalysisReportPDF.tsx
-│   │   ├── README.md
-│   │   └── icons/
-│   │       ├── IconDemoPDF.tsx
-│   │       ├── LucideIconForPDF.tsx
-│   │       ├── PDFIcon.tsx
-│   │       ├── README.md
-│   │       └── index.tsx
 │   ├── theme/
-│   │   ├── ThemeProvider.tsx
-│   │   ├── ThemeToggle.tsx
-│   │   └── index.ts
 │   ├── ui/
-│   │   ├── alert.tsx
-│   │   ├── avatar.tsx
-│   │   ├── badge.tsx
-│   │   ├── button.tsx
-│   │   ├── card.tsx
-│   │   ├── input.tsx
-│   │   ├── property-listing-badge.tsx
-│   │   ├── separator.tsx
-│   │   ├── sonner.tsx
-│   │   └── textarea.tsx
 │   └── upload/
-│       └── FileUploadSection.tsx
 ├── documentation/
-│   ├── Gemini API: PDF Document Processing documentation.md
-│   ├── Gemini PDF Document Processing tasklist.md
-│   ├── gemini-api-sdk-documentation
-│   ├── html2pdf-pro.md
-│   └── nextintl-documentation.md
 ├── hooks/
-│   └── useFileUpload.ts
 ├── i18n/
-│   ├── request.ts
-│   └── routing.ts
 ├── lib/
-│   ├── feature-flags.ts
-│   ├── i18n-types.ts
-│   ├── navigation.ts
-│   ├── types.ts
-│   └── utils.ts
 ├── messages/
-│   ├── en.json
-│   └── no.json
 ├── public/
-│   └── ...
+│   └── demo-pdfs/
 ├── snapshot/
-│   └── ...
 ├── MIGRATION_SUMMARY.md
 ├── PRIVACY_POLICY_README.md
 ├── README.md
 ├── REPOSITORY_DIGEST.md
-├── REPOSITORY_SUMMARY.md
-├── color-schema-light-mode.md
-├── commands.md
-├── components.json
-├── features implementation.md
-├── middleware.ts
-├── next-env.d.ts
-├── next.config.ts
-├── open-ai-sdk-docs.ts
-├── package.json
-├── pdf2jason-docu.md
-├── postcss.config.mjs
-├── task.txt
-├── test_analysis_data.js
-├── test_data_flow.js
-├── tsconfig.json
+├── ...
 ```
 
 ---
+
 
 ## Stack
 
@@ -153,15 +85,18 @@ playground-projects/
 - **Tailwind CSS** (theming, utility classes)
 - **shadcn/ui** (UI components)
 - **Google Gemini API** (AI analysis)
+- **Upstash Redis** (rate limiting)
 
 ---
+
 
 ## Environment & Feature Flags
 
 - **Feature Flags**: Set in `.env.local` (e.g., `NEXT_PUBLIC_ENABLE_PROPERTY_SEARCH`). Changes require a server restart.
-- **Sensitive Data**: Never commit API keys or secrets. See `.env.example` for configuration.
+- **Sensitive Data**: Never commit API keys or secrets. See `.env.local.example` for configuration. All environment variables are documented in `MIGRATION_SUMMARY.md`.
 
 ---
+
 
 ## Usage
 
@@ -175,29 +110,34 @@ npm run dev
 Visit [http://localhost:3000](http://localhost:3000)
 
 ### PDF Analysis
-- Upload a property PDF (housing report)
-- The app extracts text and analyzes it with Gemini AI
-- Get a summary with key findings, risks, and recommendations
+- Upload a housing report PDF (max 50MB, only valid property reports accepted)
+- The app sends the PDF directly to Gemini AI for analysis
+- Receive a structured summary with key findings, risks, recommendations, and market position
 
 ### Internationalization
 - Switch between English and Norwegian
-- All user-facing text is localized
+- All user-facing text is localized and kept in sync
 
 ### Theming
 - Toggle between light and dark mode
-- UI adapts using CSS variables
+- UI adapts using CSS variables and is hydration-safe
 
 ---
 
-## Best Practices (Inspired by Gitingest)
+
+## Best Practices
 
 - **Keep digests concise and structured**: Use clear sections (summary, features, structure, usage, stack).
 - **Show folder tree**: Provide a high-level directory tree for fast codebase orientation.
 - **Highlight unique flows**: Summarize the main user journey and technical flow.
 - **Document environment/config**: Note how to set up and run the project, and how to handle secrets/flags.
 - **Update regularly**: Keep the digest in sync with major codebase changes.
+- **Always update both translation files**: All user-facing text must be present in both `messages/en.json` and `messages/no.json`.
+- **Test with demo PDFs**: Use the provided demo files in `public/demo-pdfs/` for consistent testing.
+- **Never commit secrets**: API keys and sensitive data must never be committed.
 
 ---
+
 
 ## License
 
