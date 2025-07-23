@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, MotionProps } from "framer-motion";
+import { motion, MotionProps } from "motion/react";
 import React from "react";
 
 // Define the props for our component. It will accept standard motion div props.

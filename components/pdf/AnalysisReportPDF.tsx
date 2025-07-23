@@ -104,13 +104,16 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   },
   strongPointsContainer: {
     flex: 1,
+    minHeight: 40, // Ensure minimum height to prevent orphaned headers
   },
   concernsContainer: {
     flex: 1,
+    minHeight: 40, // Ensure minimum height to prevent orphaned headers
   },
   // Strong points styling (matching green theme)
   strongPointsHeader: {
     marginBottom: 8,
+    paddingTop: 12, // Increased padding to prevent header from touching page edge
   },
   strongPointsTitle: {
     fontSize: 16,
@@ -123,6 +126,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     marginBottom: 8,
+    marginTop: 8, // Increased top margin to prevent touching page edge when wrapped
   },
   strongPointTitle: {
     fontSize: 12,
@@ -139,6 +143,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   // Concerns styling (matching red theme)
   concernsHeader: {
     marginBottom: 8,
+    paddingTop: 12, // Increased padding to prevent header from touching page edge
   },
   concernsTitle: {
     fontSize: 16,
@@ -151,6 +156,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     marginBottom: 8,
+    marginTop: 8, // Increased top margin to prevent touching page edge when wrapped
   },
   concernTitle: {
     fontSize: 12,

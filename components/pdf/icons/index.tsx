@@ -2,13 +2,6 @@ import React from 'react';
 import { PDFIcon } from './PDFIcon';
 
 export { PDFIcon, type IconName } from './PDFIcon';
-export { 
-  useLucideIconForPDF, 
-  LucideIconForPDF 
-} from './LucideIconForPDF';
-
-// Demo component for testing
-export { default as IconDemoPDF } from './IconDemoPDF';
 
 // Re-export the most commonly used icons with convenient names
 export const CheckCircleIcon = ({ size = 16, color = '#059669' }) => (
