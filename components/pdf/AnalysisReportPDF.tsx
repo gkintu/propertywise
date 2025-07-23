@@ -4,7 +4,7 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { PropertyAnalysis } from '@/lib/types';
 import { TranslationFunction } from '@/lib/i18n-types';
-import { CheckCircleIcon, AlertTriangleIcon, HomeIcon, MapPinIcon, FileTextIcon, EyeIcon, TrendingUpIcon, InfoIcon } from './icons';
+import { CheckCircleIcon, AlertTriangleIcon, HomeIcon, MapPinIcon, EyeIcon, TrendingUpIcon, InfoIcon, FileTextIcon } from './icons';
 
 // Register fonts if needed (optional)
 // Font.register({
@@ -68,7 +68,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   // Market position section (blue box like web page)
   marketPositionBox: {
     backgroundColor: isDarkMode ? '#1e3a8a33' : '#EFF6FF', // dark:bg-blue-950/20
-    border: `1 solid ${isDarkMode ? '#1e40af80' : '#DBEAFE'}`, // dark:border-blue-800/50
+    border: `1 solid ${isDarkMode ? '#1e40af' : '#DBEAFE'}`, // dark:border-[#1e40af]
     borderRadius: 8,
     padding: 16,
     marginBottom: 24,
@@ -119,7 +119,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   },
   strongPointItem: {
     backgroundColor: isDarkMode ? '#14532d33' : '#ECFDF5', // dark:bg-green-950/20
-    border: `1 solid ${isDarkMode ? '#166534cc' : '#D1FAE5'}`, // dark:border-green-800/50
+    border: `1 solid ${isDarkMode ? '#166534' : '#D1FAE5'}`, // dark:border-[#166534] (green)
     borderRadius: 6,
     padding: 12,
     marginBottom: 8,
@@ -147,7 +147,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   },
   concernItem: {
     backgroundColor: isDarkMode ? '#7f1d1d33' : '#FEF2F2', // dark:bg-red-950/20
-    border: `1 solid ${isDarkMode ? '#991b1bcc' : '#FECACA'}`, // dark:border-red-800/50
+    border: `1 solid ${isDarkMode ? '#7f1d1d' : '#FECACA'}`, // dark:border-[#7f1d1d] (red)
     borderRadius: 6,
     padding: 12,
     marginBottom: 8,
@@ -167,7 +167,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   // Bottom line alert (matching yellow alert)
   bottomLineAlert: {
     backgroundColor: isDarkMode ? '#451a0333' : '#FEFCE8', // dark:bg-yellow-950/20
-    border: `1 solid ${isDarkMode ? '#92400ecc' : '#FEF08A'}`, // dark:border-yellow-800/50
+    border: `1 solid ${isDarkMode ? '#ca8a04' : '#FEF08A'}`, // dark:border-[#ca8a04] (yellow)
     borderRadius: 6,
     padding: 16,
     marginBottom: 20,

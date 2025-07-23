@@ -43,7 +43,7 @@ export const CarIcon = ({ size = 16, color = '#6B7280' }) => (
   <PDFIcon name="Car" size={size} color={color} />
 );
 
-export const FileTextIcon = ({ size = 16, color = '#3B82F6' }) => (
+export const FileTextIcon = ({ size = 16, color = '#111827' }) => (
   <PDFIcon name="FileText" size={size} color={color} />
 );
 

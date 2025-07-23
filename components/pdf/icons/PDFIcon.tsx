@@ -29,7 +29,7 @@ interface PDFIconProps {
 }
 
 // Icon path data extracted from Lucide React icons
-const iconPaths: Record<IconName, { paths: string[]; viewBox?: string; circles?: Array<{cx: string, cy: string, r: string}>; rects?: Array<{x: string, y: string, width: string, height: string}> }> = {
+const iconPaths: Record<IconName, { paths: string[]; viewBox?: string; strokeWidth?: number; circles?: Array<{cx: string, cy: string, r: string}>; rects?: Array<{x: string, y: string, width: string, height: string}> }> = {
   CheckCircle: {
     paths: ['m9 12 2 2 4-4', 'M21.801 10A10 10 0 1 1 17 3.335'],
     viewBox: '0 0 24 24'
@@ -105,7 +105,12 @@ const iconPaths: Record<IconName, { paths: string[]; viewBox?: string; circles?:
     viewBox: '0 0 24 24'
   },
   FileText: {
-    paths: ['M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z', 'M14 2v6h6'],
+    paths: [
+      'M4 3.5A1.5 1.5 0 0 1 5.5 2h7.38c.4 0 .78.16 1.06.44l5.62 5.62c.28.28.44.66.44 1.06V20.5A1.5 1.5 0 0 1 18.5 22h-13A1.5 1.5 0 0 1 4 20.5v-17z',
+      'M13 2v6a2 2 0 0 0 2 2h6',
+      'M8 13h8M8 17h6'
+    ],
+    strokeWidth: 1.5,
     viewBox: '0 0 24 24'
   },
   Eye: {
@@ -135,7 +140,7 @@ export const PDFIcon: React.FC<PDFIconProps> = ({
     );
   }
 
-  const { paths, circles, rects, viewBox = '0 0 24 24' } = iconData;
+  const { paths, circles, rects, strokeWidth = 2, viewBox = '0 0 24 24' } = iconData;
 
   return (
     <Svg 
@@ -143,7 +148,7 @@ export const PDFIcon: React.FC<PDFIconProps> = ({
       height={size} 
       viewBox={viewBox}
     >
-      <G fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <G fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
         {circles?.map((circle, index) => (
           <Circle 
             key={`circle-${index}`}
