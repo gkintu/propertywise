@@ -19,6 +19,7 @@ This repository is a Next.js 15 application for AI-powered property document ana
 - **Accessibility & Responsiveness**: Mobile-friendly, keyboard accessible, and visually consistent across themes.
 - **Feature Flags**: Static feature flag system (set via `.env.local`, requires server restart) controls UI features like property search and recent analysis.
 - **Demo PDFs**: Two default test PDFs included in `public/demo-pdfs/` for demonstration and testing.
+- **Comprehensive Testing Suite**: 23 automated tests covering validation, UI utilities, and integration workflows. Jest + React Testing Library setup ensures code quality without over-engineering.
 - **Security & Rate Limiting**: Upstash Redis-based rate limiting (5 requests/60s), CSP headers, and robust error handling. API routes are excluded from i18n middleware for reliability.
 
 ---
@@ -64,6 +65,10 @@ playground-projects/
 ├── hooks/
 ├── i18n/
 ├── lib/
+│   ├── validation.test.ts
+│   ├── utils.test.ts
+│   ├── integration.test.ts
+│   └── ...
 ├── messages/
 ├── public/
 │   └── demo-pdfs/
@@ -84,6 +89,7 @@ playground-projects/
 - **next-intl** (i18n)
 - **Tailwind CSS** (theming, utility classes)
 - **shadcn/ui** (UI components)
+- **Jest + React Testing Library** (testing framework)
 - **Google Gemini API** (AI analysis)
 - **Upstash Redis** (rate limiting)
 
@@ -108,6 +114,18 @@ npm run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000)
+
+### Testing
+
+```bash
+npm test           # Run all tests (23 tests)
+npm test -- --watch    # Run tests in watch mode
+```
+
+**Test Coverage:**
+- Validation tests (9): PDF upload security, file type/size validation
+- UI utility tests (8): Tailwind CSS class management, styling consistency  
+- Integration tests (6): Complete user workflows, validation + UI interactions
 
 ### PDF Analysis
 - Upload a housing report PDF (max 50MB, only valid property reports accepted)
@@ -134,6 +152,8 @@ Visit [http://localhost:3000](http://localhost:3000)
 - **Update regularly**: Keep the digest in sync with major codebase changes.
 - **Always update both translation files**: All user-facing text must be present in both `messages/en.json` and `messages/no.json`.
 - **Test with demo PDFs**: Use the provided demo files in `public/demo-pdfs/` for consistent testing.
+- **Run tests before commits**: Use `npm test` to ensure all 23 tests pass - covers validation, UI, and integration scenarios.
+- **Keep tests focused**: Avoid the "hiring a security team for a lemonade stand" approach - test what matters without over-engineering.
 - **Never commit secrets**: API keys and sensitive data must never be committed.
 
 ---

@@ -13,10 +13,10 @@ import { CheckCircleIcon, AlertTriangleIcon, HomeIcon, MapPinIcon, FileTextIcon,
 // });
 
 // Create styles that match the web page design
-const styles = StyleSheet.create({
+const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   page: {
     flexDirection: 'column',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: isDarkMode ? '#111827' : '#FFFFFF',
     padding: 30,
     fontFamily: 'Helvetica',
   },
@@ -26,30 +26,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     paddingBottom: 15,
-    borderBottom: '1 solid #E5E7EB',
+    borderBottom: `1 solid ${isDarkMode ? '#374151' : '#E5E7EB'}`,
     gap: 8,
   },
   brandText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#111827',
+    color: isDarkMode ? '#F9FAFB' : '#111827',
   },
   // Main title section (matching web page)
   mainTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#111827',
+    color: isDarkMode ? '#F9FAFB' : '#111827',
     marginBottom: 20,
   },
   subtitle: {
     fontSize: 11,
-    color: '#6B7280',
+    color: isDarkMode ? '#D1D5DB' : '#6B7280',
     marginBottom: 20,
   },
   // Summary card (matching web page card style)
   summaryCard: {
-    backgroundColor: '#FFFFFF',
-    border: '1 solid #E5E7EB',
+    backgroundColor: isDarkMode ? '#1F2937' : '#FFFFFF',
+    border: `1 solid ${isDarkMode ? '#374151' : '#E5E7EB'}`,
     borderRadius: 8,
     padding: 20,
     marginBottom: 20,
@@ -57,18 +57,18 @@ const styles = StyleSheet.create({
   summaryCardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#111827',
+    color: isDarkMode ? '#F9FAFB' : '#111827',
     marginBottom: 12,
   },
   summaryText: {
     fontSize: 12,
     lineHeight: 1.6,
-    color: '#374151',
+    color: isDarkMode ? '#D1D5DB' : '#374151',
   },
   // Market position section (blue box like web page)
   marketPositionBox: {
-    backgroundColor: '#EFF6FF',
-    border: '1 solid #DBEAFE',
+    backgroundColor: isDarkMode ? '#1e3a8a33' : '#EFF6FF', // dark:bg-blue-950/20
+    border: `1 solid ${isDarkMode ? '#1e40af80' : '#DBEAFE'}`, // dark:border-blue-800/50
     borderRadius: 8,
     padding: 16,
     marginBottom: 24,
@@ -76,18 +76,18 @@ const styles = StyleSheet.create({
   marketPositionTitle: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#1E3A8A',
+    color: isDarkMode ? '#93C5FD' : '#1E3A8A', // dark:text-blue-300
     marginBottom: 8,
   },
   marketPositionText: {
     fontSize: 12,
-    color: '#1E40AF',
+    color: isDarkMode ? '#BFDBFE' : '#1E40AF', // dark:text-blue-200
     lineHeight: 1.4,
   },
   // Key findings card (matching web page)
   keyFindingsCard: {
-    backgroundColor: '#FFFFFF',
-    border: '1 solid #E5E7EB',
+    backgroundColor: isDarkMode ? '#1F2937' : '#FFFFFF',
+    border: `1 solid ${isDarkMode ? '#374151' : '#E5E7EB'}`,
     borderRadius: 8,
     padding: 20,
     marginBottom: 20,
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   keyFindingsTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#111827',
+    color: isDarkMode ? '#F9FAFB' : '#111827',
     marginBottom: 16,
   },
   twoColumnLayout: {
@@ -115,11 +115,11 @@ const styles = StyleSheet.create({
   strongPointsTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#047857',
+    color: isDarkMode ? '#86EFAC' : '#047857', // dark:text-green-300
   },
   strongPointItem: {
-    backgroundColor: '#ECFDF5',
-    border: '1 solid #D1FAE5',
+    backgroundColor: isDarkMode ? '#14532d33' : '#ECFDF5', // dark:bg-green-950/20
+    border: `1 solid ${isDarkMode ? '#166534cc' : '#D1FAE5'}`, // dark:border-green-800/50
     borderRadius: 6,
     padding: 12,
     marginBottom: 8,
@@ -127,13 +127,13 @@ const styles = StyleSheet.create({
   strongPointTitle: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#065F46',
+    color: isDarkMode ? '#BBF7D0' : '#065F46', // dark:text-green-100
     marginBottom: 4,
     flex: 1,
   },
   strongPointDescription: {
     fontSize: 11,
-    color: '#000000',
+    color: isDarkMode ? '#D1D5DB' : '#000000',
     lineHeight: 1.4,
   },
   // Concerns styling (matching red theme)
@@ -143,11 +143,11 @@ const styles = StyleSheet.create({
   concernsTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#DC2626',
+    color: isDarkMode ? '#FCA5A5' : '#DC2626', // dark:text-red-300
   },
   concernItem: {
-    backgroundColor: '#FEF2F2',
-    border: '1 solid #FECACA',
+    backgroundColor: isDarkMode ? '#7f1d1d33' : '#FEF2F2', // dark:bg-red-950/20
+    border: `1 solid ${isDarkMode ? '#991b1bcc' : '#FECACA'}`, // dark:border-red-800/50
     borderRadius: 6,
     padding: 12,
     marginBottom: 8,
@@ -155,19 +155,19 @@ const styles = StyleSheet.create({
   concernTitle: {
     fontSize: 12,
     fontWeight: 'bold',
-    color: '#991B1B',
+    color: isDarkMode ? '#FECACA' : '#991B1B', // dark:text-red-100
     marginBottom: 4,
     flex: 1,
   },
   concernDescription: {
     fontSize: 11,
-    color: '#000000',
+    color: isDarkMode ? '#D1D5DB' : '#000000',
     lineHeight: 1.4,
   },
-  // Bottom line alert (matching yellow alert with border-yellow-200 bg-yellow-50)
+  // Bottom line alert (matching yellow alert)
   bottomLineAlert: {
-    backgroundColor: '#FEFCE8', // bg-yellow-50
-    border: '1 solid #FEF08A', // border-yellow-200
+    backgroundColor: isDarkMode ? '#451a0333' : '#FEFCE8', // dark:bg-yellow-950/20
+    border: `1 solid ${isDarkMode ? '#92400ecc' : '#FEF08A'}`, // dark:border-yellow-800/50
     borderRadius: 6,
     padding: 16,
     marginBottom: 20,
@@ -183,12 +183,12 @@ const styles = StyleSheet.create({
   },
   bottomLineText: {
     fontSize: 11,
-    color: '#A16207', // text-yellow-800
+    color: isDarkMode ? '#ffc657' : '#A16207', // dark:text-[#ffc657]
     lineHeight: 1.4,
   },
   bottomLineTextBold: {
     fontSize: 11,
-    color: '#A16207', // text-yellow-800
+    color: isDarkMode ? '#FBBF24' : '#A16207', // dark:text-[#FBBF24]
     lineHeight: 1.4,
     fontWeight: 'bold',
   },
@@ -199,9 +199,9 @@ const styles = StyleSheet.create({
     left: 30,
     right: 30,
     textAlign: 'center',
-    color: '#6B7280',
+    color: isDarkMode ? '#9CA3AF' : '#6B7280',
     fontSize: 9,
-    borderTop: '1 solid #E5E7EB',
+    borderTop: `1 solid ${isDarkMode ? '#374151' : '#E5E7EB'}`,
     paddingTop: 8,
   },
 });
@@ -209,14 +209,31 @@ const styles = StyleSheet.create({
 interface AnalysisReportPDFProps {
   analysisData: PropertyAnalysis;
   t: TranslationFunction;
+  isDarkMode?: boolean;
 }
 
-export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisData, t }) => (
+export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisData, t, isDarkMode = false }) => {
+  const styles = createStyles(isDarkMode);
+  
+  // Define icon colors based on theme to match web interface
+  const iconColors = {
+    trending: isDarkMode ? '#10B981' : '#047857', // TrendingUp icon - green-600 dark:green-400
+    checkCircle: isDarkMode ? '#10B981' : '#059669', // CheckCircle icon - green-800 dark:green-400
+    alertTriangle: isDarkMode ? '#F87171' : '#DC2626', // AlertTriangle icon - red-600 dark:red-400
+    info: isDarkMode ? '#F87171' : '#991B1B', // Info icon - red-800 dark:red-400
+    bottomLineAlert: isDarkMode ? '#FBBF24' : '#CA8A04', // AlertTriangle in bottom line - yellow-600 dark:yellow-400
+    brand: '#EAB308', // Yellow brand color - same in both modes
+    mapPin: isDarkMode ? '#FBBF24' : '#EAB308', // MapPin icon - yellow-600 dark:yellow-400
+    eye: isDarkMode ? '#D1D5DB' : '#374151', // Eye icon for Key Findings - gray-600 dark:text-[#D1D5DB]
+    fileText: isDarkMode ? '#D1D5DB' : '#111827', // FileText icon for Summary - dark:text-[#D1D5DB]
+  };
+  
+  return (
   <Document>
     <Page size="A4" style={styles.page}>
       {/* PropertyWise Header (matching web page) */}
       <View style={styles.brandHeader}>
-        <HomeIcon size={16} color="#EAB308" />
+        <HomeIcon size={16} color={iconColors.brand} />
         <Text style={styles.brandText}>PropertyWise</Text>
       </View>
 
@@ -224,7 +241,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
       <View>
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 4 }}>
           <View style={{ marginTop: 2 }}>
-            <MapPinIcon size={24} color="#EAB308" />
+            <MapPinIcon size={24} color={iconColors.mapPin} />
           </View>
           <Text style={styles.mainTitle}>
             {analysisData?.propertyDetails?.address || t('analysis.propertyAnalysisTitle')}
@@ -240,7 +257,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
         <View style={styles.summaryCard}>
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 12 }}>
             <View style={{ marginTop: 2 }}>
-              <FileTextIcon size={16} color="#111827" />
+              <FileTextIcon size={16} color={iconColors.fileText} />
             </View>
             <Text style={styles.summaryCardTitle}>
               {t('analysis.analysisSummaryTitle')}
@@ -271,7 +288,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
       <View style={styles.keyFindingsCard}>
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 16 }}>
           <View style={{ marginTop: 2 }}>
-            <EyeIcon size={16} color="#374151" />
+            <EyeIcon size={16} color={iconColors.eye} />
           </View>
           <Text style={styles.keyFindingsTitle}>
             {t('analysis.keyFindingsTitle')}
@@ -283,7 +300,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
           <View style={styles.strongPointsContainer}>
             <View style={styles.strongPointsHeader}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <TrendingUpIcon size={16} color="#047857" />
+                <TrendingUpIcon size={16} color={iconColors.trending} />
                 <Text style={styles.strongPointsTitle}>
                   {t('analysis.strongSellingPoints')}
                 </Text>
@@ -296,7 +313,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
               return (
                 <View key={idx} style={styles.strongPointItem} wrap={false}>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 4 }}>
-                    <CheckCircleIcon size={12} color="#059669" />
+                    <CheckCircleIcon size={12} color={iconColors.checkCircle} />
                     <Text style={styles.strongPointTitle}>
                       {spTitle}
                     </Text>
@@ -315,7 +332,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
           <View style={styles.concernsContainer}>
             <View style={styles.concernsHeader}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <AlertTriangleIcon size={16} color="#DC2626" />
+                <AlertTriangleIcon size={16} color={iconColors.alertTriangle} />
                 <Text style={styles.concernsTitle}>
                   {t('analysis.areasOfConcern')}
                 </Text>
@@ -328,7 +345,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
               return (
                 <View key={idx} style={styles.concernItem} wrap={false}>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 4 }}>
-                    <InfoIcon size={12} color="#991B1B" />
+                    <InfoIcon size={12} color={iconColors.info} />
                     <Text style={styles.concernTitle}>
                       {concernTitle}
                     </Text>
@@ -349,7 +366,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
       {analysisData?.bottomLine && (
         <View style={styles.bottomLineAlert} wrap={false}>
           <View style={styles.bottomLineIcon}>
-            <AlertTriangleIcon size={14} color="#CA8A04" />
+            <AlertTriangleIcon size={14} color={iconColors.bottomLineAlert} />
           </View>
           <View style={styles.bottomLineContent}>
             <Text style={styles.bottomLineTextBold}>
@@ -370,4 +387,5 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
       </View>
     </Page>
   </Document>
-);
+  );
+};

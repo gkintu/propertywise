@@ -19,7 +19,6 @@ const nextConfig: NextConfig = {
   },
   // Suppress hydration warnings in development
   reactStrictMode: true,
-  swcMinify: true,
   // Reduce error overlay verbosity
   onDemandEntries: {
     // period (in ms) where the server will keep pages in the buffer
@@ -43,6 +42,10 @@ const nextConfig: NextConfig = {
       config.watchOptions = {
         ...config.watchOptions,
         ignored: /node_modules/,
+      };
+      // Suppress webpack cache serialization warnings
+      config.infrastructureLogging = {
+        level: 'error',
       };
     }
     return config;
