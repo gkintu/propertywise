@@ -1,10 +1,17 @@
-# Playground Projects: Repository Digest
+# PropertyWise: Repository Digest
 
 ---
 
-## Executive Summary
+```
+propertywise/
+├── app/
+│   ├── [locale]/
+│   │   ├── analysis-result/
+│   │   ├── privacy/
+│   │   ├── layout.tsx
+│   └── page.tsxtive Summary
 
-This repository is a Next.js 15 application for AI-powered property document analysis. Users can upload Norwegian or English housing report PDFs, which are processed using Google Gemini AI to extract actionable insights. The app is fully localized (English/Norwegian), supports light/dark themes, and provides a modern, accessible UI. The backend is fully migrated to Gemini API, with robust PDF validation, rate limiting, and structured JSON output. Demo PDFs are included for testing, and all user-facing text is internationalized.
+PropertyWise is a Next.js 15 application for AI-powered property document analysis. Users can upload Norwegian or English housing report PDFs, which are processed using Google Gemini AI to extract actionable insights. The app is fully localized (English/Norwegian), supports light/dark themes, and provides a modern, accessible UI. The backend is fully migrated to Gemini API, with robust PDF validation, rate limiting, and structured JSON output. Demo PDFs are included for testing, and all user-facing text is internationalized.
 
 ---
 
