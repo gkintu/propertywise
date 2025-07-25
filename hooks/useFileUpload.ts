@@ -34,17 +34,7 @@ export function useFileUpload() {
       const blob = await upload(file.name, file, {
         access: 'public',
         handleUploadUrl: '/api/upload-blob',
-        multipart: true,
-        clientPayload: JSON.stringify({
-          size: file.size,
-          type: file.type,
-          name: file.name,
-        }),
-        onUploadProgress: (event) => {
-          const percentage = Math.round((event.loaded / event.total) * 100)
-          setUploadProgress(percentage)
-        },
-      })
+      });
       
       return blob.url
     } catch (error) {
