@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { del } from "@vercel/blob";
 import { GoogleGenAI } from "@google/genai";
-import { AnalyzePdfRequestSchema, AnalyzePdfFromBlobSchema } from "@/lib/validation";
+import {
+  AnalyzePdfRequestSchema,
+  AnalyzePdfFromBlobSchema,
+} from "@/lib/validation";
 import { ZodError } from "zod";
 
 // Initialize Gemini client
@@ -29,6 +33,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  let blobUrlToDelete: string | undefined;
+
   try {
     // Check if Gemini API key is configured
     if (!process.env.GEMINI_API_KEY) {
@@ -69,6 +75,7 @@ export async function POST(request: NextRequest) {
       }
 
       const { blobUrl, language } = validationResult.data;
+      blobUrlToDelete = blobUrl; // Set for deletion in finally block
       validatedLanguage = language;
 
       console.log("Received blob URL:", blobUrl);
@@ -115,7 +122,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const { file: validatedFile, language: parsedLanguage } = validationResult.data;
+      const { file: validatedFile, language: parsedLanguage } =
+        validationResult.data;
       validatedLanguage = parsedLanguage;
 
       console.log(
@@ -195,7 +203,7 @@ export async function POST(request: NextRequest) {
     } catch (classificationError) {
       console.error("Error in document classification:", classificationError);
       console.log(
-        "Classification failed, proceeding with property analysis as fallback"
+        "Classification failed, proceeding with property analysis as fallback",
       );
     }
 
@@ -325,7 +333,7 @@ Focus on actionable insights for a potential buyer. If you cannot extract struct
       );
     }
 
-    return NextResponse.json({ analysis: parsedAnalysis });
+    return NextResponse.json(parsedAnalysis, { status: 200 });
   } catch (error) {
     console.error("Error in /api/analyze-pdf:", error);
 
@@ -349,5 +357,20 @@ Focus on actionable insights for a potential buyer. If you cannot extract struct
       },
       { status: 500 }
     );
+  } finally {
+    if (blobUrlToDelete) {
+      try {
+        console.log(`🗑️ Deleting blob: ${blobUrlToDelete}`);
+        await del(blobUrlToDelete);
+        console.log(`✅ Successfully deleted blob: ${blobUrlToDelete}`);
+      } catch (deleteError) {
+        console.error(
+          `❌ Failed to delete blob ${blobUrlToDelete}:`,
+          deleteError,
+        );
+        // We don't re-throw here because the primary operation's response
+        // has already been determined. This is a cleanup step.
+      }
+    }
   }
 }

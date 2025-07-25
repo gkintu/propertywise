@@ -18,6 +18,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
         return {
           allowedContentTypes: ["application/pdf"],
+          addRandomSuffix: true,
           tokenPayload: JSON.stringify({
             // Pass any custom data to onUploadCompleted
             pathname,
