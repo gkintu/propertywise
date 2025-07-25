@@ -2,6 +2,13 @@ import { renderHook, act } from '@testing-library/react'
 import { useFileUpload } from './useFileUpload'
 import { toast } from 'sonner'
 
+// Mock Vercel Blob
+jest.mock('@vercel/blob', () => ({
+  put: jest.fn().mockResolvedValue({
+    url: 'https://mock-blob-url.com/file.pdf'
+  })
+}))
+
 // Mock next-intl
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string, params?: { fileName?: string }) => {
@@ -14,6 +21,7 @@ jest.mock('next-intl', () => ({
       'upload.fileUploaded': `File uploaded: ${params?.fileName}`,
       'upload.fileSelected': `File selected: ${params?.fileName}`,
       'upload.fileRemoved': 'File removed',
+      'upload.uploadFailed': 'Upload failed. Please try again.',
     }
     return translations[key] || key
   }

@@ -3,6 +3,17 @@ import { toast } from "sonner"
 import { useTranslations } from 'next-intl'
 import { upload } from '@vercel/blob/client'
 
+// Demo file blob URLs that should never be deleted
+const DEMO_FILE_BLOB_IDENTIFIERS = [
+  'demo-alv-johnsens-vei-1',
+  'demo-bolette-brygge-5', 
+  'demo-sanengveien-1'
+];
+
+const isDemoFileBlob = (blobUrl: string): boolean => {
+  return DEMO_FILE_BLOB_IDENTIFIERS.some(identifier => blobUrl.includes(identifier));
+};
+
 export function useFileUpload() {
   const t = useTranslations('HomePage')
   const [dragActive, setDragActive] = useState(false)
@@ -43,6 +54,25 @@ export function useFileUpload() {
     } finally {
       setIsUploading(false)
       setUploadProgress(0)
+    }
+  }
+
+  const deleteBlobFromUrl = async (blobUrl: string): Promise<void> => {
+    try {
+      const response = await fetch('/api/delete-blob', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ blobUrl }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete blob');
+      }
+    } catch (error) {
+      console.error('Error deleting blob:', error);
+      // Don't throw here - we don't want blob deletion failures to break the UI
     }
   }
 
@@ -134,7 +164,15 @@ export function useFileUpload() {
     }
   }
 
-  const removeFile = () => {
+  const removeFile = async () => {
+    // Delete blob only if it's NOT a demo file
+    if (uploadedFiles.length > 0) {
+      const fileWithBlobUrl = uploadedFiles[0] as File & { blobUrl?: string };
+      if (fileWithBlobUrl.blobUrl && !isDemoFileBlob(fileWithBlobUrl.blobUrl)) {
+        await deleteBlobFromUrl(fileWithBlobUrl.blobUrl);
+      }
+    }
+    
     setUploadedFiles([])
     setStatusMessage(t('upload.fileRemoved'))
     // Clear the file input as well
@@ -143,9 +181,14 @@ export function useFileUpload() {
     }
   }
 
-  const openFileDialog = () => {
-    // Clear any existing files before opening dialog
+  const openFileDialog = async () => {
+    // Clear any existing files and their blobs before opening dialog
+    // But don't delete demo file blobs
     if (uploadedFiles.length > 0) {
+      const fileWithBlobUrl = uploadedFiles[0] as File & { blobUrl?: string };
+      if (fileWithBlobUrl.blobUrl && !isDemoFileBlob(fileWithBlobUrl.blobUrl)) {
+        await deleteBlobFromUrl(fileWithBlobUrl.blobUrl);
+      }
       setUploadedFiles([])
     }
     fileInputRef.current?.click()

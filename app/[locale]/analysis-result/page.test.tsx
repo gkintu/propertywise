@@ -46,16 +46,29 @@ jest.mock('@react-pdf/renderer', () => ({
 
 // Mock components
 jest.mock('@/components/upload/FileUploadSection', () => {
-  return function MockFileUploadSection() {
+  const MockFileUploadSection = () => {
     return <div data-testid="file-upload-section">File Upload Section</div>
+  }
+  MockFileUploadSection.displayName = 'MockFileUploadSection'
+  return {
+    __esModule: true,
+    default: MockFileUploadSection,
   }
 })
 
-jest.mock('@/components/theme/ThemeToggle', () => {
-  return function MockThemeToggle() {
-    return <button data-testid="theme-toggle">Toggle Theme</button>
-  }
-})
+jest.mock('@/components/theme/ThemeToggle', () => ({
+  ThemeToggle: () => <button data-testid="theme-toggle">Toggle Theme</button>
+}))
+
+jest.mock('@/components/pdf/AnalysisReportPDF', () => ({
+  AnalysisReportPDF: () => <div data-testid="analysis-report-pdf">PDF Report</div>
+}))
+
+jest.mock('@/components/ui/property-listing-badge', () => ({
+  PropertyListingBadge: ({ children }: { children: React.ReactNode }) => (
+    <span data-testid="property-listing-badge">{children}</span>
+  )
+}))
 
 describe('AnalysisResultPage Integration Tests', () => {
   const mockPush = jest.fn()

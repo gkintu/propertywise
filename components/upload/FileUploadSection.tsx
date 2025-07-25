@@ -3,7 +3,7 @@
 import React, { useState, useRef, useImperativeHandle, forwardRef, useCallback, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Upload, X, Search } from "lucide-react";
+import { Upload, X, Search, Loader2 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -22,6 +22,8 @@ interface FileUploadSectionProps {
 
 export interface FileUploadSectionHandle {
   shake: () => void;
+  shakeAnalyzeButton: () => void;
+  hasFiles: () => boolean;
 }
 
 // Analysis states enum for better type safety
@@ -55,12 +57,14 @@ const FileUploadSection = forwardRef<
     const [analysisState, setAnalysisState] = useState<AnalysisState>(AnalysisState.IDLE);
     const [isPending, startTransition] = useTransition();
     const shakeRef = useRef<ShakeMotionHandle>(null);
+    const analyzeButtonRef = useRef<HTMLButtonElement>(null);
 
     const {
       dragActive,
       uploadedFiles,
       statusMessage,
       fileInputRef,
+      isUploading,
       handleDrag,
       handleDrop,
       handleFileSelect,
@@ -72,6 +76,27 @@ const FileUploadSection = forwardRef<
     useImperativeHandle(ref, () => ({
       shake: () => {
         shakeRef.current?.shake();
+      },
+      shakeAnalyzeButton: () => {
+        // Create a gentle shake animation for the analyze button
+        if (analyzeButtonRef.current) {
+          const keyframes = [
+            { transform: 'translateX(0)' },
+            { transform: 'translateX(-2px)' },
+            { transform: 'translateX(2px)' },
+            { transform: 'translateX(-1px)' },
+            { transform: 'translateX(1px)' },
+            { transform: 'translateX(0)' }
+          ];
+          
+          analyzeButtonRef.current.animate(keyframes, {
+            duration: 300,
+            easing: 'ease-in-out'
+          });
+        }
+      },
+      hasFiles: () => {
+        return hasFiles;
       },
     }));
 
@@ -233,38 +258,46 @@ const FileUploadSection = forwardRef<
           <ShakeMotion ref={shakeRef} duration={600} intensity={8}>
             <Card
               className={`max-w-2xl mx-auto border-2 border-dashed transition-colors ${
-                dragActive
+                dragActive && !hasFiles
                   ? "border-yellow-400 bg-yellow-50 dark:border-yellow-500/50 dark:bg-gray-800/50"
+                  : hasFiles
+                  ? "border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/30"
                   : "border-yellow-200 hover:border-yellow-400 dark:border-gray-600 dark:hover:border-yellow-500/50 dark:bg-gray-800/50"
-              } ${isAnalyzing ? 'opacity-50 pointer-events-none select-none' : ''}`}
+              } ${(isAnalyzing || isUploading || hasFiles) ? 'opacity-50 pointer-events-none select-none' : ''}`}
             >
               <CardContent
                 className="p-12 cursor-default"
                 role="region"
                 aria-label={t("upload.dropText")}
                 tabIndex={0}
-                onDragEnter={isAnalyzing ? undefined : handleDrag}
-                onDragLeave={isAnalyzing ? undefined : handleDrag}
-                onDragOver={isAnalyzing ? undefined : handleDrag}
-                onDrop={isAnalyzing ? undefined : handleDrop}
-                onKeyDown={isAnalyzing ? undefined : (e) => {
+                onDragEnter={(isAnalyzing || isUploading || hasFiles) ? undefined : handleDrag}
+                onDragLeave={(isAnalyzing || isUploading || hasFiles) ? undefined : handleDrag}
+                onDragOver={(isAnalyzing || isUploading || hasFiles) ? undefined : handleDrag}
+                onDrop={(isAnalyzing || isUploading || hasFiles) ? undefined : handleDrop}
+                onKeyDown={(isAnalyzing || isUploading || hasFiles) ? undefined : async (e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    openFileDialog();
+                    await openFileDialog();
                   }
                 }}
               >
                 <div className="text-center">
                   <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Upload className="w-8 h-8 text-yellow-600 dark:text-[#FBBF24]" />
+                    {isUploading ? (
+                      <Loader2 className="w-8 h-8 text-yellow-600 dark:text-[#FBBF24] animate-spin" />
+                    ) : (
+                      <Upload className="w-8 h-8 text-yellow-600 dark:text-[#FBBF24]" />
+                    )}
                   </div>
                   <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                    {t("upload.dropText")}
+                    {isUploading ? t("upload.uploading") : t("upload.dropText")}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-[#9CA3AF] mb-4">
-                    <span className="font-medium text-yellow-600 dark:text-[#FBBF24]">
-                      {t("upload.browseText")}
-                    </span>
+                    {!isUploading && (
+                      <span className="font-medium text-yellow-600 dark:text-[#FBBF24]">
+                        {t("upload.browseText")}
+                      </span>
+                    )}
                   </p>
                   <div className="text-sm text-gray-400 dark:text-[#6B7280]">
                     {t("upload.supportText")}
@@ -276,17 +309,17 @@ const FileUploadSection = forwardRef<
                     accept=".pdf"
                     className="hidden"
                     onChange={handleFileSelect}
-                    disabled={isAnalyzing}
+                    disabled={isAnalyzing || isUploading || hasFiles}
                   />
 
                   <Button
                     variant="outline"
                     className="mt-6 border-yellow-200 dark:border-[#FBBF24] text-yellow-600 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#FBBF24] dark:hover:text-black font-medium"
-                    onClick={isAnalyzing ? undefined : openFileDialog}
+                    onClick={(isAnalyzing || isUploading || hasFiles) ? undefined : async () => await openFileDialog()}
                     aria-label={t("upload.selectButton")}
-                    disabled={isAnalyzing}
+                    disabled={isAnalyzing || isUploading || hasFiles}
                   >
-                    {t("upload.selectButton")}
+                    {isUploading ? t("upload.uploading") : t("upload.selectButton")}
                   </Button>
                 </div>
               </CardContent>
@@ -296,7 +329,7 @@ const FileUploadSection = forwardRef<
           {!hasFiles ? (
             <DemoFilesSection
               onDemoFileUpload={(file) => setUploadedFiles([file])}
-              isLoading={isAnalyzing}
+              isLoading={isAnalyzing || isUploading}
             />
           ) : (
             <div className="max-w-2xl mx-auto mt-6">
@@ -335,10 +368,10 @@ const FileUploadSection = forwardRef<
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => removeFile()}
-                      disabled={isAnalyzing || isPending}
+                      onClick={async () => await removeFile()}
+                      disabled={isAnalyzing || isPending || isUploading}
                       className={`text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 dark:border-gray-600 ${
-                        (isAnalyzing || isPending) ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
+                        (isAnalyzing || isPending || isUploading) ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''
                       }`}
                       aria-label={`Remove ${uploadedFiles[0].name}`}
                     >
@@ -352,6 +385,7 @@ const FileUploadSection = forwardRef<
                   <AnalysisProgressBar complete={isCompleted} />
                 ) : (
                   <Button
+                    ref={analyzeButtonRef}
                     className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8 font-medium relative flex items-center justify-center disabled:opacity-50"
                     onClick={handleAnalyzeDocuments}
                     disabled={!hasFiles || isPending}

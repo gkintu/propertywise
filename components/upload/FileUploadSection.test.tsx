@@ -12,22 +12,33 @@ jest.mock('next/navigation', () => ({
 
 // Mock next-intl
 jest.mock('next-intl', () => ({
-  useTranslations: () => (key: string, params?: { fileName?: string }) => {
+  useTranslations: (namespace?: string) => (key: string, params?: { fileName?: string }) => {
     const translations: Record<string, string> = {
-      'upload.title': 'Upload Property Document',
-      'upload.description': 'Upload a PDF property report for AI analysis',
-      'upload.dropzone': 'Drag and drop your PDF here, or click to browse',
-      'upload.analyze': 'Analyze Document',
-      'upload.fileSelected': `File selected: ${params?.fileName}`,
-      'upload.fileUploaded': `File uploaded: ${params?.fileName}`,
-      'upload.validation.invalidFileTypeDrop': 'Invalid file type. Only PDFs are allowed.',
-      'upload.validation.fileSizeLimit': 'File size must be less than 50MB.',
-      'upload.validation.multipleFilesDrop': 'Please select only one file at a time.',
-      'upload.validation.multipleFilesSelect': 'Please select only one file at a time.',
-      'upload.releaseToUpload': 'Release to upload',
-      'upload.fileRemoved': 'File removed',
+      'HomePage.upload.title': 'Upload Property Document',
+      'HomePage.upload.description': 'Upload a PDF property report for AI analysis',
+      'HomePage.upload.subtitle': 'Upload a PDF property report for AI analysis',
+      'HomePage.upload.dropText': 'Drag and drop your PDF here, or click to browse',
+      'HomePage.upload.browseText': 'Browse',
+      'HomePage.upload.supportText': 'PDF only, max 50MB',
+      'HomePage.upload.selectButton': 'Select File',
+      'HomePage.upload.uploadedFile': 'Uploaded File',
+      'HomePage.upload.analyzeButton': 'Analyze Document',
+      'HomePage.upload.success': 'Analysis complete!',
+      'HomePage.upload.error': 'Analysis failed',
+      'HomePage.upload.validation.noFileSelected': 'No file selected.',
+      'HomePage.upload.validation.invalidFileTypeDrop': 'Invalid file type. Only PDFs are allowed.',
+      'HomePage.upload.validation.fileSizeLimit': 'File size must be less than 50MB.',
+      'HomePage.upload.validation.multipleFilesDrop': 'Please select only one file at a time.',
+      'HomePage.upload.validation.multipleFilesSelect': 'Please select only one file at a time.',
+      'HomePage.upload.releaseToUpload': 'Release to upload',
+      'HomePage.upload.fileRemoved': 'File removed',
+    };
+    const fullKey = namespace ? `${namespace}.${key}` : key;
+    // Handle dynamic translation for file uploaded
+    if (fullKey === 'HomePage.upload.fileUploaded' && params?.fileName) {
+      return `File uploaded: ${params.fileName}`;
     }
-    return translations[key] || key
+    return translations[fullKey] || key;
   }
 }))
 
@@ -40,16 +51,26 @@ jest.mock('sonner', () => ({
 }))
 
 // Mock the motion components
-jest.mock('@/components/motion', () => ({
-  ShakeMotion: ({ children }: { children: React.ReactNode }) => <div data-testid="shake-motion">{children}</div>,
-}))
+jest.mock('@/components/motion', () => {
+  const MockShakeMotion = React.forwardRef((props: any, ref: any) => {
+    React.useImperativeHandle(ref, () => ({
+      shake: jest.fn(),
+    }));
+    return <div data-testid="shake-motion">{props.children}</div>;
+  });
+  MockShakeMotion.displayName = 'MockShakeMotion';
+  return {
+    ShakeMotion: MockShakeMotion,
+    ShakeMotionHandle: {} as unknown,
+  };
+})
 
 // Mock the demo files section
-jest.mock('./DemoFilesSection', () => {
-  return function MockDemoFilesSection({ onFileSelect }: { onFileSelect: (file: File) => void }) {
+jest.mock('./DemoFilesSection', () => ({
+  DemoFilesSection: ({ onDemoFileUpload }: { onDemoFileUpload: (file: File) => void }) => {
     const handleDemoClick = () => {
       const mockFile = new File(['mock content'], 'demo.pdf', { type: 'application/pdf' })
-      onFileSelect(mockFile)
+      onDemoFileUpload(mockFile)
     }
     return (
       <div data-testid="demo-files-section">
@@ -59,7 +80,7 @@ jest.mock('./DemoFilesSection', () => {
       </div>
     )
   }
-})
+}))
 
 // Mock the progress bar
 jest.mock('./AnalysisProgressBar', () => {
@@ -116,9 +137,8 @@ describe('FileUploadSection Integration Tests', () => {
     it('should handle valid file selection and enable analyze button', async () => {
       render(<FileUploadSection />)
       
-      const fileInput = screen.getByRole('textbox', { hidden: true }) || 
-                       document.querySelector('input[type="file"]')
-      expect(fileInput).toBeInTheDocument()
+      const fileInput = document.querySelector('input[type="file"]');
+      expect(fileInput).toBeInTheDocument();
 
       const validFile = createMockFile('document.pdf', 1024 * 1024, 'application/pdf')
       

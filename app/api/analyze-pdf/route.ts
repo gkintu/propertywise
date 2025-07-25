@@ -7,6 +7,17 @@ import {
 } from "@/lib/validation";
 import { ZodError } from "zod";
 
+// Demo file blob URLs that should never be deleted
+const DEMO_FILE_BLOB_IDENTIFIERS = [
+  'demo-alv-johnsens-vei-1',
+  'demo-bolette-brygge-5', 
+  'demo-sanengveien-1'
+];
+
+const isDemoFileBlob = (blobUrl: string): boolean => {
+  return DEMO_FILE_BLOB_IDENTIFIERS.some(identifier => blobUrl.includes(identifier));
+};
+
 // Initialize Gemini client
 const genai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY || "",
@@ -358,7 +369,7 @@ Focus on actionable insights for a potential buyer. If you cannot extract struct
       { status: 500 }
     );
   } finally {
-    if (blobUrlToDelete) {
+    if (blobUrlToDelete && !isDemoFileBlob(blobUrlToDelete)) {
       try {
         console.log(`🗑️ Deleting blob: ${blobUrlToDelete}`);
         await del(blobUrlToDelete);
@@ -371,6 +382,8 @@ Focus on actionable insights for a potential buyer. If you cannot extract struct
         // We don't re-throw here because the primary operation's response
         // has already been determined. This is a cleanup step.
       }
+    } else if (blobUrlToDelete) {
+      console.log(`🛡️ Preserving demo file blob: ${blobUrlToDelete}`);
     }
   }
 }
