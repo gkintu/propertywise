@@ -2,7 +2,7 @@ import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { useRouter, useParams } from 'next/navigation'
 import { toast } from 'sonner'
-import FileUploadSection from './FileUploadSection'
+import FileUploadSection, { FileUploadSectionHandle } from './FileUploadSection'
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -284,14 +284,18 @@ describe('FileUploadSection Integration Tests', () => {
 
   describe('Imperative API', () => {
     it('should expose shake method through ref', () => {
-      const ref = React.createRef<{ shake: () => void }>()
+      const ref = React.createRef<FileUploadSectionHandle>()
       render(<FileUploadSection ref={ref} />)
       
       expect(ref.current).toBeTruthy()
       expect(typeof ref.current?.shake).toBe('function')
+      expect(typeof ref.current?.shakeAnalyzeButton).toBe('function')
+      expect(typeof ref.current?.hasFiles).toBe('function')
       
       // Should not throw when called
       expect(() => ref.current?.shake()).not.toThrow()
+      expect(() => ref.current?.shakeAnalyzeButton()).not.toThrow()
+      expect(typeof ref.current?.hasFiles()).toBe('boolean')
     })
   })
 
