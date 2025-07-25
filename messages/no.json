@@ -48,6 +48,8 @@
       "fileSelected": "Fil valgt: {fileName}",
       "fileRemoved": "Fil fjernet",
       "releaseToUpload": "Slipp for å laste opp fil",
+      "uploading": "Laster opp...",
+      "uploadFailed": "Opplasting mislyktes. Vennligst prøv igjen.",
       "progressStages": {
         "extractingDetails": "Henter eiendomsdetaljer",
         "analyzingPrice": "Analyserer pris og marked",

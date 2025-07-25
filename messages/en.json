@@ -48,6 +48,8 @@
       "fileSelected": "File selected: {fileName}",
       "fileRemoved": "File removed",
       "releaseToUpload": "Release to upload file",
+      "uploading": "Uploading...",
+      "uploadFailed": "Upload failed. Please try again.",
       "progressStages": {
         "extractingDetails": "Extracting Property Details",
         "analyzingPrice": "Analyzing Price & Market Data",

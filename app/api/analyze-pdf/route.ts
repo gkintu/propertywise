@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
-import { AnalyzePdfRequestSchema } from "@/lib/validation";
+import { AnalyzePdfRequestSchema, AnalyzePdfFromBlobSchema } from "@/lib/validation";
 import { ZodError } from "zod";
 
 // Initialize Gemini client
@@ -41,47 +41,101 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const formData = await request.formData();
-    const file = formData.get("file");
-    const language = formData.get("language");
-
-    // Validate request using Zod
-    const validationResult = AnalyzePdfRequestSchema.safeParse({
-      file,
-      language,
-    });
-
-    if (!validationResult.success) {
-      return NextResponse.json(
-        {
-          error: "Invalid request data.",
-          errorType: "validation_error",
-          details: validationResult.error.flatten().fieldErrors,
-        },
-        { status: 400 }
-      );
-    }
-
-    const { file: validatedFile, language: validatedLanguage } =
-      validationResult.data;
-
-    console.log(
-      "Received file:",
-      validatedFile.name,
-      "Type:",
-      validatedFile.type,
-      "Size:",
-      validatedFile.size
-    );
-
-    // Convert file to buffer and create PDF part for Gemini
-    const fileBuffer = Buffer.from(await validatedFile.arrayBuffer());
-    const pdfPart = {
+    // Try to parse as JSON first (blob URL), then fall back to FormData (file upload)
+    let pdfPart: {
       inlineData: {
-        data: fileBuffer.toString("base64"),
-        mimeType: validatedFile.type,
-      },
+        data: string;
+        mimeType: string;
+      };
     };
+    let validatedLanguage: "en" | "no" = "en";
+
+    const contentType = request.headers.get("content-type");
+    
+    if (contentType?.includes("application/json")) {
+      // Handle blob URL request
+      const body = await request.json();
+      const validationResult = AnalyzePdfFromBlobSchema.safeParse(body);
+
+      if (!validationResult.success) {
+        return NextResponse.json(
+          {
+            error: "Invalid request data.",
+            errorType: "validation_error",
+            details: validationResult.error.flatten().fieldErrors,
+          },
+          { status: 400 }
+        );
+      }
+
+      const { blobUrl, language } = validationResult.data;
+      validatedLanguage = language;
+
+      console.log("Received blob URL:", blobUrl);
+
+      // Fetch the PDF from the blob URL
+      const blobResponse = await fetch(blobUrl);
+      if (!blobResponse.ok) {
+        return NextResponse.json(
+          {
+            error: "Failed to fetch PDF from blob URL.",
+            errorType: "blob_fetch_error",
+          },
+          { status: 400 }
+        );
+      }
+
+      const fileBuffer = Buffer.from(await blobResponse.arrayBuffer());
+      pdfPart = {
+        inlineData: {
+          data: fileBuffer.toString("base64"),
+          mimeType: "application/pdf",
+        },
+      };
+    } else {
+      // Handle file upload request (legacy support)
+      const formData = await request.formData();
+      const file = formData.get("file");
+      const language = formData.get("language");
+
+      // Validate request using Zod
+      const validationResult = AnalyzePdfRequestSchema.safeParse({
+        file,
+        language,
+      });
+
+      if (!validationResult.success) {
+        return NextResponse.json(
+          {
+            error: "Invalid request data.",
+            errorType: "validation_error",
+            details: validationResult.error.flatten().fieldErrors,
+          },
+          { status: 400 }
+        );
+      }
+
+      const { file: validatedFile, language: parsedLanguage } = validationResult.data;
+      validatedLanguage = parsedLanguage;
+
+      console.log(
+        "Received file:",
+        validatedFile.name,
+        "Type:",
+        validatedFile.type,
+        "Size:",
+        validatedFile.size
+      );
+
+      // Convert file to buffer and create PDF part for Gemini
+      const fileBuffer = Buffer.from(await validatedFile.arrayBuffer());
+      pdfPart = {
+        inlineData: {
+          data: fileBuffer.toString("base64"),
+          mimeType: validatedFile.type,
+        },
+      };
+    }
 
     // STEP 1: Document Classification
     const documentClassificationSchema = {

@@ -131,6 +131,9 @@ const FileUploadSection = forwardRef<
         return;
       }
 
+      // Check if file has blob URL (from blob upload)
+      const fileWithBlobUrl = fileToAnalyze as File & { blobUrl?: string };
+      
       // Clear previous results
       ['analysisResult', 'analysisError', 'analysisErrorType'].forEach(key => {
         localStorage.removeItem(key);
@@ -140,15 +143,32 @@ const FileUploadSection = forwardRef<
       setAnalysisState(AnalysisState.ANALYZING);
       onAnalysisStart?.();
 
-      const formData = new FormData();
-      formData.append("file", fileToAnalyze);
-      formData.append("language", locale);
-
       try {
-        const response = await fetch("/api/analyze-pdf", {
-          method: "POST",
-          body: formData,
-        });
+        let response: Response;
+
+        if (fileWithBlobUrl.blobUrl) {
+          // Use blob URL for analysis (new method)
+          response = await fetch("/api/analyze-pdf", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              blobUrl: fileWithBlobUrl.blobUrl,
+              language: locale,
+            }),
+          });
+        } else {
+          // Fall back to direct file upload (legacy method)
+          const formData = new FormData();
+          formData.append("file", fileToAnalyze);
+          formData.append("language", locale);
+
+          response = await fetch("/api/analyze-pdf", {
+            method: "POST",
+            body: formData,
+          });
+        }
         
         if (!response.ok) {
           const errorText = await response.text();

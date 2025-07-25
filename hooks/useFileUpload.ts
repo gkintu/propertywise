@@ -1,12 +1,15 @@
 import { useState, useRef } from 'react'
 import { toast } from "sonner"
 import { useTranslations } from 'next-intl'
+import { upload } from '@vercel/blob/client'
 
 export function useFileUpload() {
   const t = useTranslations('HomePage')
   const [dragActive, setDragActive] = useState(false)
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [statusMessage, setStatusMessage] = useState<string>('')
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const validateFile = (file: File): string | null => {
@@ -23,6 +26,36 @@ export function useFileUpload() {
     return null
   }
 
+  const uploadToBlob = async (file: File): Promise<string> => {
+    setIsUploading(true)
+    setUploadProgress(0)
+    
+    try {
+      const blob = await upload(file.name, file, {
+        access: 'public',
+        handleUploadUrl: '/api/upload-blob',
+        multipart: true,
+        clientPayload: JSON.stringify({
+          size: file.size,
+          type: file.type,
+          name: file.name,
+        }),
+        onUploadProgress: (event) => {
+          const percentage = Math.round((event.loaded / event.total) * 100)
+          setUploadProgress(percentage)
+        },
+      })
+      
+      return blob.url
+    } catch (error) {
+      console.error('Upload error:', error)
+      throw new Error(t('upload.uploadFailed'))
+    } finally {
+      setIsUploading(false)
+      setUploadProgress(0)
+    }
+  }
+
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -35,7 +68,7 @@ export function useFileUpload() {
     }
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
@@ -58,14 +91,23 @@ export function useFileUpload() {
         return
       }
       
-      // Clear previous files and set the new one
-      setUploadedFiles([file])
-      setStatusMessage(t('upload.fileUploaded', {fileName: file.name}))
-      toast.success(t('upload.fileUploaded', {fileName: file.name}))
+      try {
+        setStatusMessage(t('upload.uploading'))
+        const blobUrl = await uploadToBlob(file)
+        
+        // Store both file and blob URL
+        const fileWithBlobUrl = Object.assign(file, { blobUrl })
+        setUploadedFiles([fileWithBlobUrl])
+        setStatusMessage(t('upload.fileUploaded', {fileName: file.name}))
+        toast.success(t('upload.fileUploaded', {fileName: file.name}))
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : t('upload.uploadFailed'))
+        setStatusMessage('')
+      }
     }
   }
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     
     // Validate file count
@@ -85,10 +127,20 @@ export function useFileUpload() {
         return
       }
       
-      // Clear previous files and set the new one
-      setUploadedFiles([file])
-      setStatusMessage(t('upload.fileSelected', {fileName: file.name}))
-      toast.success(t('upload.fileSelected', {fileName: file.name}))
+      try {
+        setStatusMessage(t('upload.uploading'))
+        const blobUrl = await uploadToBlob(file)
+        
+        // Store both file and blob URL
+        const fileWithBlobUrl = Object.assign(file, { blobUrl })
+        setUploadedFiles([fileWithBlobUrl])
+        setStatusMessage(t('upload.fileSelected', {fileName: file.name}))
+        toast.success(t('upload.fileSelected', {fileName: file.name}))
+      } catch (error) {
+        toast.error(error instanceof Error ? error.message : t('upload.uploadFailed'))
+        setStatusMessage('')
+        e.target.value = '' // Clear the input
+      }
     }
   }
 
@@ -114,11 +166,14 @@ export function useFileUpload() {
     uploadedFiles,
     statusMessage,
     fileInputRef,
+    isUploading,
+    uploadProgress,
     handleDrag,
     handleDrop,
     handleFileSelect,
     removeFile,
     openFileDialog,
     setUploadedFiles, // Expose setter
+    uploadToBlob, // Expose upload function
   }
 }
