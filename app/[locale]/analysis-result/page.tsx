@@ -238,7 +238,7 @@ export default function AnalysisResultPage() {
       setDataSource("No Data");
     }
     setIsLoading(false);
-  }, []);
+  }, [isDev]);
 
   if (isLoading) {
     return (

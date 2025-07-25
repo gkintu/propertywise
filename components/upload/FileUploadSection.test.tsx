@@ -52,7 +52,7 @@ jest.mock('sonner', () => ({
 
 // Mock the motion components
 jest.mock('@/components/motion', () => {
-  const MockShakeMotion = React.forwardRef((props: any, ref: any) => {
+  const MockShakeMotion = React.forwardRef((props: { children: React.ReactNode }, ref: React.Ref<{ shake: () => void }>) => {
     React.useImperativeHandle(ref, () => ({
       shake: jest.fn(),
     }));
