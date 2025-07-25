@@ -90,14 +90,66 @@ export async function POST(request: NextRequest) {
       validatedLanguage = language;
 
       console.log("Received blob URL:", blobUrl);
-
-      // Fetch the PDF from the blob URL
-      const blobResponse = await fetch(blobUrl);
-      if (!blobResponse.ok) {
+      console.log("Validating blob URL format...");
+      
+      // Additional validation for blob URL format
+      if (!blobUrl.includes('blob.vercel-storage.com')) {
+        console.error("Invalid blob URL format:", blobUrl);
         return NextResponse.json(
           {
-            error: "Failed to fetch PDF from blob URL.",
+            error: "Invalid blob URL format.",
+            errorType: "invalid_blob_url",
+            details: `Expected Vercel blob URL, got: ${blobUrl}`,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Fetch the PDF from the blob URL with retry logic and exponential backoff
+      console.log("Attempting to fetch blob from URL...");
+      let blobResponse: Response | undefined;
+      let retryCount = 0;
+      const maxRetries = 5; // Increased from 3
+      
+      while (retryCount <= maxRetries) {
+        blobResponse = await fetch(blobUrl);
+        console.log(`Blob fetch attempt ${retryCount + 1}: status ${blobResponse.status} ${blobResponse.statusText}`);
+        
+        if (blobResponse.ok) {
+          console.log("✅ Blob fetched successfully");
+          break;
+        }
+        
+        if (blobResponse.status === 404 && retryCount < maxRetries) {
+          // Exponential backoff: 500ms, 1s, 2s, 4s, 8s
+          const retryDelay = 500 * Math.pow(2, retryCount);
+          console.log(`Blob not found, retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/${maxRetries + 1})`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          retryCount++;
+        } else {
+          // Final failure
+          console.error("Failed to fetch blob. Status:", blobResponse.status, "Text:", blobResponse.statusText);
+          const responseText = await blobResponse.text();
+          console.error("Blob fetch error response:", responseText);
+          
+          return NextResponse.json(
+            {
+              error: "Failed to fetch PDF from blob URL.",
+              errorType: "blob_fetch_error",
+              details: `Status: ${blobResponse.status}, Response: ${responseText}, Retries: ${retryCount}`,
+            },
+            { status: 400 }
+          );
+        }
+      }
+      
+      // Ensure we have a successful response
+      if (!blobResponse || !blobResponse.ok) {
+        return NextResponse.json(
+          {
+            error: "Failed to fetch PDF from blob URL after all retries.",
             errorType: "blob_fetch_error",
+            details: "All retry attempts failed",
           },
           { status: 400 }
         );

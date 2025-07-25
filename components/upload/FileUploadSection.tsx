@@ -7,7 +7,7 @@ import { Upload, X, Search, Loader2 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { useFileUpload } from "@/hooks/useFileUpload";
+import { useFileUpload, markBlobAsProcessed } from "@/hooks/useFileUpload";
 import { ShakeMotion, ShakeMotionHandle } from "@/components/motion";
 import { DemoFilesSection } from "./DemoFilesSection";
 import AnalysisProgressBar from "./AnalysisProgressBar";
@@ -212,6 +212,11 @@ const FileUploadSection = forwardRef<
         const data: AnalysisResult = await response.json();
 
         if (data && (data.analysis || data.summary)) {
+          // Mark blob as processed if we have a blob URL
+          if (fileWithBlobUrl.blobUrl) {
+            markBlobAsProcessed(fileWithBlobUrl.blobUrl);
+          }
+          
           handleAnalysisSuccess(data);
         } else {
           throw new Error("No analysis data received from server");

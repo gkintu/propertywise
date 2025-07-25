@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { toast } from "sonner"
 import { useTranslations } from 'next-intl'
 import { upload } from '@vercel/blob/client'
@@ -23,6 +23,163 @@ export function useFileUpload() {
   const [uploadProgress, setUploadProgress] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Session and blob tracking
+  const getSessionId = () => {
+    let sessionId = sessionStorage.getItem('upload-session-id');
+    if (!sessionId) {
+      sessionId = `session-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+      sessionStorage.setItem('upload-session-id', sessionId);
+    }
+    return sessionId;
+  };
+
+  const trackBlobForCleanup = (blobUrl: string) => {
+    const sessionId = getSessionId();
+    const allBlobs = JSON.parse(localStorage.getItem('user-uploaded-blobs') || '[]');
+    
+    const blobEntry = {
+      url: blobUrl,
+      timestamp: Date.now(),
+      processed: false,
+      sessionId: sessionId,
+      active: true
+    };
+    
+    allBlobs.push(blobEntry);
+    localStorage.setItem('user-uploaded-blobs', JSON.stringify(allBlobs));
+    console.log(`🏷️ Tracked blob for session ${sessionId}: ${blobUrl}`);
+  };
+
+  const markBlobProcessed = (blobUrl: string) => {
+    const allBlobs = JSON.parse(localStorage.getItem('user-uploaded-blobs') || '[]');
+    
+    const updatedBlobs = allBlobs.map((blob: { url: string; processed: boolean; active: boolean }) => 
+      blob.url === blobUrl ? { ...blob, processed: true, active: false } : blob
+    );
+    
+    localStorage.setItem('user-uploaded-blobs', JSON.stringify(updatedBlobs));
+    console.log(`✅ Marked blob as processed: ${blobUrl}`);
+  };
+
+  // Handle page unload events (F5, tab close)
+  useEffect(() => {
+    const handlePageUnload = async () => {
+      const currentSessionId = getSessionId();
+      const allBlobs = JSON.parse(localStorage.getItem('user-uploaded-blobs') || '[]');
+      
+      // Find unprocessed blobs from current session that need immediate cleanup
+      const blobsToCleanup = allBlobs.filter((blob: { sessionId: string; processed: boolean; url: string }) => 
+        blob.sessionId === currentSessionId && !blob.processed && !isDemoFileBlob(blob.url)
+      );
+      
+      if (blobsToCleanup.length > 0) {
+        console.log(`🧹 Page unload - immediately cleaning up ${blobsToCleanup.length} unprocessed blobs`);
+        
+        // Use sendBeacon for reliable cleanup during page unload
+        // This is the only way to make HTTP requests during beforeunload that actually work
+        for (const blob of blobsToCleanup) {
+          try {
+            const cleanupData = JSON.stringify({ blobUrl: blob.url });
+            const success = navigator.sendBeacon('/api/cleanup-blob', cleanupData);
+            
+            if (success) {
+              console.log(`📡 Beacon sent for blob cleanup: ${blob.url}`);
+            } else {
+              console.warn(`⚠️ Failed to send beacon for blob: ${blob.url}`);
+              // Fallback: mark for later cleanup
+              blob.needsCleanup = true;
+              blob.closedAt = Date.now();
+            }
+          } catch (error) {
+            console.warn(`⚠️ Error sending cleanup beacon for blob: ${blob.url}`, error);
+            // Fallback: mark for later cleanup
+            blob.needsCleanup = true;
+            blob.closedAt = Date.now();
+          }
+        }
+        
+        // Remove cleaned blobs from localStorage
+        const remainingBlobs = allBlobs.filter((blob: { sessionId: string; processed: boolean }) => 
+          !(blob.sessionId === currentSessionId && !blob.processed)
+        );
+        
+        localStorage.setItem('user-uploaded-blobs', JSON.stringify(remainingBlobs));
+      }
+    };
+
+    // beforeunload is the most reliable for cleanup actions
+    window.addEventListener('beforeunload', handlePageUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handlePageUnload);
+    };
+  }, []);
+
+  // Cleanup stale blobs on component mount
+  useEffect(() => {
+    const cleanupStaleBlobs = async () => {
+      const allBlobs = JSON.parse(localStorage.getItem('user-uploaded-blobs') || '[]');
+      const currentSessionId = getSessionId();
+      const now = Date.now();
+      const maxAge = 1000 * 60 * 60; // 1 hour maximum age
+      
+      const blobsToCleanup = allBlobs.filter((blob: { sessionId: string; processed: boolean; needsCleanup?: boolean; closedAt?: number; timestamp: number }) => {
+        const isDifferentSession = blob.sessionId !== currentSessionId;
+        const isMarkedForCleanup = blob.needsCleanup && blob.closedAt && (now - blob.closedAt > 30000); // 30 second grace period
+        const isExpired = now - blob.timestamp > maxAge;
+        const isUnprocessed = !blob.processed;
+        
+        return (isDifferentSession && isUnprocessed) || isMarkedForCleanup || isExpired;
+      });
+
+      if (blobsToCleanup.length === 0) {
+        console.log(`🧹 No stale blobs to clean up`);
+        return;
+      }
+
+      console.log(`🧹 Found ${blobsToCleanup.length} stale blobs to clean up`);
+
+      // Clean up blobs in parallel with error handling
+      const cleanupPromises = blobsToCleanup.map(async (blob: { url: string }) => {
+        try {
+          const response = await fetch('/api/cleanup-blob', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ blobUrl: blob.url }),
+          });
+          
+          if (response.ok) {
+            console.log(`✅ Cleaned up stale blob: ${blob.url}`);
+            return blob.url;
+          } else {
+            console.warn(`⚠️ Failed to cleanup blob: ${blob.url} (${response.status})`);
+            return null;
+          }
+        } catch (error) {
+          console.warn(`⚠️ Error cleaning up blob: ${blob.url}`, error);
+          return null;
+        }
+      });
+
+      const cleanedUrls = (await Promise.all(cleanupPromises)).filter(Boolean);
+      
+      // Remove cleaned blobs from tracking
+      const remainingBlobs = allBlobs.filter((blob: { url: string }) => 
+        !cleanedUrls.includes(blob.url)
+      );
+      
+      localStorage.setItem('user-uploaded-blobs', JSON.stringify(remainingBlobs));
+      
+      if (cleanedUrls.length > 0) {
+        console.log(`🧹 Successfully cleaned up ${cleanedUrls.length} stale blobs`);
+      }
+    };
+
+    // Small delay to ensure component is fully mounted
+    const timer = setTimeout(cleanupStaleBlobs, 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const validateFile = (file: File): string | null => {
     // Validate file type
     if (file.type !== "application/pdf") {
@@ -42,11 +199,63 @@ export function useFileUpload() {
     setUploadProgress(0)
     
     try {
-      const blob = await upload(file.name, file, {
+      console.log("Starting blob upload for file:", file.name);
+      
+      // Generate unique filename to prevent collisions
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 8);
+      const fileExtension = file.name.split('.').pop() || 'pdf';
+      const baseName = file.name.replace(/\.[^/.]+$/, "");
+      const uniqueFilename = `user-upload-${baseName}-${timestamp}-${randomString}.${fileExtension}`;
+      
+      console.log("Uploading with unique filename:", uniqueFilename);
+      
+      const blob = await upload(uniqueFilename, file, {
         access: 'public',
         handleUploadUrl: '/api/upload-blob',
       });
       
+      console.log("Blob upload successful. URL:", blob.url);
+      console.log("Full blob response:", blob);
+      
+      // Track blob for potential cleanup
+      trackBlobForCleanup(blob.url);
+      
+      // Verify blob is accessible before returning (with exponential backoff)
+      console.log("Verifying blob accessibility...");
+      let verificationSuccessful = false;
+      const maxVerificationRetries = 5;
+      
+      for (let attempt = 0; attempt < maxVerificationRetries; attempt++) {
+        try {
+          const verificationResponse = await fetch(blob.url, { method: 'HEAD' });
+          console.log(`Blob verification attempt ${attempt + 1}: ${verificationResponse.status} ${verificationResponse.statusText}`);
+          
+          if (verificationResponse.ok) {
+            console.log("Blob verified as accessible");
+            verificationSuccessful = true;
+            break;
+          }
+          
+          // Exponential backoff: 500ms, 1s, 2s, 4s, 8s
+          if (attempt < maxVerificationRetries - 1) {
+            const delay = 500 * Math.pow(2, attempt);
+            console.warn(`Blob not accessible, retrying in ${delay}ms... (attempt ${attempt + 1}/${maxVerificationRetries})`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        } catch (error) {
+          console.warn(`Blob verification attempt ${attempt + 1} failed:`, error);
+          if (attempt < maxVerificationRetries - 1) {
+            const delay = 500 * Math.pow(2, attempt);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        }
+      }
+      
+      if (!verificationSuccessful) {
+        console.warn("⚠️ Blob verification failed after all attempts, but proceeding anyway. The blob may become accessible shortly.");
+        console.warn("📝 Note: Analysis may retry if blob is not accessible during processing.");
+      }
       return blob.url
     } catch (error) {
       console.error('Upload error:', error)
@@ -208,5 +417,18 @@ export function useFileUpload() {
     openFileDialog,
     setUploadedFiles, // Expose setter
     uploadToBlob, // Expose upload function
+    markBlobProcessed, // Expose blob processing function
   }
 }
+
+// Export function to mark blob as processed (call this after successful analysis)
+export const markBlobAsProcessed = (blobUrl: string) => {
+  const allBlobs = JSON.parse(localStorage.getItem('user-uploaded-blobs') || '[]');
+  
+  const updatedBlobs = allBlobs.map((blob: { url: string; processed: boolean; active: boolean }) => 
+    blob.url === blobUrl ? { ...blob, processed: true, active: false } : blob
+  );
+  
+  localStorage.setItem('user-uploaded-blobs', JSON.stringify(updatedBlobs));
+  console.log(`✅ Marked blob as processed: ${blobUrl}`);
+};

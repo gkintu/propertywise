@@ -118,7 +118,7 @@ async function downloadAsPDF(
 }
 
 export default function AnalysisResultPage() {
-  const [isDev, setIsDev] = useState(false);
+  const isDev = process.env.NODE_ENV === "development";
   const t = useTranslations("AnalysisResult");
   const [analysisData, setAnalysisData] = useState<PropertyAnalysis | null>(
     null
@@ -131,10 +131,6 @@ export default function AnalysisResultPage() {
   const [showUpload, setShowUpload] = useState(false);
   const [showAnalyzeUpload, setShowAnalyzeUpload] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    setIsDev(process.env.NODE_ENV === "development");
-  }, []);
 
   useEffect(() => {
     const storedAnalysis = localStorage.getItem("analysisResult");

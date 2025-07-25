@@ -18,6 +18,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
         return {
           allowedContentTypes: ["application/pdf"],
+          allowOverwrite: true, // Allow overwriting existing blobs
           tokenPayload: JSON.stringify({
             // Pass any custom data to onUploadCompleted
             pathname,
