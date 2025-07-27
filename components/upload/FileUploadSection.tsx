@@ -103,7 +103,9 @@ const FileUploadSection = forwardRef<
     // Memoized navigation handler
     const navigateToResults = useCallback(() => {
       startTransition(() => {
-        router.push(`/${locale}/analysis-result`);
+        // Add timestamp to URL to force page refresh/re-read of data
+        const timestamp = Date.now();
+        router.push(`/${locale}/analysis-result?t=${timestamp}`);
       });
     }, [router, locale]);
 
@@ -117,6 +119,9 @@ const FileUploadSection = forwardRef<
       // Store error info for results page
       localStorage.setItem("analysisError", errorMessage);
       localStorage.setItem("analysisErrorType", errorType);
+      
+      // Dispatch custom event to notify analysis-result page of localStorage update
+      window.dispatchEvent(new Event('localStorageUpdated'));
       
       setAnalysisState(AnalysisState.ERROR);
       
@@ -134,13 +139,32 @@ const FileUploadSection = forwardRef<
       [key: string]: unknown;
     }
     const handleAnalysisSuccess = useCallback((data: AnalysisResult) => {
-      localStorage.setItem("analysisResult", JSON.stringify(data));
+      console.log("🎉 Analysis successful, storing data:", data);
+      
+      // Add timestamp to force re-reading of data on analysis result page
+      const dataWithTimestamp = {
+        ...data,
+        timestamp: Date.now()
+      };
+      
+      console.log("💾 Storing to localStorage:", dataWithTimestamp);
+      localStorage.setItem("analysisResult", JSON.stringify(dataWithTimestamp));
+      
+      // Verify storage worked
+      const stored = localStorage.getItem("analysisResult");
+      console.log("✅ Verified localStorage storage:", stored ? "success" : "failed");
+      
+      // Dispatch custom event to notify analysis-result page of localStorage update
+      console.log("📢 Dispatching localStorageUpdated event");
+      window.dispatchEvent(new Event('localStorageUpdated'));
+      
       toast.success(t("upload.success"));
       
       setAnalysisState(AnalysisState.COMPLETED);
       
       // Brief delay to show 100% completion, then navigate
       setTimeout(() => {
+        console.log("🚀 Navigating to results page");
         navigateToResults();
         onAnalysisComplete?.();
       }, 500);
@@ -160,9 +184,14 @@ const FileUploadSection = forwardRef<
       const fileWithBlobUrl = fileToAnalyze as File & { blobUrl?: string };
       
       // Clear previous results
+      console.log("🧹 Clearing previous localStorage results");
       ['analysisResult', 'analysisError', 'analysisErrorType'].forEach(key => {
         localStorage.removeItem(key);
       });
+      
+      // Dispatch custom event to notify any listening components
+      console.log("📢 Dispatching localStorageUpdated event (clearing)");
+      window.dispatchEvent(new Event('localStorageUpdated'));
       
       // Start analysis
       setAnalysisState(AnalysisState.ANALYZING);

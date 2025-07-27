@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -28,6 +28,7 @@ import { AnalysisReportPDF } from "@/components/pdf/AnalysisReportPDF";
 import FileUploadSection, { FileUploadSectionHandle } from "@/components/upload/FileUploadSection";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { PropertyListingBadge } from "@/components/ui/property-listing-badge";
+import AnalysisProgressBar from "@/components/upload/AnalysisProgressBar";
 
 // Helper function to extract JSON from text that might be wrapped in markdown or have extra formatting
 function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
@@ -120,6 +121,7 @@ async function downloadAsPDF(
 export default function AnalysisResultPage() {
   const isDev = process.env.NODE_ENV === "development";
   const t = useTranslations("AnalysisResult");
+  const searchParams = useSearchParams();
   const [analysisData, setAnalysisData] = useState<PropertyAnalysis | null>(
     null
   );
@@ -151,112 +153,157 @@ export default function AnalysisResultPage() {
   };
 
   useEffect(() => {
-    const storedAnalysis = localStorage.getItem("analysisResult");
-    const storedError = localStorage.getItem("analysisError");
-    const storedErrorType = localStorage.getItem("analysisErrorType");
+    const loadAnalysisData = () => {
+      console.log("🔄 Loading analysis data...");
+      
+      // Reset all state
+      setAnalysisData(null);
+      setSummaryData(null);
+      setError(null);
+      setErrorType(null);
+      setIsLoading(true);
+      
+      const storedAnalysis = localStorage.getItem("analysisResult");
+      const storedError = localStorage.getItem("analysisError");
+      const storedErrorType = localStorage.getItem("analysisErrorType");
 
-    if (
-      storedAnalysis &&
-      storedAnalysis !== "undefined" &&
-      storedAnalysis !== "null"
-    ) {
-      try {
-        const parsed = JSON.parse(storedAnalysis);
-        if (isDev) console.log("📊 Parsed data structure:", parsed);
-        // Check if it's an AnalysisResponse wrapper or direct PropertyAnalysis
-        if (parsed.analysis && typeof parsed.analysis === "object") {
-          if (isDev)
-            console.log("✅ Loading wrapped AnalysisResponse data", {
-              strongPoints: parsed.analysis.strongPoints?.length || 0,
-              concerns: parsed.analysis.concerns?.length || 0,
-              hasPropertyDetails: !!parsed.analysis.propertyDetails,
-            });
-          setAnalysisData(parsed.analysis);
-          setDataSource("API Response (structured JSON)");
-        } else if (
-          parsed.propertyDetails &&
-          (parsed.strongPoints || parsed.concerns)
-        ) {
-          if (isDev)
-            console.log("✅ Loading direct PropertyAnalysis data", {
-              strongPoints: parsed.strongPoints?.length || 0,
-              concerns: parsed.concerns?.length || 0,
-              hasPropertyDetails: !!parsed.propertyDetails,
-            });
-          setAnalysisData(parsed);
-          setDataSource("Direct PropertyAnalysis (structured JSON)");
-        } else if (parsed.summary && typeof parsed.summary === "string") {
-          if (isDev)
-            console.log(
-              "⚠️ Loading summary fallback data (AI did not return structured JSON)"
-            );
-          // Try to extract JSON from the summary if it contains structured data
-          const cleanedSummary = tryExtractJsonFromText(parsed.summary);
-          if (cleanedSummary) {
+      console.log("📦 localStorage contents:", {
+        analysisResult: storedAnalysis ? "present" : "missing",
+        analysisError: storedError ? "present" : "missing",
+        analysisErrorType: storedErrorType ? "present" : "missing"
+      });
+
+      if (
+        storedAnalysis &&
+        storedAnalysis !== "undefined" &&
+        storedAnalysis !== "null"
+      ) {
+        try {
+          const parsed = JSON.parse(storedAnalysis);
+          if (isDev) console.log("📊 Parsed data structure:", parsed);
+          // Check if it's an AnalysisResponse wrapper or direct PropertyAnalysis
+          if (parsed.analysis && typeof parsed.analysis === "object") {
+            if (isDev)
+              console.log("✅ Loading wrapped AnalysisResponse data", {
+                strongPoints: parsed.analysis.strongPoints?.length || 0,
+                concerns: parsed.analysis.concerns?.length || 0,
+                hasPropertyDetails: !!parsed.analysis.propertyDetails,
+              });
+            setAnalysisData(parsed.analysis);
+            setDataSource("API Response (structured JSON)");
+          } else if (
+            parsed.propertyDetails &&
+            (parsed.strongPoints || parsed.concerns)
+          ) {
+            if (isDev)
+              console.log("✅ Loading direct PropertyAnalysis data", {
+                strongPoints: parsed.strongPoints?.length || 0,
+                concerns: parsed.concerns?.length || 0,
+                hasPropertyDetails: !!parsed.propertyDetails,
+              });
+            setAnalysisData(parsed);
+            setDataSource("Direct PropertyAnalysis (structured JSON)");
+          } else if (parsed.summary && typeof parsed.summary === "string") {
             if (isDev)
               console.log(
-                "✅ Successfully extracted structured data from summary text"
+                "⚠️ Loading summary fallback data (AI did not return structured JSON)"
               );
-            setAnalysisData(cleanedSummary);
-            setDataSource("Extracted from summary text (structured JSON)");
+            // Try to extract JSON from the summary if it contains structured data
+            const cleanedSummary = tryExtractJsonFromText(parsed.summary);
+            if (cleanedSummary) {
+              if (isDev)
+                console.log(
+                  "✅ Successfully extracted structured data from summary text"
+                );
+              setAnalysisData(cleanedSummary);
+              setDataSource("Extracted from summary text (structured JSON)");
+            } else {
+              setSummaryData(parsed.summary);
+              setDataSource(
+                "Summary fallback (AI returned text instead of JSON)"
+              );
+            }
           } else {
-            setSummaryData(parsed.summary);
-            setDataSource(
-              "Summary fallback (AI returned text instead of JSON)"
-            );
+            // Try to parse the raw stored analysis as JSON if it looks like structured data
+            const directParsed = tryExtractJsonFromText(storedAnalysis);
+            if (directParsed) {
+              if (isDev)
+                console.log(
+                  "✅ Successfully extracted structured data from raw stored analysis"
+                );
+              setAnalysisData(directParsed);
+              setDataSource("Extracted from raw analysis (structured JSON)");
+            } else {
+              if (isDev) console.log("❌ No structured data found in:", parsed);
+              setError(
+                "No valid analysis data found. The API may have returned an unexpected format."
+              );
+              setDataSource("Unknown format");
+            }
           }
-        } else {
-          // Try to parse the raw stored analysis as JSON if it looks like structured data
+        } catch (parseError) {
+          if (isDev)
+            console.error("❌ Error parsing analysis result:", parseError);
+          // If parsing fails, try to extract JSON directly from the stored analysis
           const directParsed = tryExtractJsonFromText(storedAnalysis);
           if (directParsed) {
             if (isDev)
               console.log(
-                "✅ Successfully extracted structured data from raw stored analysis"
+                "✅ Successfully extracted structured data from unparseable stored analysis"
               );
             setAnalysisData(directParsed);
-            setDataSource("Extracted from raw analysis (structured JSON)");
+            setDataSource("Extracted from raw text (structured JSON)");
           } else {
-            if (isDev) console.log("❌ No structured data found in:", parsed);
-            setError(
-              "No valid analysis data found. The API may have returned an unexpected format."
-            );
-            setDataSource("Unknown format");
+            setError("Invalid analysis result format");
+            setDataSource("Parse Error");
           }
         }
-      } catch (parseError) {
-        if (isDev)
-          console.error("❌ Error parsing analysis result:", parseError);
-        // If parsing fails, try to extract JSON directly from the stored analysis
-        const directParsed = tryExtractJsonFromText(storedAnalysis);
-        if (directParsed) {
-          if (isDev)
-            console.log(
-              "✅ Successfully extracted structured data from unparseable stored analysis"
-            );
-          setAnalysisData(directParsed);
-          setDataSource("Extracted from raw text (structured JSON)");
-        } else {
-          setError("Invalid analysis result format");
-          setDataSource("Parse Error");
-        }
+      } else if (
+        storedError &&
+        storedError !== "undefined" &&
+        storedError !== "null"
+      ) {
+        console.log("❌ Found stored error:", storedError);
+        setError(storedError);
+        setErrorType(storedErrorType || "processing_error");
+        setDataSource("Stored Error");
+      } else {
+        // No valid data found
+        console.log("❌ No analysis data found in localStorage");
+        setError(
+          "No analysis result found. Please upload and analyze a document first."
+        );
+        setDataSource("No Data");
       }
-    } else if (
-      storedError &&
-      storedError !== "undefined" &&
-      storedError !== "null"
-    ) {
-      setError(storedError);
-      setErrorType(storedErrorType || "processing_error");
-      setDataSource("Stored Error");
-    } else {
-      // No valid data found
-      setError(
-        "No analysis result found. Please upload and analyze a document first."
-      );
-      setDataSource("No Data");
-    }
-    setIsLoading(false);
-  }, [isDev]);
+      setIsLoading(false);
+      console.log("✅ Analysis data loading complete");
+    };
+
+    // Load data initially
+    loadAnalysisData();
+
+    // Listen for storage events to reload data when localStorage changes
+    const handleStorageChange = (e: StorageEvent) => {
+      console.log("📢 Storage event received:", e.key);
+      if (e.key === 'analysisResult' || e.key === 'analysisError') {
+        loadAnalysisData();
+      }
+    };
+
+    // Listen for custom events when localStorage is updated from the same tab
+    const handleCustomStorageChange = () => {
+      console.log("📢 Custom storage event received");
+      loadAnalysisData();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageUpdated', handleCustomStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageUpdated', handleCustomStorageChange);
+    };
+  }, [isDev, searchParams]);
 
   if (isLoading) {
     return (
@@ -282,13 +329,18 @@ export default function AnalysisResultPage() {
         </header>
 
         <div className="flex items-center justify-center min-h-[calc(100vh-80px)]">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-950/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+          <div className="text-center max-w-md mx-auto">
+            <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-950/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <FileText className="w-12 h-12 text-yellow-600 dark:text-[#FBBF24]" />
             </div>
-            <p className="text-xl text-gray-600 dark:text-[#D1D5DB]">
+            <p className="text-xl text-gray-600 dark:text-[#D1D5DB] mb-8">
               {t("loading.loadingText")}
             </p>
+            
+            {/* Reuse the same progress bar from FileUploadSection */}
+            <div className="mt-6">
+              <AnalysisProgressBar complete={false} />
+            </div>
           </div>
         </div>
       </div>
