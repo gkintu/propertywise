@@ -21,3 +21,12 @@ export const AnalyzePdfRequestSchema = z.object({
     z.enum(['en', 'no'])
   ),
 });
+
+// New schema for blob-based analysis
+export const AnalyzePdfFromBlobSchema = z.object({
+  blobUrl: z.string().url('A valid blob URL is required.'),
+  language: z.preprocess(
+    (lang) => (typeof lang === 'string' && lang ? lang : 'en'),
+    z.enum(['en', 'no'])
+  ),
+});

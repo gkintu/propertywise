@@ -2,6 +2,13 @@ import { renderHook, act } from '@testing-library/react'
 import { useFileUpload } from './useFileUpload'
 import { toast } from 'sonner'
 
+// Mock Vercel Blob
+jest.mock('@vercel/blob/client', () => ({
+  upload: jest.fn().mockResolvedValue({
+    url: 'https://mock-blob-url.com/file.pdf'
+  })
+}))
+
 // Mock next-intl
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string, params?: { fileName?: string }) => {
@@ -14,6 +21,7 @@ jest.mock('next-intl', () => ({
       'upload.fileUploaded': `File uploaded: ${params?.fileName}`,
       'upload.fileSelected': `File selected: ${params?.fileName}`,
       'upload.fileRemoved': 'File removed',
+      'upload.uploadFailed': 'Upload failed. Please try again.',
     }
     return translations[key] || key
   }
@@ -27,9 +35,52 @@ jest.mock('sonner', () => ({
   }
 }))
 
+// Mock global fetch for blob verification and cleanup
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    statusText: 'OK',
+  } as Response)
+)
+
+// Mock sessionStorage
+Object.defineProperty(window, 'sessionStorage', {
+  value: {
+    getItem: jest.fn(),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn(),
+  },
+  writable: true,
+})
+
+// Mock localStorage
+Object.defineProperty(window, 'localStorage', {
+  value: {
+    getItem: jest.fn(() => '[]'),
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn(),
+  },
+  writable: true,
+})
+
 describe('useFileUpload', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    // Clear any timers or async operations
+    jest.clearAllTimers()
+    // Use fake timers to speed up tests
+    jest.useFakeTimers()
+    // Reset localStorage and sessionStorage mocks
+    ;(window.localStorage.getItem as jest.Mock).mockReturnValue('[]')
+    ;(window.sessionStorage.getItem as jest.Mock).mockReturnValue(null)
+  })
+
+  afterEach(() => {
+    // Restore real timers
+    jest.useRealTimers()
   })
 
   // Helper function to create a mock File
@@ -149,8 +200,14 @@ describe('useFileUpload', () => {
   })
 
   describe('file drop handling', () => {
-    it('should handle valid PDF file drop', () => {
+    it('should handle valid PDF file drop', async () => {
       const { result } = renderHook(() => useFileUpload())
+      
+      // Fast-forward past the cleanup timeout
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      
       const validFile = createMockFile('document.pdf', 1024 * 1024, 'application/pdf')
 
       const mockEvent = {
@@ -161,8 +218,10 @@ describe('useFileUpload', () => {
         }
       }
 
-      act(() => {
-        result.current.handleDrop(mockEvent as unknown as React.DragEvent)
+      await act(async () => {
+        await result.current.handleDrop(mockEvent as unknown as React.DragEvent)
+        // Fast-forward any internal timers
+        jest.advanceTimersByTime(1000)
       })
 
       expect(result.current.uploadedFiles).toHaveLength(1)
@@ -172,8 +231,14 @@ describe('useFileUpload', () => {
       expect(toast.success).toHaveBeenCalledWith('File uploaded: document.pdf')
     })
 
-    it('should reject non-PDF files', () => {
+    it('should reject non-PDF files', async () => {
       const { result } = renderHook(() => useFileUpload())
+      
+      // Fast-forward past the cleanup timeout
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      
       const invalidFile = createMockFile('document.txt', 1024, 'text/plain')
 
       const mockEvent = {
@@ -184,16 +249,22 @@ describe('useFileUpload', () => {
         }
       }
 
-      act(() => {
-        result.current.handleDrop(mockEvent as unknown as React.DragEvent)
+      await act(async () => {
+        await result.current.handleDrop(mockEvent as unknown as React.DragEvent)
       })
 
       expect(result.current.uploadedFiles).toHaveLength(0)
       expect(toast.error).toHaveBeenCalledWith('Invalid file type. Only PDFs are allowed.')
     })
 
-    it('should reject files larger than 50MB', () => {
+    it('should reject files larger than 50MB', async () => {
       const { result } = renderHook(() => useFileUpload())
+      
+      // Fast-forward past the cleanup timeout
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      
       const largeFile = createMockFile('large.pdf', 51 * 1024 * 1024, 'application/pdf')
 
       const mockEvent = {
@@ -204,16 +275,22 @@ describe('useFileUpload', () => {
         }
       }
 
-      act(() => {
-        result.current.handleDrop(mockEvent as unknown as React.DragEvent)
+      await act(async () => {
+        await result.current.handleDrop(mockEvent as unknown as React.DragEvent)
       })
 
       expect(result.current.uploadedFiles).toHaveLength(0)
       expect(toast.error).toHaveBeenCalledWith('File size must be less than 50MB.')
     })
 
-    it('should reject multiple files', () => {
+    it('should reject multiple files', async () => {
       const { result } = renderHook(() => useFileUpload())
+      
+      // Fast-forward past the cleanup timeout
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      
       const file1 = createMockFile('doc1.pdf')
       const file2 = createMockFile('doc2.pdf')
 
@@ -225,8 +302,8 @@ describe('useFileUpload', () => {
         }
       }
 
-      act(() => {
-        result.current.handleDrop(mockEvent as unknown as React.DragEvent)
+      await act(async () => {
+        await result.current.handleDrop(mockEvent as unknown as React.DragEvent)
       })
 
       expect(result.current.uploadedFiles).toHaveLength(0)
@@ -235,8 +312,14 @@ describe('useFileUpload', () => {
   })
 
   describe('file input selection', () => {
-    it('should handle valid file selection', () => {
+    it('should handle valid file selection', async () => {
       const { result } = renderHook(() => useFileUpload())
+      
+      // Fast-forward past the cleanup timeout
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      
       const validFile = createMockFile('selected.pdf')
 
       const mockEvent = {
@@ -246,8 +329,10 @@ describe('useFileUpload', () => {
         }
       }
 
-      act(() => {
-        result.current.handleFileSelect(mockEvent as unknown as React.ChangeEvent<HTMLInputElement>)
+      await act(async () => {
+        await result.current.handleFileSelect(mockEvent as unknown as React.ChangeEvent<HTMLInputElement>)
+        // Fast-forward any internal timers
+        jest.advanceTimersByTime(1000)
       })
 
       expect(result.current.uploadedFiles).toHaveLength(1)
@@ -258,6 +343,12 @@ describe('useFileUpload', () => {
 
     it('should clear input on validation error', () => {
       const { result } = renderHook(() => useFileUpload())
+      
+      // Fast-forward past the cleanup timeout
+      act(() => {
+        jest.advanceTimersByTime(1000)
+      })
+      
       const invalidFile = createMockFile('invalid.txt', 1024, 'text/plain')
 
       const mockTarget = {

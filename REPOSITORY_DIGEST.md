@@ -98,6 +98,7 @@ playground-projects/
 - **shadcn/ui** (UI components)
 - **Jest + React Testing Library** (testing framework)
 - **Google Gemini API** (AI analysis)
+- **Vercel Blob**: Large file uploads and storage bypassing function payload limits
 - **Upstash Redis** (rate limiting)
 
 ---

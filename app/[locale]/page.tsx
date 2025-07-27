@@ -28,8 +28,14 @@ export default function Home({ params }: PageProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const handleStartAnalysis = () => {
-    // Shake the upload component to draw attention
-    fileUploadRef.current?.shake();
+    // Check if files are already uploaded
+    if (fileUploadRef.current?.hasFiles()) {
+      // If files exist, shake the analyze button instead
+      fileUploadRef.current?.shakeAnalyzeButton();
+    } else {
+      // If no files, shake the upload component to draw attention
+      fileUploadRef.current?.shake();
+    }
     
     // Scroll to the upload section
     const uploadSection = document.getElementById('upload-section');
