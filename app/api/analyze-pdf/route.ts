@@ -1,7 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
+import { del } from "@vercel/blob";
 import { GoogleGenAI } from "@google/genai";
-import { AnalyzePdfRequestSchema } from "@/lib/validation";
+import {
+  AnalyzePdfRequestSchema,
+  AnalyzePdfFromBlobSchema,
+} from "@/lib/validation";
 import { ZodError } from "zod";
+
+// Demo file blob URLs that should never be deleted
+const DEMO_FILE_BLOB_IDENTIFIERS = [
+  'demo-alv-johnsens-vei-1',
+  'demo-bolette-brygge-5', 
+  'demo-sanengveien-1'
+];
+
+const isDemoFileBlob = (blobUrl: string): boolean => {
+  return DEMO_FILE_BLOB_IDENTIFIERS.some(identifier => blobUrl.includes(identifier));
+};
 
 // Initialize Gemini client
 const genai = new GoogleGenAI({
@@ -29,6 +44,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  let blobUrlToDelete: string | undefined;
+
   try {
     // Check if Gemini API key is configured
     if (!process.env.GEMINI_API_KEY) {
@@ -41,47 +58,155 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const formData = await request.formData();
-    const file = formData.get("file");
-    const language = formData.get("language");
-
-    // Validate request using Zod
-    const validationResult = AnalyzePdfRequestSchema.safeParse({
-      file,
-      language,
-    });
-
-    if (!validationResult.success) {
-      return NextResponse.json(
-        {
-          error: "Invalid request data.",
-          errorType: "validation_error",
-          details: validationResult.error.flatten().fieldErrors,
-        },
-        { status: 400 }
-      );
-    }
-
-    const { file: validatedFile, language: validatedLanguage } =
-      validationResult.data;
-
-    console.log(
-      "Received file:",
-      validatedFile.name,
-      "Type:",
-      validatedFile.type,
-      "Size:",
-      validatedFile.size
-    );
-
-    // Convert file to buffer and create PDF part for Gemini
-    const fileBuffer = Buffer.from(await validatedFile.arrayBuffer());
-    const pdfPart = {
+    // Try to parse as JSON first (blob URL), then fall back to FormData (file upload)
+    let pdfPart: {
       inlineData: {
-        data: fileBuffer.toString("base64"),
-        mimeType: validatedFile.type,
-      },
+        data: string;
+        mimeType: string;
+      };
     };
+    let validatedLanguage: "en" | "no" = "en";
+
+    const contentType = request.headers.get("content-type");
+    
+    if (contentType?.includes("application/json")) {
+      // Handle blob URL request
+      const body = await request.json();
+      const validationResult = AnalyzePdfFromBlobSchema.safeParse(body);
+
+      if (!validationResult.success) {
+        return NextResponse.json(
+          {
+            error: "Invalid request data.",
+            errorType: "validation_error",
+            details: validationResult.error.flatten().fieldErrors,
+          },
+          { status: 400 }
+        );
+      }
+
+      const { blobUrl, language } = validationResult.data;
+      blobUrlToDelete = blobUrl; // Set for deletion in finally block
+      validatedLanguage = language;
+
+      console.log("Received blob URL:", blobUrl);
+      console.log("Validating blob URL format...");
+      
+      // Additional validation for blob URL format
+      if (!blobUrl.includes('blob.vercel-storage.com')) {
+        console.error("Invalid blob URL format:", blobUrl);
+        return NextResponse.json(
+          {
+            error: "Invalid blob URL format.",
+            errorType: "invalid_blob_url",
+            details: `Expected Vercel blob URL, got: ${blobUrl}`,
+          },
+          { status: 400 }
+        );
+      }
+
+      // Fetch the PDF from the blob URL with retry logic and exponential backoff
+      console.log("Attempting to fetch blob from URL...");
+      let blobResponse: Response | undefined;
+      let retryCount = 0;
+      const maxRetries = 5; // Increased from 3
+      
+      while (retryCount <= maxRetries) {
+        blobResponse = await fetch(blobUrl);
+        console.log(`Blob fetch attempt ${retryCount + 1}: status ${blobResponse.status} ${blobResponse.statusText}`);
+        
+        if (blobResponse.ok) {
+          console.log("✅ Blob fetched successfully");
+          break;
+        }
+        
+        if (blobResponse.status === 404 && retryCount < maxRetries) {
+          // Exponential backoff: 500ms, 1s, 2s, 4s, 8s
+          const retryDelay = 500 * Math.pow(2, retryCount);
+          console.log(`Blob not found, retrying in ${retryDelay}ms... (attempt ${retryCount + 1}/${maxRetries + 1})`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay));
+          retryCount++;
+        } else {
+          // Final failure
+          console.error("Failed to fetch blob. Status:", blobResponse.status, "Text:", blobResponse.statusText);
+          const responseText = await blobResponse.text();
+          console.error("Blob fetch error response:", responseText);
+          
+          return NextResponse.json(
+            {
+              error: "Failed to fetch PDF from blob URL.",
+              errorType: "blob_fetch_error",
+              details: `Status: ${blobResponse.status}, Response: ${responseText}, Retries: ${retryCount}`,
+            },
+            { status: 400 }
+          );
+        }
+      }
+      
+      // Ensure we have a successful response
+      if (!blobResponse || !blobResponse.ok) {
+        return NextResponse.json(
+          {
+            error: "Failed to fetch PDF from blob URL after all retries.",
+            errorType: "blob_fetch_error",
+            details: "All retry attempts failed",
+          },
+          { status: 400 }
+        );
+      }
+
+      const fileBuffer = Buffer.from(await blobResponse.arrayBuffer());
+      pdfPart = {
+        inlineData: {
+          data: fileBuffer.toString("base64"),
+          mimeType: "application/pdf",
+        },
+      };
+    } else {
+      // Handle file upload request (legacy support)
+      const formData = await request.formData();
+      const file = formData.get("file");
+      const language = formData.get("language");
+
+      // Validate request using Zod
+      const validationResult = AnalyzePdfRequestSchema.safeParse({
+        file,
+        language,
+      });
+
+      if (!validationResult.success) {
+        return NextResponse.json(
+          {
+            error: "Invalid request data.",
+            errorType: "validation_error",
+            details: validationResult.error.flatten().fieldErrors,
+          },
+          { status: 400 }
+        );
+      }
+
+      const { file: validatedFile, language: parsedLanguage } =
+        validationResult.data;
+      validatedLanguage = parsedLanguage;
+
+      console.log(
+        "Received file:",
+        validatedFile.name,
+        "Type:",
+        validatedFile.type,
+        "Size:",
+        validatedFile.size
+      );
+
+      // Convert file to buffer and create PDF part for Gemini
+      const fileBuffer = Buffer.from(await validatedFile.arrayBuffer());
+      pdfPart = {
+        inlineData: {
+          data: fileBuffer.toString("base64"),
+          mimeType: validatedFile.type,
+        },
+      };
+    }
 
     // STEP 1: Document Classification
     const documentClassificationSchema = {
@@ -141,7 +266,7 @@ export async function POST(request: NextRequest) {
     } catch (classificationError) {
       console.error("Error in document classification:", classificationError);
       console.log(
-        "Classification failed, proceeding with property analysis as fallback"
+        "Classification failed, proceeding with property analysis as fallback",
       );
     }
 
@@ -271,7 +396,7 @@ Focus on actionable insights for a potential buyer. If you cannot extract struct
       );
     }
 
-    return NextResponse.json({ analysis: parsedAnalysis });
+    return NextResponse.json(parsedAnalysis, { status: 200 });
   } catch (error) {
     console.error("Error in /api/analyze-pdf:", error);
 
@@ -295,5 +420,22 @@ Focus on actionable insights for a potential buyer. If you cannot extract struct
       },
       { status: 500 }
     );
+  } finally {
+    if (blobUrlToDelete && !isDemoFileBlob(blobUrlToDelete)) {
+      try {
+        console.log(`🗑️ Deleting blob: ${blobUrlToDelete}`);
+        await del(blobUrlToDelete);
+        console.log(`✅ Successfully deleted blob: ${blobUrlToDelete}`);
+      } catch (deleteError) {
+        console.error(
+          `❌ Failed to delete blob ${blobUrlToDelete}:`,
+          deleteError,
+        );
+        // We don't re-throw here because the primary operation's response
+        // has already been determined. This is a cleanup step.
+      }
+    } else if (blobUrlToDelete) {
+      console.log(`🛡️ Preserving demo file blob: ${blobUrlToDelete}`);
+    }
   }
 }

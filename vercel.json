@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "app/api/analyze-pdf/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/demo-pdf/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/upload-blob/route.ts": {
+      "maxDuration": 30
+    },
+    "app/api/delete-blob/route.ts": {
+      "maxDuration": 10
+    }
+  }
+}
