@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { useTheme } from "next-themes";
 import {
   Home as HomeIcon,
   ArrowLeft,
@@ -80,12 +81,13 @@ function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
 // PDF download function using react-pdf/renderer
 async function downloadAsPDF(
   analysisData: PropertyAnalysis,
-  t: TranslationFunction
+  t: TranslationFunction,
+  isDarkMode: boolean = false
 ) {
   try {
     // Generate PDF using react-pdf/renderer
     const blob = await pdf(
-      <AnalysisReportPDF analysisData={analysisData} t={t} />
+      <AnalysisReportPDF analysisData={analysisData} t={t} isDarkMode={isDarkMode} />
     ).toBlob();
 
     // Create download link
@@ -121,6 +123,7 @@ async function downloadAsPDF(
 export default function AnalysisResultPage() {
   const isDev = process.env.NODE_ENV === "development";
   const t = useTranslations("AnalysisResult");
+  const { theme } = useTheme();
   const searchParams = useSearchParams();
   const [analysisData, setAnalysisData] = useState<PropertyAnalysis | null>(
     null
@@ -666,7 +669,7 @@ export default function AnalysisResultPage() {
               size="lg"
               variant="outline"
               className="px-8 border-yellow-200 dark:border-[#CA8A04] text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#374151]"
-              onClick={() => analysisData && downloadAsPDF(analysisData, t)}
+              onClick={() => analysisData && downloadAsPDF(analysisData, t, theme === 'dark')}
             >
               <Download className="w-4 h-4 mr-2" />
               {t("analysis.downloadPdfButton")}
