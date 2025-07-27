@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
@@ -26,7 +26,7 @@ import { pdf } from "@react-pdf/renderer";
 import { PropertyAnalysis } from "@/lib/types";
 import { TranslationFunction } from "@/lib/i18n-types";
 import { AnalysisReportPDF } from "@/components/pdf/AnalysisReportPDF";
-import FileUploadSection from "@/components/upload/FileUploadSection";
+import FileUploadSection, { FileUploadSectionHandle } from "@/components/upload/FileUploadSection";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { PropertyListingBadge } from "@/components/ui/property-listing-badge";
 
@@ -133,7 +133,25 @@ export default function AnalysisResultPage() {
   const [dataSource, setDataSource] = useState<string>("");
   const [showUpload, setShowUpload] = useState(false);
   const [showAnalyzeUpload, setShowAnalyzeUpload] = useState(false);
+  const fileUploadRef = useRef<FileUploadSectionHandle>(null);
   const router = useRouter();
+
+  const handleAnalyzeAnother = () => {
+    // First show the upload section
+    setShowAnalyzeUpload(true);
+    
+    // Add a small delay to ensure the component is rendered before scrolling and shaking
+    setTimeout(() => {
+      // Shake the upload component to draw attention
+      fileUploadRef.current?.shake();
+      
+      // Scroll to the upload section
+      const uploadSection = document.getElementById('analyze-upload-section');
+      if (uploadSection) {
+        uploadSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
 
   useEffect(() => {
     const storedAnalysis = localStorage.getItem("analysisResult");
@@ -588,9 +606,9 @@ export default function AnalysisResultPage() {
               {t("analysis.goBackHomeButton")}
             </Button>
             <Button
-              onClick={() => setShowAnalyzeUpload(true)}
+              onClick={handleAnalyzeAnother}
               size="lg"
-              className="bg-yellow-500 hover:bg-[#FACC15] text-white dark:text-[#111827] px-8"
+              className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8"
             >
               <Upload className="w-4 h-4 mr-2" />
               {t("analysis.analyzeAnotherButton")}
@@ -610,8 +628,9 @@ export default function AnalysisResultPage() {
 
           {/* Show upload section when user clicks "Analyze Another Document" */}
           {showAnalyzeUpload && (
-            <div className="mb-8">
+            <div id="analyze-upload-section" className="mb-8">
               <FileUploadSection
+                ref={fileUploadRef}
                 showTitle={false}
                 containerWidth="full"
                 onAnalysisStart={() => {
@@ -749,9 +768,9 @@ export default function AnalysisResultPage() {
               {t("summary.goBackHomeButton")}
             </Button>
             <Button
-              onClick={() => setShowAnalyzeUpload(true)}
+              onClick={handleAnalyzeAnother}
               size="lg"
-              className="bg-yellow-500 hover:bg-[#FACC15] text-white dark:text-[#111827] px-8"
+              className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8"
             >
               <Upload className="w-4 h-4 mr-2" />
               {t("summary.analyzeAnotherButton")}
@@ -773,10 +792,11 @@ export default function AnalysisResultPage() {
 
           <Separator className="my-8 dark:bg-[#374151]" />
 
-          {/* Show upload section when user clicks "Analyze Another Document" */}
+                    {/* Show upload section when user clicks "Analyze Another Document" */}
           {showAnalyzeUpload && (
-            <div className="mb-8">
+            <div id="analyze-upload-section" className="mb-8">
               <FileUploadSection
+                ref={fileUploadRef}
                 showTitle={false}
                 containerWidth="full"
                 onAnalysisStart={() => {
