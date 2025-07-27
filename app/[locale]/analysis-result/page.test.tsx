@@ -3,13 +3,15 @@
  */
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import AnalysisResultPage from './page'
 import { PropertyAnalysis } from '@/lib/types'
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+  useSearchParams: jest.fn(),
+  usePathname: jest.fn(),
 }))
 
 // Mock next-intl
@@ -113,10 +115,21 @@ beforeAll(() => {
 
 describe('AnalysisResultPage Integration Tests', () => {
   const mockPush = jest.fn()
+  const mockSearchParams = {
+    get: jest.fn(),
+    has: jest.fn(),
+    toString: jest.fn(() => ''),
+    keys: jest.fn(),
+    values: jest.fn(),
+    entries: jest.fn(),
+    forEach: jest.fn(),
+    getAll: jest.fn(),
+  }
   
   beforeEach(() => {
     jest.clearAllMocks()
     ;(useRouter as jest.Mock).mockReturnValue({ push: mockPush })
+    ;(useSearchParams as jest.Mock).mockReturnValue(mockSearchParams)
     
     // Clear localStorage before each test
     localStorage.clear()

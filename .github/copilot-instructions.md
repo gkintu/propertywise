@@ -72,6 +72,23 @@ This is a Next.js 15 property analysis application that uses Google Gemini AI to
 - Demo PDF files available in `public/demo-pdfs/` for testing analysis flow
 - Debug mode controlled by `NODE_ENV=development` shows additional analysis metadata
 
+### Testing & Quality Assurance
+- Jest with `@testing-library/react` for component testing
+- Custom test setup in `jest.setup.ts` with Node.js polyfills (TextEncoder, fetch mocks)
+- Test command: `npm test` or `npm run test:watch` for watch mode
+- File upload validation tested extensively in `hooks/useFileUpload.test.ts`
+- Integration tests in `lib/integration.test.ts` demonstrate validation + styling patterns
+- Mock implementations for next-intl, next/navigation, and @vercel/blob in test files
+- Use `@jest-environment jsdom` comment for component tests requiring DOM APIs
+
+### Blob Storage & File Management
+- **Demo files never deleted**: Demo blob URLs contain special identifiers (`demo-alv-johnsens-vei-1`, etc.)
+- Blob lifecycle: Upload → Track in localStorage → Verify accessibility → Process → Cleanup on success/error
+- Exponential backoff retry pattern for blob verification (5 attempts, 500ms-8s delays)
+- Session-based cleanup: `beforeunload` events trigger immediate cleanup of unprocessed blobs
+- Use `scripts/upload-demo-files.js` to refresh demo file blob URLs in production
+- Blob URLs auto-expire; use permanent demo URLs in `DemoFilesSection.tsx` for testing
+
 ### Error Handling & User Experience
 - Analysis errors stored in localStorage with specific error types (`invalid_document_type`, `insufficient_property_data`, etc.)
 - Progress bar component (`AnalysisProgressBar`) with staged animation for long-running operations
