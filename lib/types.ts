@@ -21,10 +21,20 @@ export interface Concern {
   category: 'electrical' | 'structural' | 'safety' | 'pest' | 'maintenance' | 'age' | 'other';
 }
 
+export interface HiddenDefect {
+  category: 'shared_debt' | 'legal_deficiencies' | 'moisture_water_damage' | 'rot_fungus_pests' | 'electrical_faults' | 'drainage_leaks' | 'roof_structural_issues' | 'environmental_hazards';
+  riskLevel: 'low' | 'medium' | 'high';
+  signsToLookFor: string[];
+  consequences: string;
+  preventiveMeasures: string;
+  actionRequired?: string;
+}
+
 export interface PropertyAnalysis {
   propertyDetails: PropertyDetails;
   strongPoints: (StrongPoint | string)[];
   concerns: (Concern | string)[];
+  hiddenDefects: HiddenDefect[];
   bottomLine: string;
   summary: string;
 }

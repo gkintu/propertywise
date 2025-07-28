@@ -198,6 +198,65 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     lineHeight: 1.4,
     fontWeight: 'bold',
   },
+  // Hidden defects section styling
+  hiddenDefectsCard: {
+    backgroundColor: isDarkMode ? '#1F2937' : '#FFFFFF',
+    border: `1 solid ${isDarkMode ? '#7C3AED' : '#A855F7'}`, // purple border
+    borderRadius: 8,
+    padding: 20,
+    marginBottom: 20,
+  },
+  hiddenDefectsTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: isDarkMode ? '#C4B5FD' : '#7C2D12', // purple theme
+    marginBottom: 8,
+  },
+  hiddenDefectsDescription: {
+    fontSize: 12,
+    color: isDarkMode ? '#D1D5DB' : '#374151',
+    marginBottom: 16,
+    lineHeight: 1.4,
+  },
+  hiddenDefectItem: {
+    backgroundColor: isDarkMode ? '#374151' : '#F9FAFB',
+    border: `1 solid ${isDarkMode ? '#4B5563' : '#E5E7EB'}`,
+    borderRadius: 6,
+    padding: 12,
+    marginBottom: 12,
+  },
+  hiddenDefectCategory: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: isDarkMode ? '#F9FAFB' : '#111827',
+  },
+  hiddenDefectRisk: {
+    fontSize: 10,
+    backgroundColor: isDarkMode ? '#7C2D12' : '#FEF3C7',
+    color: isDarkMode ? '#FCD34D' : '#92400E',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  hiddenDefectLabel: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: isDarkMode ? '#D1D5DB' : '#374151',
+    marginBottom: 4,
+    marginTop: 8,
+  },
+  hiddenDefectText: {
+    fontSize: 10,
+    color: isDarkMode ? '#D1D5DB' : '#374151',
+    lineHeight: 1.4,
+    marginBottom: 8,
+  },
+  hiddenDefectListItem: {
+    fontSize: 10,
+    color: isDarkMode ? '#D1D5DB' : '#374151',
+    lineHeight: 1.3,
+    marginBottom: 2,
+  },
   // Footer
   footer: {
     position: 'absolute',
@@ -367,6 +426,61 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
           </View>
         </View>
       </View>
+
+      {/* Hidden Defects Section */}
+      {analysisData?.hiddenDefects && analysisData.hiddenDefects.length > 0 && (
+        <View style={styles.hiddenDefectsCard}>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 16 }}>
+            <View style={{ marginTop: 2 }}>
+              <EyeIcon size={16} color={iconColors.eye} />
+            </View>
+            <Text style={styles.hiddenDefectsTitle}>
+              {t('hiddenDefects.title')}
+            </Text>
+          </View>
+          <Text style={styles.hiddenDefectsDescription}>
+            {t('hiddenDefects.description')}
+          </Text>
+          
+          {analysisData.hiddenDefects.map((defect, idx) => (
+            <View key={idx} style={styles.hiddenDefectItem} wrap={false}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <Text style={styles.hiddenDefectCategory}>
+                  {t(`hiddenDefects.categories.${defect.category}.title`)}
+                </Text>
+                <Text style={styles.hiddenDefectRisk}>
+                  {t(`hiddenDefects.riskLevels.${defect.riskLevel}`)}
+                </Text>
+              </View>
+              
+              <Text style={styles.hiddenDefectLabel}>
+                {t('hiddenDefects.signsToLookFor')}:
+              </Text>
+              <View style={{ marginBottom: 8 }}>
+                {defect.signsToLookFor.map((sign, signIdx) => (
+                  <Text key={signIdx} style={styles.hiddenDefectListItem}>
+                    • {sign}
+                  </Text>
+                ))}
+              </View>
+              
+              <Text style={styles.hiddenDefectLabel}>
+                {t('hiddenDefects.consequences')}:
+              </Text>
+              <Text style={styles.hiddenDefectText}>
+                {defect.consequences}
+              </Text>
+              
+              <Text style={styles.hiddenDefectLabel}>
+                {t('hiddenDefects.preventiveMeasures')}:
+              </Text>
+              <Text style={styles.hiddenDefectText}>
+                {defect.preventiveMeasures}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
 
       {/* Bottom Line Alert (matching yellow alert from web page) */}
       {analysisData?.bottomLine && (

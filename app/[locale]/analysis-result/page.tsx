@@ -30,6 +30,7 @@ import FileUploadSection, { FileUploadSectionHandle } from "@/components/upload/
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { PropertyListingBadge } from "@/components/ui/property-listing-badge";
 import AnalysisProgressBar from "@/components/upload/AnalysisProgressBar";
+import { HiddenDefectsSection } from "@/components/ui/hidden-defects-section";
 
 // Helper function to extract JSON from text that might be wrapped in markdown or have extra formatting
 function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
@@ -622,6 +623,11 @@ export default function AnalysisResultPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Hidden Defects Section */}
+          {analysisData?.hiddenDefects && analysisData.hiddenDefects.length > 0 && (
+            <HiddenDefectsSection hiddenDefects={analysisData.hiddenDefects} />
+          )}
 
           {analysisData?.bottomLine && (
             <Alert className="mb-6 border-yellow-200 dark:border-yellow-800/50 bg-yellow-50 dark:bg-yellow-950/20">

@@ -127,6 +127,46 @@
         "checkingRisks": "Checking for Hidden Risks"
       }
     },
+    "hiddenDefects": {
+      "title": "Hidden Property Defects",
+      "description": "Potential issues that may not be immediately visible but could affect your purchase decision.",
+      "signsToLookFor": "Signs to Look For",
+      "consequences": "Potential Consequences",
+      "preventiveMeasures": "What to Do Before Purchase",
+      "actionRequired": "Recommended Action",
+      "helpMeAssess": "Help Me Assess",
+      "riskLevels": {
+        "low": "Low Risk",
+        "medium": "Medium Risk",
+        "high": "High Risk"
+      },
+      "categories": {
+        "shared_debt": {
+          "title": "Shared Debt (Fellesgjeld)"
+        },
+        "legal_deficiencies": {
+          "title": "Legal Deficiencies"
+        },
+        "moisture_water_damage": {
+          "title": "Moisture & Water Damage"
+        },
+        "rot_fungus_pests": {
+          "title": "Rot, Fungus & Pests"
+        },
+        "electrical_faults": {
+          "title": "Electrical Faults"
+        },
+        "drainage_leaks": {
+          "title": "Drainage & Leaks"
+        },
+        "roof_structural_issues": {
+          "title": "Roof & Structural Issues"
+        },
+        "environmental_hazards": {
+          "title": "Environmental Hazards"
+        }
+      }
+    },
     "summary": {
       "propertyAnalysisReportTitle": "Property Analysis Report",
       "limitedAnalysisTitle": "Limited Analysis Format:",

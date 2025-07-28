@@ -153,6 +153,7 @@ describe('AnalysisResultPage Integration Tests', () => {
       'Old electrical system needs updating',
       'Some moisture issues in bathroom'
     ],
+    hiddenDefects: [],
     bottomLine: 'Well-located property with good potential, some maintenance needed',
     summary: 'Well-located property with good potential, some maintenance needed'
   }
@@ -325,7 +326,10 @@ describe('AnalysisResultPage Integration Tests', () => {
           price: 4500000 // Required field to prevent crash
         },
         strongPoints: ['Good location'],
-        // Missing summary, concerns, bottomLine (optional fields)
+        concerns: [],
+        hiddenDefects: [],
+        bottomLine: 'Good location',
+        summary: 'Good location'
       }
 
       localStorage.setItem('analysisResult', JSON.stringify(incompleteAnalysis))

@@ -127,6 +127,46 @@
         "checkingRisks": "Sjekker skjulte risikoer"
       }
     },
+    "hiddenDefects": {
+      "title": "Skjulte eiendomsmangler",
+      "description": "Potensielle problemer som kanskje ikke er umiddelbart synlige, men som kan påvirke kjøpsbeslutningen din.",
+      "signsToLookFor": "Tegn å se etter",
+      "consequences": "Potensielle konsekvenser",
+      "preventiveMeasures": "Hva du bør gjøre før kjøp",
+      "actionRequired": "Anbefalt handling",
+      "helpMeAssess": "Hjelp meg vurdere",
+      "riskLevels": {
+        "low": "Lav risiko",
+        "medium": "Middels risiko", 
+        "high": "Høy risiko"
+      },
+      "categories": {
+        "shared_debt": {
+          "title": "Fellesgjeld"
+        },
+        "legal_deficiencies": {
+          "title": "Lovlighetsmangler"
+        },
+        "moisture_water_damage": {
+          "title": "Fukt- og vannskader"
+        },
+        "rot_fungus_pests": {
+          "title": "Råte, sopp og skadedyr"
+        },
+        "electrical_faults": {
+          "title": "Elektriske feil"
+        },
+        "drainage_leaks": {
+          "title": "Drenering og lekkasjer"
+        },
+        "roof_structural_issues": {
+          "title": "Tak og konstruksjonsproblemer"
+        },
+        "environmental_hazards": {
+          "title": "Miljøgifter"
+        }
+      }
+    },
     "summary": {
       "propertyAnalysisReportTitle": "Eiendomsanalyserapport",
       "limitedAnalysisTitle": "Begrenset analyseformat:",

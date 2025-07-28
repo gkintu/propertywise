@@ -342,6 +342,36 @@ export async function POST(request: NextRequest) {
             required: ["title", "description", "severity", "category"],
           },
         },
+        hiddenDefects: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              category: {
+                type: "string",
+                enum: [
+                  "shared_debt",
+                  "legal_deficiencies", 
+                  "moisture_water_damage",
+                  "rot_fungus_pests",
+                  "electrical_faults",
+                  "drainage_leaks",
+                  "roof_structural_issues",
+                  "environmental_hazards"
+                ],
+              },
+              riskLevel: { type: "string", enum: ["low", "medium", "high"] },
+              signsToLookFor: {
+                type: "array",
+                items: { type: "string" }
+              },
+              consequences: { type: "string" },
+              preventiveMeasures: { type: "string" },
+              actionRequired: { type: "string" },
+            },
+            required: ["category", "riskLevel", "signsToLookFor", "consequences", "preventiveMeasures"],
+          },
+        },
         bottomLine: { type: "string" },
         summary: { type: "string" },
       },
@@ -349,6 +379,7 @@ export async function POST(request: NextRequest) {
         "propertyDetails",
         "strongPoints",
         "concerns",
+        "hiddenDefects",
         "bottomLine",
         "summary",
       ],
@@ -358,7 +389,24 @@ export async function POST(request: NextRequest) {
 
 ${languageInstruction}
 
-Focus on actionable insights for a potential buyer. If you cannot extract structured data from the document, provide a brief summary in the summary field.`;
+Focus on actionable insights for a potential buyer. If you cannot extract structured data from the document, provide a brief summary in the summary field.
+
+For the hiddenDefects section, analyze the document for potential hidden issues that buyers should be aware of. Include risk assessment for each category:
+- shared_debt: Financial obligations shared with other owners
+- legal_deficiencies: Permits, zoning violations, or legal compliance issues  
+- moisture_water_damage: Water damage, leaks, or moisture problems
+- rot_fungus_pests: Structural damage from biological causes
+- electrical_faults: Electrical system issues or code violations
+- drainage_leaks: Plumbing, drainage, or water system problems
+- roof_structural_issues: Roof damage, leaks, structural problems, or aging materials
+- environmental_hazards: Asbestos, lead, PCBs, or other toxic materials
+
+For each identified defect, provide:
+- riskLevel: low/medium/high based on document findings
+- signsToLookFor: 2-3 specific indicators mentioned in the document or commonly associated
+- consequences: Brief description of potential impact (financial, health, structural)
+- preventiveMeasures: What buyers should do before purchase (inspection, expert consultation, etc.)
+- actionRequired: Specific recommended actions if defect is suspected/confirmed`;
 
     const response = await genai.models.generateContent({
       model: "gemini-2.5-flash-lite-preview-06-17",
