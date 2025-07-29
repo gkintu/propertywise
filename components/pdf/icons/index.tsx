@@ -2,6 +2,7 @@ import React from 'react';
 import { PDFIcon } from './PDFIcon';
 
 export { PDFIcon, type IconName } from './PDFIcon';
+export { defectIcons, type DefectType } from './DefectIcons';
 
 // Re-export the most commonly used icons with convenient names
 export const CheckCircleIcon = ({ size = 16, color = '#059669' }) => (
