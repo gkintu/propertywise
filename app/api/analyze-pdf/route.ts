@@ -229,7 +229,7 @@ export async function POST(request: NextRequest) {
 
     try {
       const classificationResponse = await genai.models.generateContent({
-        model: "gemini-2.5-flash-lite-preview-06-17",
+        model: "gemini-2.5-flash",
         contents: [{ text: classificationPrompt }, pdfPart],
         config: {
           responseMimeType: "application/json",
@@ -391,7 +391,9 @@ ${languageInstruction}
 
 Focus on actionable insights for a potential buyer. If you cannot extract structured data from the document, provide a brief summary in the summary field.
 
-For the hiddenDefects section, analyze the document for potential hidden issues that buyers should be aware of. Include risk assessment for each category:
+For the hiddenDefects section, analyze the document for potential hidden issues that buyers should be aware of. ONLY include categories where you find actual risks, concerns, or relevant information in the document. Do not include categories just because they exist in the schema - only include them if there are genuine findings to report.
+
+Available categories to assess (only include if relevant findings exist):
 - shared_debt: Financial obligations shared with other owners
 - legal_deficiencies: Permits, zoning violations, or legal compliance issues  
 - moisture_water_damage: Water damage, leaks, or moisture problems
@@ -401,15 +403,17 @@ For the hiddenDefects section, analyze the document for potential hidden issues 
 - roof_structural_issues: Roof damage, leaks, structural problems, or aging materials
 - environmental_hazards: Asbestos, lead, PCBs, or other toxic materials
 
-For each identified defect, provide:
+For each identified defect category that has actual findings, provide:
 - riskLevel: low/medium/high based on document findings
-- signsToLookFor: 2-3 specific indicators mentioned in the document or commonly associated
+- signsToLookFor: 2-3 specific indicators mentioned in the document or commonly associated with the identified issue
 - consequences: Brief description of potential impact (financial, health, structural)
 - preventiveMeasures: What buyers should do before purchase (inspection, expert consultation, etc.)
-- actionRequired: Specific recommended actions if defect is suspected/confirmed`;
+- actionRequired: Specific recommended actions if defect is suspected/confirmed
+
+If no hidden defects are found or mentioned in the document, return an empty array for hiddenDefects.`;
 
     const response = await genai.models.generateContent({
-      model: "gemini-2.5-flash-lite-preview-06-17",
+      model: "gemini-2.5-flash",
       contents: [{ text: systemPrompt }, pdfPart],
       config: {
         responseMimeType: "application/json",

@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,8 @@ import {
   Info,
   Download,
   Upload,
+  Maximize2,
+  Calendar,
 } from "lucide-react";
 import { pdf } from "@react-pdf/renderer";
 import { PropertyAnalysis } from "@/lib/types";
@@ -510,32 +513,73 @@ export default function AnalysisResultPage() {
           )}
 
           {analysisData?.propertyDetails && (
-            <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/50 rounded-lg p-4 mb-8">
-              <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
-                {t("analysis.marketPosition")}
-              </p>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-blue-800 dark:text-blue-200">
-                <span className="font-medium">
-                  {analysisData.propertyDetails.bedrooms}
-                  {t("analysis.roomPropertyPriced", {
-                    propertyType: analysisData.propertyDetails.propertyType,
-                    price: analysisData.propertyDetails.price.toLocaleString(),
-                  })}
-                </span>
-                <span>•</span>
-                <span className="font-medium">
-                  {t("analysis.totalSize", {
-                    size: analysisData.propertyDetails.size,
-                  })}
-                </span>
-                <span>•</span>
-                <span className="font-medium">
-                  {t("analysis.built", {
-                    year: analysisData.propertyDetails.yearBuilt,
-                  })}
-                </span>
-              </div>
-            </div>
+            <Card className="bg-white/85 dark:bg-[#111827]/85 backdrop-blur-sm border-gray-200 dark:border-slate-700 shadow-2xl mb-8">
+              <CardContent className="p-8">
+                <div className="space-y-6">
+                  {/* Property Details */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    {/* Property Type */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1 bg-blue-100 dark:bg-blue-500/20 rounded-lg">
+                          <HomeIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t("analysis.marketPosition")}</span>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {analysisData.propertyDetails.propertyType}
+                      </div>
+                      <Badge variant="secondary" className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/30">
+                        {analysisData.propertyDetails.bedrooms}-room apartment
+                      </Badge>
+                    </div>
+
+                    {/* Price */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-emerald-500 dark:bg-emerald-400 rounded-full"></div>
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">Price</span>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {analysisData.propertyDetails.price.toLocaleString()}
+                        <span className="text-lg font-normal text-gray-500 dark:text-slate-400 ml-2">NOK</span>
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-slate-400">{t("analysis.askingPrice")}</p>
+                    </div>
+
+                    {/* Size */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Maximize2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">Total Area</span>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {analysisData.propertyDetails.size}
+                        <span className="text-lg font-normal text-gray-500 dark:text-slate-400 ml-2">sqm</span>
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-slate-400">{t("analysis.totalArea")}</p>
+                    </div>
+
+                    {/* Year Built */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">Year Built</span>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {analysisData.propertyDetails.yearBuilt}
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-slate-400">
+                        {new Date().getFullYear() - analysisData.propertyDetails.yearBuilt} years old
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Additional Info Bar */}
+                  {/* Additional Info Bar removed as requested */}
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           <Card className="mb-6 border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1F2937]">

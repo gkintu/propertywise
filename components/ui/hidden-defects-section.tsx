@@ -68,16 +68,13 @@ export function HiddenDefectsSection({ hiddenDefects, className }: HiddenDefects
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4 pl-10">
-                    <div>
-                      <h4 className="font-semibold">
-                        {t("hiddenDefects.signsToLookFor")}
-                      </h4>
-                      <ul className="list-disc pl-5 mt-1">
-                        {defect.signsToLookFor.map((sign: string, i: number) => (
-                          <li key={i}>{sign}</li>
-                        ))}
-                      </ul>
+                    {/* Brief explanation section */}
+                    <div className="bg-yellow-50 dark:bg-yellow-950/20 p-3 rounded-md border border-yellow-200 dark:border-yellow-800/50">
+                      <p className="text-sm text-[#b3621d] dark:text-[#ffc657]">
+                        {defect.briefExplanation}
+                      </p>
                     </div>
+                    
                     <div>
                       <h4 className="font-semibold">
                         {t("hiddenDefects.consequences")}
@@ -91,7 +88,14 @@ export function HiddenDefectsSection({ hiddenDefects, className }: HiddenDefects
                       <p>{defect.preventiveMeasures}</p>
                     </div>
                     {defect.actionRequired && (
-                      <Badge variant="outline">{defect.actionRequired}</Badge>
+                      <div>
+                        <h4 className="font-semibold">
+                          {t("hiddenDefects.actionRequired")}
+                        </h4>
+                        <p className="text-sm bg-gray-50/30 dark:bg-gray-600/10 p-2 rounded border-l-4 border-yellow-200 dark:border-yellow-800/50">
+                          {defect.actionRequired}
+                        </p>
+                      </div>
                     )}
                   </div>
                 </AccordionContent>

@@ -224,6 +224,8 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     borderRadius: 6,
     padding: 12,
     marginBottom: 12,
+    marginTop: 8, // Add space at top for better page break spacing
+    breakInside: 'avoid', // Prevent breaking inside the card
   },
   hiddenDefectCategory: {
     fontSize: 13,
@@ -443,7 +445,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
           </Text>
           
           {analysisData.hiddenDefects.map((defect, idx) => (
-            <View key={idx} style={styles.hiddenDefectItem} wrap={false}>
+            <View key={idx} style={styles.hiddenDefectItem} wrap={false} minPresenceAhead={50}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                 <Text style={styles.hiddenDefectCategory}>
                   {t(`hiddenDefects.categories.${defect.category}.title`)}
