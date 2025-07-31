@@ -361,15 +361,12 @@ export async function POST(request: NextRequest) {
                 ],
               },
               riskLevel: { type: "string", enum: ["low", "medium", "high"] },
-              signsToLookFor: {
-                type: "array",
-                items: { type: "string" }
-              },
+              briefExplanation: { type: "string" },
               consequences: { type: "string" },
               preventiveMeasures: { type: "string" },
               actionRequired: { type: "string" },
             },
-            required: ["category", "riskLevel", "signsToLookFor", "consequences", "preventiveMeasures"],
+            required: ["category", "riskLevel", "briefExplanation", "consequences", "preventiveMeasures"],
           },
         },
         bottomLine: { type: "string" },
@@ -404,8 +401,8 @@ Available categories to assess (only include if relevant findings exist):
 - environmental_hazards: Asbestos, lead, PCBs, or other toxic materials
 
 For each identified defect category that has actual findings, provide:
+- briefExplanation: A short summary of what was specifically found in the document (e.g., "Page 17 mentions expected increase in maintenance costs", "Document shows moisture damage in basement area")
 - riskLevel: low/medium/high based on document findings
-- signsToLookFor: 2-3 specific indicators mentioned in the document or commonly associated with the identified issue
 - consequences: Brief description of potential impact (financial, health, structural)
 - preventiveMeasures: What buyers should do before purchase (inspection, expert consultation, etc.)
 - actionRequired: Specific recommended actions if defect is suspected/confirmed
