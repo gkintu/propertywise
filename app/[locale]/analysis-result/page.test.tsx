@@ -40,7 +40,7 @@ jest.mock('next-intl', () => ({
       'analysis.areasOfConcern': 'Areas of Concern',
       'analysis.bottomLine': 'Bottom Line:',
       'analysis.marketPosition': 'Market Position:',
-      'analysis.roomPropertyPriced': '-room {propertyType} priced at {price} NOK',
+      'analysis.roomPropertyPriced': '-room {propertyType} priced at {price} {currency}',
       'analysis.totalSize': '{size} sqm total',
       'analysis.built': 'Built {year}',
       

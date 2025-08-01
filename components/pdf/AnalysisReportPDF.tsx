@@ -345,7 +345,8 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ analysisDa
           <Text style={styles.marketPositionText}>
             {analysisData.propertyDetails.bedrooms}{t('analysis.roomPropertyPriced', {
               propertyType: analysisData.propertyDetails.propertyType,
-              price: analysisData.propertyDetails.price.toLocaleString()
+              price: analysisData.propertyDetails.price.toLocaleString(),
+              currency: analysisData.propertyDetails.currency || 'NOK'
             })} • {t('analysis.totalSize', { size: analysisData.propertyDetails.size })} • {t('analysis.built', { year: analysisData.propertyDetails.yearBuilt })}
           </Text>
         </View>

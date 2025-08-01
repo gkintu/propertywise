@@ -2,6 +2,7 @@ export interface PropertyDetails {
   address: string;
   bedrooms: number;
   price: number;
+  currency?: string; // e.g., "NOK", "USD", "EUR", "SEK", "DKK"
   size: number; // in square meters
   yearBuilt: number;
   propertyType: string; // e.g., "apartment", "house", "condo"

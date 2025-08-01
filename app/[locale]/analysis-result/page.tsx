@@ -538,11 +538,13 @@ export default function AnalysisResultPage() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-emerald-500 dark:bg-emerald-400 rounded-full"></div>
-                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">Price</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t("analysis.priceLabel")}</span>
                       </div>
                       <div className="text-2xl font-bold text-gray-900 dark:text-white">
                         {analysisData.propertyDetails.price.toLocaleString()}
-                        <span className="text-lg font-normal text-gray-500 dark:text-slate-400 ml-2">NOK</span>
+                        <span className="text-lg font-normal text-gray-500 dark:text-slate-400 ml-2">
+                          {analysisData.propertyDetails.currency || 'NOK'}
+                        </span>
                       </div>
                       <p className="text-sm text-gray-500 dark:text-slate-400">{t("analysis.askingPrice")}</p>
                     </div>
@@ -551,7 +553,7 @@ export default function AnalysisResultPage() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <Maximize2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">Total Area</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t("analysis.sizeLabel")}</span>
                       </div>
                       <div className="text-2xl font-bold text-gray-900 dark:text-white">
                         {analysisData.propertyDetails.size}
@@ -564,7 +566,7 @@ export default function AnalysisResultPage() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">Year Built</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t("analysis.yearBuiltLabel")}</span>
                       </div>
                       <div className="text-2xl font-bold text-gray-900 dark:text-white">
                         {analysisData.propertyDetails.yearBuilt}
