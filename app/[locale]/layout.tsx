@@ -3,20 +3,24 @@ import {notFound} from 'next/navigation';
 import {setRequestLocale} from 'next-intl/server';
 import {routing} from '@/i18n/routing';
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { headers } from "next/headers";
 import "../globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Using Inter for monospace as well since it's a versatile font family
+const interMono = Inter({
+  variable: "--font-inter-mono", 
   subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600"], // Specific weights for monospace usage
 });
 
 export const metadata: Metadata = {
@@ -40,7 +44,7 @@ export default async function LocaleLayout(props: { children: React.ReactNode; p
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${interMono.variable} antialiased`}
         suppressHydrationWarning={true}
       >
         <ThemeProvider

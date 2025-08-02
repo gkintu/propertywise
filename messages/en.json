@@ -126,6 +126,17 @@
       "pdfGenerationError": "Failed to generate PDF. Please try again.",
       "debugTitle": "🚧 Debug Data (Remove before deployment)",
       "rawAnalysisData": "Raw Analysis Data:",
+      "propertyTypes": {
+        "apartment": "Apartment",
+        "house": "House", 
+        "condo": "Condo"
+      },
+      "ageLabels": {
+        "new": "New",
+        "yearsOld": "{years} years old"
+      },
+      "noStrongPointsAvailable": "No strong points available",
+      "noConcernsAvailable": "No concerns available",
       "progressStages": {
         "extractingDetails": "Extracting Property Details",
         "analyzingPrice": "Analyzing Price & Market Data",
@@ -140,6 +151,7 @@
       "preventiveMeasures": "What to Do Before Purchase",
       "actionRequired": "Recommended Action",
       "helpMeAssess": "Help Me Assess",
+      "noSignsAvailable": "No signs specified",
       "riskLevels": {
         "low": "Low Risk",
         "medium": "Medium Risk",

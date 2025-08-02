@@ -126,6 +126,17 @@
       "pdfGenerationError": "Kunne ikke generere PDF. Prøv igjen.",
       "debugTitle": "🚧 Feilsøkingsdata (Fjern før distribusjon)",
       "rawAnalysisData": "Rådata for analyse:",
+      "propertyTypes": {
+        "apartment": "Leilighet",
+        "house": "Hus",
+        "condo": "Leilighet"
+      },
+      "ageLabels": {
+        "new": "Ny",
+        "yearsOld": "{years} år gammel"
+      },
+      "noStrongPointsAvailable": "Ingen sterke punkter tilgjengelig",
+      "noConcernsAvailable": "Ingen bekymringer tilgjengelig",
       "progressStages": {
         "extractingDetails": "Henter eiendomsdetaljer",
         "analyzingPrice": "Analyserer pris og marked",
@@ -140,6 +151,7 @@
       "preventiveMeasures": "Hva du bør gjøre før kjøp",
       "actionRequired": "Anbefalt handling",
       "helpMeAssess": "Hjelp meg vurdere",
+      "noSignsAvailable": "Ingen tegn spesifisert",
       "riskLevels": {
         "low": "Lav risiko",
         "medium": "Middels risiko", 

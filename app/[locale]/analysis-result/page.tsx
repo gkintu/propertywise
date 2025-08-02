@@ -82,17 +82,95 @@ function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
   return null;
 }
 
-// PDF download function using react-pdf/renderer
+// PDF download function using react-pdf/renderer with comprehensive error handling
 async function downloadAsPDF(
   analysisData: PropertyAnalysis,
   t: TranslationFunction,
   isDarkMode: boolean = false
 ) {
   try {
-    // Generate PDF using react-pdf/renderer
+    console.log("🔄 Starting PDF generation...");
+    
+    // Validate required data before generating PDF
+    if (!analysisData || !analysisData.propertyDetails) {
+      console.error("Invalid analysis data for PDF generation");
+      toast.error(t("analysis.pdfGenerationError") || "Error generating PDF: Invalid data");
+      return;
+    }
+
+    // Comprehensive data sanitization before PDF generation
+    const sanitizedData: PropertyAnalysis = {
+      propertyDetails: {
+        address: analysisData.propertyDetails?.address?.substring(0, 200) || 'Property Address',
+        bedrooms: Number(analysisData.propertyDetails?.bedrooms) || 0,
+        price: Number(analysisData.propertyDetails?.price) || 0,
+        currency: analysisData.propertyDetails?.currency || 'NOK',
+        size: Number(analysisData.propertyDetails?.size) || 0,
+        yearBuilt: Number(analysisData.propertyDetails?.yearBuilt) || new Date().getFullYear(),
+        propertyType: analysisData.propertyDetails?.propertyType?.substring(0, 50) || 'property',
+      },
+      strongPoints: Array.isArray(analysisData.strongPoints) 
+        ? analysisData.strongPoints.slice(0, 10).map((point, idx) => {
+            if (typeof point === 'string') {
+              return point.substring(0, 300);
+            }
+            return {
+              title: point?.title?.substring(0, 100) || `Strong Point ${idx + 1}`,
+              description: point?.description?.substring(0, 200) || '',
+              category: ('category' in point ? point.category : 'other') as 'kitchen' | 'location' | 'fees' | 'outdoor' | 'storage' | 'condition' | 'other'
+            };
+          })
+        : [],
+      concerns: Array.isArray(analysisData.concerns) 
+        ? analysisData.concerns.slice(0, 10).map((concern, idx) => {
+            if (typeof concern === 'string') {
+              return concern.substring(0, 300);
+            }
+            return {
+              title: concern?.title?.substring(0, 100) || `Concern ${idx + 1}`,
+              description: concern?.description?.substring(0, 200) || '',
+              severity: ('severity' in concern ? concern.severity : 'medium') as 'low' | 'medium' | 'high',
+              category: ('category' in concern ? concern.category : 'other') as 'electrical' | 'structural' | 'safety' | 'pest' | 'maintenance' | 'age' | 'other',
+              estimatedCost: ('estimatedCost' in concern && concern.estimatedCost ? concern.estimatedCost.substring(0, 100) : undefined)
+            };
+          })
+        : [],
+      hiddenDefects: Array.isArray(analysisData.hiddenDefects) 
+        ? analysisData.hiddenDefects.slice(0, 5).map(defect => ({
+            category: defect?.category || 'unknown',
+            riskLevel: defect?.riskLevel || 'medium',
+            briefExplanation: defect?.briefExplanation?.substring(0, 200) || '',
+            signsToLookFor: Array.isArray(defect?.signsToLookFor) 
+              ? defect.signsToLookFor.slice(0, 5).map(sign => sign?.substring(0, 100) || '') 
+              : [],
+            consequences: defect?.consequences?.substring(0, 300) || '',
+            preventiveMeasures: defect?.preventiveMeasures?.substring(0, 300) || '',
+            actionRequired: defect?.actionRequired?.substring(0, 200) || ''
+          }))
+        : [],
+      bottomLine: analysisData.bottomLine?.substring(0, 500) || '',
+      summary: analysisData.summary?.substring(0, 1000) || ''
+    };
+
+    console.log("📊 Sanitized data:", {
+      hasPropertyDetails: !!sanitizedData.propertyDetails,
+      strongPointsCount: sanitizedData.strongPoints.length,
+      concernsCount: sanitizedData.concerns.length,
+      hiddenDefectsCount: sanitizedData.hiddenDefects.length,
+      summaryLength: sanitizedData.summary.length
+    });
+
+    // Generate PDF using react-pdf/renderer with error boundary
+    console.log("🎨 Generating PDF component...");
     const blob = await pdf(
-      <AnalysisReportPDF analysisData={analysisData} t={t} isDarkMode={isDarkMode} />
+      <AnalysisReportPDF 
+        analysisData={sanitizedData} 
+        t={t} 
+        isDarkMode={isDarkMode} 
+      />
     ).toBlob();
+
+    console.log("✅ PDF blob generated successfully, size:", blob.size);
 
     // Create download link
     const url = URL.createObjectURL(blob);
@@ -101,7 +179,7 @@ async function downloadAsPDF(
 
     // Generate filename from property address
     const propertyAddress =
-      analysisData?.propertyDetails?.address
+      sanitizedData.propertyDetails.address
         ?.replace(/[^a-zA-Z0-9\s]/g, "")
         ?.trim() || "Property";
 
@@ -116,11 +194,32 @@ async function downloadAsPDF(
     // Clean up the URL object
     URL.revokeObjectURL(url);
 
-    console.log("PDF generated successfully:", filename);
-    toast.success(t("analysis.pdfGeneratedSuccess"));
+    console.log("📁 PDF download triggered:", filename);
+    toast.success(t("analysis.pdfGeneratedSuccess") || "PDF generated successfully!");
   } catch (error) {
-    console.error("Error generating PDF:", error);
-    toast.error(t("analysis.pdfGenerationError"));
+    console.error("❌ Error generating PDF:", error);
+    
+    // Enhanced error reporting
+    let errorMessage = "Unknown error occurred";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      console.error("Error details:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+    }
+    
+    // Check for specific react-pdf errors
+    if (errorMessage.includes("Invalid array length")) {
+      errorMessage = "PDF generation failed due to data size limits. Please try with smaller content.";
+    } else if (errorMessage.includes("out of memory")) {
+      errorMessage = "PDF generation failed due to memory constraints. Please try again.";
+    } else if (errorMessage.includes("render")) {
+      errorMessage = "PDF rendering failed. Please check your data and try again.";
+    }
+    
+    toast.error(t("analysis.pdfGenerationError") || `Error generating PDF: ${errorMessage}`);
   }
 }
 
@@ -527,7 +626,7 @@ export default function AnalysisResultPage() {
                         <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t("analysis.marketPosition")}</span>
                       </div>
                       <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {analysisData.propertyDetails.propertyType}
+                        {t(`analysis.propertyTypes.${analysisData.propertyDetails.propertyType}`) || analysisData.propertyDetails.propertyType}
                       </div>
                       <Badge variant="secondary" className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/30">
                         {analysisData.propertyDetails.bedrooms}-room apartment
@@ -571,9 +670,12 @@ export default function AnalysisResultPage() {
                       <div className="text-2xl font-bold text-gray-900 dark:text-white">
                         {analysisData.propertyDetails.yearBuilt}
                       </div>
-                      <p className="text-sm text-gray-500 dark:text-slate-400">
-                        {new Date().getFullYear() - analysisData.propertyDetails.yearBuilt} years old
-                      </p>
+                      <Badge variant="secondary" className="bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-500/30">
+                        {(() => {
+                          const age = new Date().getFullYear() - analysisData.propertyDetails.yearBuilt;
+                          return age <= 0 ? t("analysis.ageLabels.new") : t("analysis.ageLabels.yearsOld", { years: age });
+                        })()}
+                      </Badge>
                     </div>
                   </div>
 
