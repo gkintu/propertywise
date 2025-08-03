@@ -41,7 +41,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   page: {
     flexDirection: 'column',
     backgroundColor: isDarkMode ? '#111827' : '#FFFFFF',
-    padding: 30,
+    padding: '0 30 30 30',
     fontFamily: 'Helvetica',
     color: isDarkMode ? '#F9FAFB' : '#111827',
     fontSize: 12,
