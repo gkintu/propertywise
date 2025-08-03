@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, use } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -25,10 +25,8 @@ import {
   Maximize2,
   Calendar,
 } from "lucide-react";
-import { pdf } from "@react-pdf/renderer";
 import { PropertyAnalysis } from "@/lib/types";
 import { TranslationFunction } from "@/lib/i18n-types";
-import { AnalysisReportPDF } from "@/components/pdf/AnalysisReportPDF";
 import FileUploadSection, { FileUploadSectionHandle } from "@/components/upload/FileUploadSection";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { PropertyListingBadge } from "@/components/ui/property-listing-badge";
@@ -82,23 +80,24 @@ function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
   return null;
 }
 
-// PDF download function using react-pdf/renderer with comprehensive error handling
+// Server-side PDF download function - migrated from client-side to API route
 async function downloadAsPDF(
   analysisData: PropertyAnalysis,
   t: TranslationFunction,
-  isDarkMode: boolean = false
+  isDarkMode: boolean = false,
+  locale: string = 'en'
 ) {
   try {
-    console.log("🔄 Starting PDF generation...");
+    console.log("🔄 Starting server-side PDF generation...");
     
-    // Validate required data before generating PDF
+    // Validate required data before sending to server
     if (!analysisData || !analysisData.propertyDetails) {
       console.error("Invalid analysis data for PDF generation");
       toast.error(t("analysis.pdfGenerationError") || "Error generating PDF: Invalid data");
       return;
     }
 
-    // Comprehensive data sanitization before PDF generation
+    // Comprehensive data sanitization before sending to server
     const sanitizedData: PropertyAnalysis = {
       propertyDetails: {
         address: analysisData.propertyDetails?.address?.substring(0, 200) || 'Property Address',
@@ -119,7 +118,7 @@ async function downloadAsPDF(
               description: point?.description?.substring(0, 200) || '',
               category: ('category' in point ? point.category : 'other') as 'kitchen' | 'location' | 'fees' | 'outdoor' | 'storage' | 'condition' | 'other'
             };
-          })
+          }) 
         : [],
       concerns: Array.isArray(analysisData.concerns) 
         ? analysisData.concerns.slice(0, 10).map((concern, idx) => {
@@ -130,100 +129,113 @@ async function downloadAsPDF(
               title: concern?.title?.substring(0, 100) || `Concern ${idx + 1}`,
               description: concern?.description?.substring(0, 200) || '',
               severity: ('severity' in concern ? concern.severity : 'medium') as 'low' | 'medium' | 'high',
-              category: ('category' in concern ? concern.category : 'other') as 'electrical' | 'structural' | 'safety' | 'pest' | 'maintenance' | 'age' | 'other',
-              estimatedCost: ('estimatedCost' in concern && concern.estimatedCost ? concern.estimatedCost.substring(0, 100) : undefined)
+              estimatedCost: concern?.estimatedCost?.substring(0, 50) || '',
+              category: ('category' in concern ? concern.category : 'other') as 'electrical' | 'structural' | 'safety' | 'pest' | 'maintenance' | 'age' | 'other'
             };
           })
         : [],
       hiddenDefects: Array.isArray(analysisData.hiddenDefects) 
-        ? analysisData.hiddenDefects.slice(0, 5).map(defect => ({
-            category: defect?.category || 'unknown',
-            riskLevel: defect?.riskLevel || 'medium',
+        ? analysisData.hiddenDefects.slice(0, 8).map(defect => ({
+            category: defect?.category || 'other' as 'shared_debt' | 'legal_deficiencies' | 'moisture_water_damage' | 'rot_fungus_pests' | 'electrical_faults' | 'drainage_leaks' | 'roof_structural_issues' | 'environmental_hazards',
+            riskLevel: defect?.riskLevel || 'medium' as 'low' | 'medium' | 'high',
             briefExplanation: defect?.briefExplanation?.substring(0, 200) || '',
             signsToLookFor: Array.isArray(defect?.signsToLookFor) 
               ? defect.signsToLookFor.slice(0, 5).map(sign => sign?.substring(0, 100) || '') 
               : [],
-            consequences: defect?.consequences?.substring(0, 300) || '',
-            preventiveMeasures: defect?.preventiveMeasures?.substring(0, 300) || '',
-            actionRequired: defect?.actionRequired?.substring(0, 200) || ''
+            consequences: defect?.consequences?.substring(0, 200) || '',
+            preventiveMeasures: defect?.preventiveMeasures?.substring(0, 200) || '',
+            actionRequired: defect?.actionRequired?.substring(0, 150) || ''
           }))
         : [],
       bottomLine: analysisData.bottomLine?.substring(0, 500) || '',
       summary: analysisData.summary?.substring(0, 1000) || ''
     };
 
-    console.log("📊 Sanitized data:", {
-      hasPropertyDetails: !!sanitizedData.propertyDetails,
-      strongPointsCount: sanitizedData.strongPoints.length,
-      concernsCount: sanitizedData.concerns.length,
-      hiddenDefectsCount: sanitizedData.hiddenDefects.length,
-      summaryLength: sanitizedData.summary.length
+    // Show loading state
+    toast.loading(t("analysis.generatingPdf") || "Generating PDF...", { id: 'pdf-generation' });
+
+    // Call server-side PDF generation API
+    const response = await fetch('/api/generate-pdf', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        analysisData: sanitizedData,
+        theme: isDarkMode ? 'dark' : 'light',
+        locale: locale
+      })
     });
 
-    // Generate PDF using react-pdf/renderer with error boundary
-    console.log("🎨 Generating PDF component...");
-    const blob = await pdf(
-      <AnalysisReportPDF 
-        analysisData={sanitizedData} 
-        t={t} 
-        isDarkMode={isDarkMode} 
-      />
-    ).toBlob();
+    // Handle server response
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Server error' }));
+      console.error('Server-side PDF generation failed:', errorData);
+      toast.error(
+        t("analysis.pdfGenerationError") || "Error generating PDF", 
+        { id: 'pdf-generation' }
+      );
+      return;
+    }
 
-    console.log("✅ PDF blob generated successfully, size:", blob.size);
+    // Check content type
+    const contentType = response.headers.get('content-type');
+    if (contentType !== 'application/pdf') {
+      console.error('Invalid response content type:', contentType);
+      toast.error(
+        t("analysis.pdfGenerationError") || "Error generating PDF: Invalid response", 
+        { id: 'pdf-generation' }
+      );
+      return;
+    }
 
-    // Create download link
+    // Convert response to blob and trigger download
+    const blob = await response.blob();
+    if (blob.size === 0) {
+      console.error('Generated PDF is empty');
+      toast.error(
+        t("analysis.pdfGenerationError") || "Error generating PDF: Empty file", 
+        { id: 'pdf-generation' }
+      );
+      return;
+    }
+
+    // Create download link and trigger download
     const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-
-    // Generate filename from property address
-    const propertyAddress =
-      sanitizedData.propertyDetails.address
-        ?.replace(/[^a-zA-Z0-9\s]/g, "")
-        ?.trim() || "Property";
-
-    const filename = `${propertyAddress}_Analysis_Report.pdf`;
+    
+    // Extract filename from Content-Disposition header or use default
+    const contentDisposition = response.headers.get('content-disposition');
+    const filename = contentDisposition 
+      ? contentDisposition.split('filename=')[1]?.replace(/"/g, '') || `property-analysis-${Date.now()}.pdf`
+      : `property-analysis-${Date.now()}.pdf`;
+    
     link.download = filename;
-
-    // Trigger download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    // Clean up the URL object
     URL.revokeObjectURL(url);
 
-    console.log("📁 PDF download triggered:", filename);
-    toast.success(t("analysis.pdfGeneratedSuccess") || "PDF generated successfully!");
+    // Success notification
+    toast.success(
+      t("analysis.pdfDownloadSuccess") || "PDF downloaded successfully!", 
+      { id: 'pdf-generation' }
+    );
+
+    console.log(`✅ Server-side PDF generated successfully: ${filename} (${blob.size} bytes)`);
+
   } catch (error) {
-    console.error("❌ Error generating PDF:", error);
-    
-    // Enhanced error reporting
-    let errorMessage = "Unknown error occurred";
-    if (error instanceof Error) {
-      errorMessage = error.message;
-      console.error("Error details:", {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      });
-    }
-    
-    // Check for specific react-pdf errors
-    if (errorMessage.includes("Invalid array length")) {
-      errorMessage = "PDF generation failed due to data size limits. Please try with smaller content.";
-    } else if (errorMessage.includes("out of memory")) {
-      errorMessage = "PDF generation failed due to memory constraints. Please try again.";
-    } else if (errorMessage.includes("render")) {
-      errorMessage = "PDF rendering failed. Please check your data and try again.";
-    }
-    
-    toast.error(t("analysis.pdfGenerationError") || `Error generating PDF: ${errorMessage}`);
+    console.error("PDF generation error:", error);
+    toast.error(
+      t("analysis.pdfGenerationError") || "Error generating PDF", 
+      { id: 'pdf-generation' }
+    );
   }
 }
 
-export default function AnalysisResultPage() {
+export default function AnalysisResultPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = use(params);
   const isDev = process.env.NODE_ENV === "development";
   const t = useTranslations("AnalysisResult");
   const { theme } = useTheme();
@@ -823,7 +835,7 @@ export default function AnalysisResultPage() {
               size="lg"
               variant="outline"
               className="px-8 border-yellow-200 dark:border-[#CA8A04] text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#374151]"
-              onClick={() => analysisData && downloadAsPDF(analysisData, t, theme === 'dark')}
+              onClick={() => analysisData && downloadAsPDF(analysisData, t, theme === 'dark', locale)}
             >
               <Download className="w-4 h-4 mr-2" />
               {t("analysis.downloadPdfButton")}

@@ -123,6 +123,8 @@
       "goBackHomeButton": "Gå tilbake hjem",
       "downloadPdfButton": "Last ned PDF",
       "pdfGeneratedSuccess": "PDF generert!",
+      "generatingPdf": "Genererer PDF...",
+      "pdfDownloadSuccess": "PDF lastet ned!",
       "pdfGenerationError": "Kunne ikke generere PDF. Prøv igjen.",
       "debugTitle": "🚧 Feilsøkingsdata (Fjern før distribusjon)",
       "rawAnalysisData": "Rådata for analyse:",

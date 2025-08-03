@@ -123,6 +123,8 @@
       "goBackHomeButton": "Go Back Home",
       "downloadPdfButton": "Download PDF",
       "pdfGeneratedSuccess": "PDF generated successfully!",
+      "generatingPdf": "Generating PDF...",
+      "pdfDownloadSuccess": "PDF downloaded successfully!",
       "pdfGenerationError": "Failed to generate PDF. Please try again.",
       "debugTitle": "🚧 Debug Data (Remove before deployment)",
       "rawAnalysisData": "Raw Analysis Data:",
