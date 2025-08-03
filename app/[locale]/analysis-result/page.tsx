@@ -109,7 +109,7 @@ async function downloadAsPDF(
         propertyType: analysisData.propertyDetails?.propertyType?.substring(0, 50) || 'property',
       },
       strongPoints: Array.isArray(analysisData.strongPoints) 
-        ? analysisData.strongPoints.slice(0, 10).map((point, idx) => {
+        ? analysisData.strongPoints.map((point, idx) => {
             if (typeof point === 'string') {
               return point.substring(0, 300);
             }
@@ -121,7 +121,7 @@ async function downloadAsPDF(
           }) 
         : [],
       concerns: Array.isArray(analysisData.concerns) 
-        ? analysisData.concerns.slice(0, 10).map((concern, idx) => {
+        ? analysisData.concerns.map((concern, idx) => {
             if (typeof concern === 'string') {
               return concern.substring(0, 300);
             }
@@ -135,12 +135,12 @@ async function downloadAsPDF(
           })
         : [],
       hiddenDefects: Array.isArray(analysisData.hiddenDefects) 
-        ? analysisData.hiddenDefects.slice(0, 8).map(defect => ({
+        ? analysisData.hiddenDefects.map(defect => ({
             category: defect?.category || 'other' as 'shared_debt' | 'legal_deficiencies' | 'moisture_water_damage' | 'rot_fungus_pests' | 'electrical_faults' | 'drainage_leaks' | 'roof_structural_issues' | 'environmental_hazards',
             riskLevel: defect?.riskLevel || 'medium' as 'low' | 'medium' | 'high',
             briefExplanation: defect?.briefExplanation?.substring(0, 200) || '',
             signsToLookFor: Array.isArray(defect?.signsToLookFor) 
-              ? defect.signsToLookFor.slice(0, 5).map(sign => sign?.substring(0, 100) || '') 
+              ? defect.signsToLookFor.map(sign => sign?.substring(0, 100) || '') 
               : [],
             consequences: defect?.consequences?.substring(0, 200) || '',
             preventiveMeasures: defect?.preventiveMeasures?.substring(0, 200) || '',

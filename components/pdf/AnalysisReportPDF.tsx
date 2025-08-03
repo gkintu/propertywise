@@ -375,7 +375,7 @@ const renderStrongPoints = (
 ) => {
   // Defensive programming - ensure we have safe data
   const safeStrongPoints = Array.isArray(strongPoints) 
-    ? strongPoints.slice(0, 10) // Limit to 10 items max
+    ? strongPoints // No longer limiting to 10 items
     : [];
 
   return (
@@ -428,7 +428,7 @@ const renderConcerns = (
 ) => {
   // Defensive programming - ensure we have safe data
   const safeConcerns = Array.isArray(concerns) 
-    ? concerns.slice(0, 10) // Limit to 10 items max
+    ? concerns // No longer limiting to 10 items
     : [];
 
   return (
@@ -503,13 +503,13 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
         propertyType: analysisData.propertyDetails?.propertyType || 'property',
       },
       strongPoints: Array.isArray(analysisData.strongPoints) 
-        ? analysisData.strongPoints.slice(0, 10)
+        ? analysisData.strongPoints
         : [],
       concerns: Array.isArray(analysisData.concerns) 
-        ? analysisData.concerns.slice(0, 10) 
+        ? analysisData.concerns 
         : [],
       hiddenDefects: Array.isArray(analysisData.hiddenDefects) 
-        ? analysisData.hiddenDefects.slice(0, 5) 
+        ? analysisData.hiddenDefects 
         : [],
       bottomLine: analysisData.bottomLine?.substring(0, 500) || 'No bottom line available',
       summary: analysisData.summary?.substring(0, 1000) || 'No summary available',
@@ -613,7 +613,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
                 
                 // Safely handle signsToLookFor array
                 const signsToLookFor = Array.isArray(defect?.signsToLookFor) 
-                  ? defect.signsToLookFor.slice(0, 5) // Limit to first 5 signs
+                  ? defect.signsToLookFor // No longer limiting signs
                   : [];
                 
                 return (
