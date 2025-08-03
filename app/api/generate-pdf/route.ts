@@ -61,13 +61,17 @@ const requestSchema = z.object({
 /**
  * Server-side translation helper
  * Creates a translation function similar to useTranslations() but for server-side use
+ * The PDF component expects to work with AnalysisResult namespace keys
  */
 function getServerTranslations(locale: string) {
   const messages = locale === 'no' ? noMessages : enMessages;
   
   return function t(key: string): string {
-    // Navigate through nested object structure using dot notation
-    const keys = key.split('.');
+    // The PDF component uses keys like 'analysis.analysisSummaryTitle' 
+    // but they should be 'AnalysisResult.analysis.analysisSummaryTitle'
+    const fullKey = `AnalysisResult.${key}`;
+    const keys = fullKey.split('.');
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let result: any = messages;
     
@@ -75,7 +79,8 @@ function getServerTranslations(locale: string) {
       if (result && typeof result === 'object' && k in result) {
         result = result[k];
       } else {
-        // Return the key if translation is not found
+        // Return the key if translation is not found (fallback to English text)
+        console.warn(`Translation not found for key: ${fullKey}`);
         return key;
       }
     }
