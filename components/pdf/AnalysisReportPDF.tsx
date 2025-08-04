@@ -52,6 +52,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   brandHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 20,
     marginBottom: 24,
     paddingBottom: 16,
     borderBottom: `1 solid ${isDarkMode ? '#374151' : '#E5E7EB'}`,
