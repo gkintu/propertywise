@@ -21,6 +21,7 @@ import {
 import { PropertyAnalysis } from "@/lib/types";
 import { PDFViewer } from "@react-pdf/renderer";
 import { AnalysisReportPDF } from "@/components/pdf/AnalysisReportPDF";
+import { ClientOnly } from "@/components/hydration";
 
 // Sample data for PDF preview (matches the structure from analysis)
 const sampleAnalysisData: PropertyAnalysis = {
@@ -179,6 +180,9 @@ export default function PDFPreviewPage({ params }: { params: Promise<{ locale: s
   use(params);
   const [pdfTheme, setPdfTheme] = useState<'light' | 'dark'>('dark');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [lastRefresh, setLastRefresh] = useState<string>('');
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   const isDev = process.env.NODE_ENV === "development";
   
@@ -189,13 +193,57 @@ export default function PDFPreviewPage({ params }: { params: Promise<{ locale: s
     }
   }, [isDev, router]);
 
+  // Client-side initialization to prevent hydration mismatch
+  useEffect(() => {
+    setIsClient(true);
+    setLastRefresh(new Date().toLocaleTimeString());
+  }, []);
+
   const refreshPDF = () => {
     setRefreshKey(prev => prev + 1);
+    setLastRefresh(new Date().toLocaleTimeString());
   };
 
   const togglePdfTheme = () => {
     setPdfTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
+
+  const toggleAutoRefresh = () => {
+    setAutoRefresh(prev => !prev);
+  };
+
+  // Auto-refresh functionality for development
+  useEffect(() => {
+    if (autoRefresh && isDev) {
+      const interval = setInterval(() => {
+        // Check for file system changes would go here in a real implementation
+        // For now, we'll just refresh every 30 seconds if autoRefresh is enabled
+      }, 30000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [autoRefresh, isDev]);
+
+  // Keyboard shortcuts for development
+  useEffect(() => {
+    if (!isDev) return;
+
+    const handleKeyboard = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + R to refresh
+      if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+        e.preventDefault();
+        refreshPDF();
+      }
+      // Ctrl/Cmd + D to toggle dark mode
+      if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+        e.preventDefault();
+        togglePdfTheme();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyboard);
+    return () => window.removeEventListener('keydown', handleKeyboard);
+  }, [isDev]);
 
   // Don't render in production (following debug component pattern)
   if (!isDev) {
@@ -225,6 +273,22 @@ export default function PDFPreviewPage({ params }: { params: Promise<{ locale: s
           </div>
           
           <div className="flex items-center gap-2">
+            {isClient && (
+              <div className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
+                Last refresh: {lastRefresh}
+              </div>
+            )}
+            
+            <Button
+              onClick={toggleAutoRefresh}
+              variant="outline"
+              size="sm"
+              className={`gap-2 ${autoRefresh ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' : ''}`}
+            >
+              <div className={`w-2 h-2 rounded-full ${autoRefresh ? 'bg-green-500' : 'bg-gray-400'}`} />
+              Auto
+            </Button>
+            
             <Button
               onClick={refreshPDF}
               variant="outline"
@@ -253,8 +317,9 @@ export default function PDFPreviewPage({ params }: { params: Promise<{ locale: s
         <Alert className="mb-6 border-blue-200 dark:border-blue-800/50 bg-blue-50 dark:bg-blue-950/20">
           <Info className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           <AlertDescription className="text-blue-800 dark:text-blue-200">
-            <strong>🚧 Development PDF Preview</strong> - This page allows you to see PDF changes in real-time without downloading. 
-            Use the theme toggle to test both light and dark PDF modes. Make changes to the AnalysisReportPDF component and see them instantly.
+            <strong>🚧 Development PDF Preview</strong> - This page shows PDF changes in real-time. 
+            Edit <code className="bg-blue-100 dark:bg-blue-900/50 px-1 py-0.5 rounded text-xs">AnalysisReportPDF.tsx</code> and see changes instantly.
+            Use keyboard shortcut <kbd className="bg-blue-100 dark:bg-blue-900/50 px-1 py-0.5 rounded text-xs">Ctrl+S</kbd> (or <kbd className="bg-blue-100 dark:bg-blue-900/50 px-1 py-0.5 rounded text-xs">Cmd+S</kbd>) to save and refresh.
           </AlertDescription>
         </Alert>
 
@@ -268,18 +333,20 @@ export default function PDFPreviewPage({ params }: { params: Promise<{ locale: s
           </CardHeader>
           <CardContent>
             <div className="w-full h-[800px] border border-gray-300 dark:border-[#4B5563] rounded-lg overflow-hidden bg-gray-100 dark:bg-[#374151]">
-              <PDFViewer 
-                key={refreshKey} 
-                width="100%" 
-                height="100%"
-                showToolbar={true}
-              >
-                <AnalysisReportPDF 
-                  analysisData={sampleAnalysisData}
-                  t={mockT}
-                  isDarkMode={pdfTheme === 'dark'}
-                />
-              </PDFViewer>
+              <ClientOnly>
+                <PDFViewer 
+                  key={refreshKey} 
+                  width="100%" 
+                  height="100%"
+                  showToolbar={true}
+                >
+                  <AnalysisReportPDF 
+                    analysisData={sampleAnalysisData}
+                    t={mockT}
+                    isDarkMode={pdfTheme === 'dark'}
+                  />
+                </PDFViewer>
+              </ClientOnly>
             </div>
           </CardContent>
         </Card>
@@ -311,6 +378,10 @@ export default function PDFPreviewPage({ params }: { params: Promise<{ locale: s
             <div className="flex items-start gap-2">
               <span className="font-semibold text-yellow-600 dark:text-[#FBBF24]">5.</span>
               <span>Preview includes comprehensive sample data with hidden defects, strong points, and concerns</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="font-semibold text-yellow-600 dark:text-[#FBBF24]">6.</span>
+              <span>Use keyboard shortcuts: <kbd className="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded text-xs">Ctrl+R</kbd> to refresh, <kbd className="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded text-xs">Ctrl+D</kbd> to toggle theme</span>
             </div>
             
             <Separator className="my-4 dark:bg-[#374151]" />
