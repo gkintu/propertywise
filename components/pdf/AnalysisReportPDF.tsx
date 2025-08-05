@@ -265,7 +265,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 4,
-    marginBottom: 6,
+    marginBottom: 8,
   },
   propertyDetailIconContainer: {
     backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.2)' : '#E0E7FF',
@@ -291,7 +291,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: isDarkMode ? '#FFFFFF' : '#111827',
-    marginBottom: 2,
+    marginBottom: 4,
   },
   propertyDetailCurrency: {
     fontSize: 12,
@@ -301,20 +301,21 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   propertyDetailSubtext: {
     fontSize: 9,
     color: isDarkMode ? '#9CA3AF' : '#6B7280',
-    marginTop: 0,
+    marginTop: 8,
   },
   propertyDetailBadge: {
-    backgroundColor: isDarkMode ? 'rgba(52, 211, 153, 0.2)' : '#D1FAE5',
-    borderRadius: 6,
+    borderWidth: 1,
+    borderRadius: 5,
     paddingVertical: 3,
     paddingHorizontal: 7,
-    marginTop: 6,
+    marginTop: 8,
     alignSelf: 'flex-start',
   },
   propertyDetailBadgeText: {
     fontSize: 8,
     fontWeight: 'bold',
     color: isDarkMode ? '#A7F3D0' : '#065F46',
+    lineHeight: 1,
   },
   dot: {
     width: 8,
@@ -659,8 +660,11 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
                 <Text style={styles.propertyDetailValue}>
                   {(t && t(`analysis.propertyTypes.${safeAnalysisData.propertyDetails.propertyType}`)) || safeAnalysisData.propertyDetails.propertyType}
                 </Text>
-                <View style={styles.propertyDetailBadge}>
-                  <Text style={styles.propertyDetailBadgeText}>
+                <View style={[styles.propertyDetailBadge, {
+                  backgroundColor: isDarkMode ? 'rgba(52, 211, 153, 0.1)' : '#ECFDF5',
+                  borderColor: isDarkMode ? '#34D399' : '#10B981',
+                }]}>
+                  <Text style={[styles.propertyDetailBadgeText, { color: isDarkMode ? '#A7F3D0' : '#065F46' }]}>
                     {safeAnalysisData.propertyDetails.bedrooms}-room apartment
                   </Text>
                 </View>
@@ -719,7 +723,10 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
                 <Text style={styles.propertyDetailValue}>
                   {safeAnalysisData.propertyDetails.yearBuilt}
                 </Text>
-                <View style={[styles.propertyDetailBadge, { backgroundColor: isDarkMode ? 'rgba(192, 132, 252, 0.2)' : '#F3E8FF' }]}>
+                <View style={[styles.propertyDetailBadge, {
+                  backgroundColor: isDarkMode ? 'rgba(192, 132, 252, 0.1)' : '#F5F3FF',
+                  borderColor: isDarkMode ? '#C084FC' : '#9333EA',
+                }]}>
                   <Text style={[styles.propertyDetailBadgeText, { color: isDarkMode ? '#E9D5FF' : '#8B5CF6' }]}>
                     {(() => {
                       const age = new Date().getFullYear() - safeAnalysisData.propertyDetails.yearBuilt;
