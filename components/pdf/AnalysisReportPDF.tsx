@@ -544,8 +544,8 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
               </Text>
             </View>
             <Text style={styles.subtitle}>
-              {(t && t('analysis.reportGeneratedOn', { date: new Date().toLocaleDateString() })) 
-                || `Report generated on ${new Date().toLocaleDateString()}`}
+              {(t && t('analysis.reportGeneratedOn', { date: new Date().toLocaleDateString('en-CA') }))
+                || `Report generated on ${new Date().toLocaleDateString('en-CA')}`}
             </Text>
           </View>
 

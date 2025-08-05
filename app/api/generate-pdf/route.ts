@@ -66,15 +66,15 @@ const requestSchema = z.object({
 function getServerTranslations(locale: string) {
   const messages = locale === 'no' ? noMessages : enMessages;
   
-  return function t(key: string): string {
-    // The PDF component uses keys like 'analysis.analysisSummaryTitle' 
+  return function t(key: string, values?: Record<string, string | number>): string {
+    // The PDF component uses keys like 'analysis.analysisSummaryTitle'
     // but they should be 'AnalysisResult.analysis.analysisSummaryTitle'
     const fullKey = `AnalysisResult.${key}`;
     const keys = fullKey.split('.');
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let result: any = messages;
-    
+
     for (const k of keys) {
       if (result && typeof result === 'object' && k in result) {
         result = result[k];
@@ -84,8 +84,19 @@ function getServerTranslations(locale: string) {
         return key;
       }
     }
-    
-    return typeof result === 'string' ? result : key;
+
+    if (typeof result === 'string') {
+      if (values) {
+        return result.replace(/\{(\w+)\}/g, (placeholder, placeholderKey) => {
+          return values[placeholderKey] !== undefined
+            ? String(values[placeholderKey])
+            : placeholder;
+        });
+      }
+      return result;
+    }
+
+    return key;
   };
 }
 
