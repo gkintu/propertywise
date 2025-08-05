@@ -20,7 +20,9 @@ export type IconName =
   | 'Error'
   | 'FileText'
   | 'Eye'
-  | 'TrendingUp';
+  | 'TrendingUp'
+  | 'Maximize2'
+  | 'Calendar';
 
 interface PDFIconProps {
   name: IconName;
@@ -118,6 +120,15 @@ const iconPaths: Record<IconName, { paths: string[]; viewBox?: string; strokeWid
   Eye: {
     paths: ['M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z'],
     circles: [{ cx: '12', cy: '12', r: '3' }],
+    viewBox: '0 0 24 24'
+  },
+  Maximize2: {
+    paths: ['M15 3h6v6', 'M9 21H3v-6', 'M21 3l-7 7', 'M3 21l7-7'],
+    viewBox: '0 0 24 24'
+  },
+  Calendar: {
+    paths: ['M8 2v4', 'M16 2v4', 'M3 10h18'],
+    rects: [{ x: '3', y: '4', width: '18', height: '18', rx: '2' }],
     viewBox: '0 0 24 24'
   }
 };

@@ -10,7 +10,9 @@ import {
   EyeIcon, 
   TrendingUpIcon, 
   InfoIcon, 
-  FileTextIcon 
+  FileTextIcon,
+  Maximize2Icon,
+  CalendarIcon,
 } from './icons';
 
 /**
@@ -239,6 +241,74 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     borderRadius: 8,
     padding: 20,
     marginBottom: 20,
+  },
+
+  propertyDetailsCard: {
+    backgroundColor: isDarkMode ? 'rgba(17, 24, 39, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+    border: `1 solid ${isDarkMode ? '#4B5563' : '#E5E7EB'}`,
+    borderRadius: 12,
+    padding: 24,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+  },
+  propertyDetailsGrid: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  propertyDetailItem: {
+    flex: 1,
+  },
+  propertyDetailHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 6,
+  },
+  propertyDetailIconContainer: {
+    backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.2)' : '#E0E7FF',
+    borderRadius: 6,
+    padding: 4,
+  },
+  propertyDetailLabel: {
+    fontSize: 10,
+    color: isDarkMode ? '#D1D5DB' : '#4B5563',
+    fontWeight: 'medium',
+  },
+  propertyDetailValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: isDarkMode ? '#FFFFFF' : '#111827',
+  },
+  propertyDetailCurrency: {
+    fontSize: 14,
+    fontWeight: 'normal',
+    color: isDarkMode ? '#9CA3AF' : '#6B7280',
+  },
+  propertyDetailSubtext: {
+    fontSize: 10,
+    color: isDarkMode ? '#9CA3AF' : '#6B7280',
+    marginTop: 2,
+  },
+  propertyDetailBadge: {
+    backgroundColor: isDarkMode ? 'rgba(52, 211, 153, 0.2)' : '#D1FAE5',
+    borderRadius: 4,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    marginTop: 4,
+    alignSelf: 'flex-start',
+  },
+  propertyDetailBadgeText: {
+    fontSize: 9,
+    fontWeight: 'medium',
+    color: isDarkMode ? '#A7F3D0' : '#065F46',
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
 
   hiddenDefectsTitle: {
@@ -562,16 +632,86 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
             </Text>
           </View>
 
-          {/* Market Position Section */}
-          <View style={styles.marketPositionBox}>
-            <Text style={styles.marketPositionTitle}>
-              {(t && t('analysis.marketPosition')) || 'Market Position'}
-            </Text>
-            <Text style={styles.marketPositionText}>
-              {safeAnalysisData.propertyDetails.bedrooms} bedroom {safeAnalysisData.propertyDetails.propertyType} • 
-              {safeAnalysisData.propertyDetails.price.toLocaleString()} {safeAnalysisData.propertyDetails.currency} • 
-              {safeAnalysisData.propertyDetails.size}m² • Built {safeAnalysisData.propertyDetails.yearBuilt}
-            </Text>
+          {/* Property Details Section */}
+          <View style={styles.propertyDetailsCard} wrap={false}>
+            <View style={styles.propertyDetailsGrid}>
+              {/* Property Type */}
+              <View style={styles.propertyDetailItem}>
+                <View style={styles.propertyDetailHeader}>
+                  <View style={styles.propertyDetailIconContainer}>
+                    <HomeIcon size={12} color={isDarkMode ? '#A5B4FC' : '#4F46E5'} />
+                  </View>
+                  <Text style={styles.propertyDetailLabel}>
+                    {(t && t('analysis.marketPosition')) || 'Property Type'}
+                  </Text>
+                </View>
+                <Text style={styles.propertyDetailValue}>
+                  {(t && t(`analysis.propertyTypes.${safeAnalysisData.propertyDetails.propertyType}`)) || safeAnalysisData.propertyDetails.propertyType}
+                </Text>
+                <View style={styles.propertyDetailBadge}>
+                  <Text style={styles.propertyDetailBadgeText}>
+                    {safeAnalysisData.propertyDetails.bedrooms}-room apartment
+                  </Text>
+                </View>
+              </View>
+
+              {/* Price */}
+              <View style={styles.propertyDetailItem}>
+                <View style={styles.propertyDetailHeader}>
+                  <View style={[styles.dot, { backgroundColor: isDarkMode ? '#34D399' : '#10B981' }]} />
+                  <Text style={styles.propertyDetailLabel}>
+                    {(t && t('analysis.priceLabel')) || 'Price'}
+                  </Text>
+                </View>
+                <Text style={styles.propertyDetailValue}>
+                  {safeAnalysisData.propertyDetails.price.toLocaleString()}
+                  <Text style={styles.propertyDetailCurrency}>
+                    {' '}{safeAnalysisData.propertyDetails.currency || 'NOK'}
+                  </Text>
+                </Text>
+                <Text style={styles.propertyDetailSubtext}>
+                  {(t && t('analysis.askingPrice')) || 'Asking Price'}
+                </Text>
+              </View>
+
+              {/* Size */}
+              <View style={styles.propertyDetailItem}>
+                <View style={styles.propertyDetailHeader}>
+                  <Maximize2Icon size={12} color={isDarkMode ? '#A5B4FC' : '#4F46E5'} />
+                  <Text style={styles.propertyDetailLabel}>
+                    {(t && t('analysis.sizeLabel')) || 'Size'}
+                  </Text>
+                </View>
+                <Text style={styles.propertyDetailValue}>
+                  {safeAnalysisData.propertyDetails.size}
+                  <Text style={styles.propertyDetailCurrency}> m²</Text>
+                </Text>
+                <Text style={styles.propertyDetailSubtext}>
+                  {(t && t('analysis.totalArea')) || 'Total Area'}
+                </Text>
+              </View>
+
+              {/* Year Built */}
+              <View style={styles.propertyDetailItem}>
+                <View style={styles.propertyDetailHeader}>
+                  <CalendarIcon size={12} color={isDarkMode ? '#C084FC' : '#9333EA'} />
+                  <Text style={styles.propertyDetailLabel}>
+                    {(t && t('analysis.yearBuiltLabel')) || 'Year Built'}
+                  </Text>
+                </View>
+                <Text style={styles.propertyDetailValue}>
+                  {safeAnalysisData.propertyDetails.yearBuilt}
+                </Text>
+                <View style={[styles.propertyDetailBadge, { backgroundColor: isDarkMode ? 'rgba(192, 132, 252, 0.2)' : '#F3E8FF' }]}>
+                  <Text style={[styles.propertyDetailBadgeText, { color: isDarkMode ? '#E9D5FF' : '#8B5CF6' }]}>
+                    {(() => {
+                      const age = new Date().getFullYear() - safeAnalysisData.propertyDetails.yearBuilt;
+                      return age <= 0 ? (t && t('analysis.ageLabels.new')) || 'New' : (t && t('analysis.ageLabels.yearsOld', { years: age })) || `${age} years old`;
+                    })()}
+                  </Text>
+                </View>
+              </View>
+            </View>
           </View>
 
           {/* Key Findings Section */}

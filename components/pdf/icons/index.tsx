@@ -49,6 +49,14 @@ export const TrendingUpIcon = ({ size = 16, color = '#047857' }) => (
   <PDFIcon name="TrendingUp" size={size} color={color} />
 );
 
+export const Maximize2Icon = ({ size = 16, color = '#047857' }) => (
+  <PDFIcon name="Maximize2" size={size} color={color} />
+);
+
+export const CalendarIcon = ({ size = 16, color = '#047857' }) => (
+  <PDFIcon name="Calendar" size={size} color={color} />
+);
+
 export const InfoIcon = ({ size = 16, color = '#991B1B' }) => (
   <PDFIcon name="Info" size={size} color={color} />
 );
