@@ -136,19 +136,16 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     lineHeight: 1.4,
   },
 
-  // Two-column layout for key findings
-  twoColumnLayout: {
-    flexDirection: 'row',
-    gap: 20,
-    marginTop: 16,
+  columnContainer: {
+    flexDirection: 'column',
   },
 
-  columnContainer: {
-    flex: 1,
-    minHeight: 40,
-  },
+  
 
   // Strong points styling (green theme)
+  strongPointsContainer: {
+    marginBottom: 20, // Added margin to push concerns down
+  },
   strongPointsHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -167,7 +164,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     border: `1 solid ${isDarkMode ? '#166534' : '#D1FAE5'}`,
     borderRadius: 6,
     padding: 12,
-    marginBottom: 8,
+    marginBottom: 12,
   },
 
   strongPointHeader: {
@@ -210,7 +207,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     border: `1 solid ${isDarkMode ? '#7f1d1d' : '#FECACA'}`,
     borderRadius: 6,
     padding: 12,
-    marginBottom: 8,
+    marginBottom: 12,
   },
 
   concernHeader: {
@@ -739,26 +736,21 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
           </View>
 
           {/* Key Findings Section */}
-          <View style={styles.card} minPresenceAhead={200}>
-            <View style={styles.cardHeader}>
-              <EyeIcon size={16} color={iconColors.eye} />
-              <Text style={styles.cardTitle}>
-                {(t && t('analysis.keyFindingsTitle')) || 'Key Findings'}
-              </Text>
-            </View>
+          <View style={styles.card}>
             
-            <View style={styles.twoColumnLayout}>
+            <View style={styles.strongPointsContainer}>
               {/* Strong Points Column */}
               {renderStrongPoints(safeAnalysisData.strongPoints, styles, iconColors, t)}
+            </View>
               
               {/* Concerns Column */}
               {renderConcerns(safeAnalysisData.concerns, styles, iconColors, t)}
-            </View>
+            
           </View>
 
           {/* Hidden Defects Section */}
           {safeAnalysisData.hiddenDefects.length > 0 && (
-            <View style={styles.hiddenDefectsCard} minPresenceAhead={150}>
+            <View style={styles.hiddenDefectsCard}>
               <View style={styles.cardHeader}>
                 <EyeIcon size={16} color={iconColors.eye} />
                 <Text style={styles.hiddenDefectsTitle}>
@@ -782,7 +774,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
                   : [];
                 
                 return (
-                  <View key={`defect-${idx}`} style={styles.hiddenDefectItem} wrap={false} minPresenceAhead={50}>
+                  <View key={`defect-${idx}`} style={styles.hiddenDefectItem} wrap={false}>
                     <View style={styles.hiddenDefectHeader}>
                       <Text style={styles.hiddenDefectCategory}>
                         {(t && t(`hiddenDefects.categories.${category}.title`)) || category}
