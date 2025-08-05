@@ -263,7 +263,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   },
   propertyDetailHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     gap: 4,
     marginBottom: 6,
   },
@@ -276,11 +276,16 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     width: 22,
     height: 22,
   },
+  propertyDetailIconWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 22,
+    height: 22,
+  },
   propertyDetailLabel: {
     fontSize: 10,
     color: isDarkMode ? '#D1D5DB' : '#4B5563',
     fontWeight: 'medium',
-    paddingTop: 1,
   },
   propertyDetailValue: {
     fontSize: 18,
@@ -664,7 +669,9 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
               {/* Price */}
               <View style={styles.propertyDetailItem}>
                 <View style={styles.propertyDetailHeader}>
-                  <View style={[styles.dot, { backgroundColor: isDarkMode ? '#34D399' : '#10B981' }]} />
+                  <View style={styles.propertyDetailIconWrapper}>
+                    <View style={[styles.dot, { backgroundColor: isDarkMode ? '#34D399' : '#10B981' }]} />
+                  </View>
                   <Text style={styles.propertyDetailLabel}>
                     {(t && t('analysis.priceLabel')) || 'Price'}
                   </Text>
@@ -683,7 +690,9 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
               {/* Size */}
               <View style={styles.propertyDetailItem}>
                 <View style={styles.propertyDetailHeader}>
-                  <Maximize2Icon size={12} color={isDarkMode ? '#A5B4FC' : '#4F46E5'} />
+                  <View style={styles.propertyDetailIconWrapper}>
+                    <Maximize2Icon size={14} color={isDarkMode ? '#A5B4FC' : '#4F46E5'} />
+                  </View>
                   <Text style={styles.propertyDetailLabel}>
                     {(t && t('analysis.sizeLabel')) || 'Size'}
                   </Text>
@@ -700,7 +709,9 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
               {/* Year Built */}
               <View style={styles.propertyDetailItem}>
                 <View style={styles.propertyDetailHeader}>
-                  <CalendarIcon size={12} color={isDarkMode ? '#C084FC' : '#9333EA'} />
+                  <View style={styles.propertyDetailIconWrapper}>
+                    <CalendarIcon size={14} color={isDarkMode ? '#C084FC' : '#9333EA'} />
+                  </View>
                   <Text style={styles.propertyDetailLabel}>
                     {(t && t('analysis.yearBuiltLabel')) || 'Year Built'}
                   </Text>
