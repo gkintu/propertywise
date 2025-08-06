@@ -22,6 +22,7 @@ interface AnalysisReportPDFProps {
   analysisData: PropertyAnalysis;
   t: TranslationFunction;
   isDarkMode?: boolean;
+  locale?: 'en' | 'no';
 }
 
 /**
@@ -559,7 +560,8 @@ const renderConcerns = (
 export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({ 
   analysisData, 
   t, 
-  isDarkMode = false 
+  isDarkMode = false,
+  locale = 'en',
 }) => {
   // Comprehensive data validation and error handling
   try {
@@ -598,6 +600,18 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
     const styles = createStyles(isDarkMode);
     const iconColors = getIconColors(isDarkMode);
 
+    // Conditionally format the date based on locale
+    const today = new Date();
+    let formattedDate;
+    if (locale === 'no') {
+      const day = String(today.getDate()).padStart(2, '0');
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const year = today.getFullYear();
+      formattedDate = `${day}-${month}-${year}`;
+    } else {
+      formattedDate = today.toLocaleDateString('en-CA'); // YYYY-MM-DD
+    }
+
     return (
       <Document
         title={`PropertyWise Analysis - ${safeAnalysisData.propertyDetails.address}`}
@@ -623,8 +637,8 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
               </Text>
             </View>
             <Text style={styles.subtitle}>
-              {(t && t('analysis.reportGeneratedOn', { date: new Date().toLocaleDateString('en-CA') }))
-                || `Report generated on ${new Date().toLocaleDateString('en-CA')}`}
+              {(t && t('analysis.reportGeneratedOn', { date: formattedDate }))
+                || `Report generated on ${formattedDate}`}
             </Text>
           </View>
 

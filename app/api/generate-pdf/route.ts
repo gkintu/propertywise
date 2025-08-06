@@ -144,12 +144,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         analysisData,
         t,
         isDarkMode,
+        locale,
       }) as React.ReactElement
     );
 
-    // Generate filename with timestamp
-    const timestamp = Date.now();
-    const filename = `property-analysis-${timestamp}.pdf`;
+    // Generate filename with property address and date
+    const address = analysisData.propertyDetails.address;
+    const sanitizedAddress = address.replace(/[^a-zA-Z0-9\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
+    
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+    const year = String(today.getFullYear()).slice(-2);
+    const formattedDate = `${day}${month}${year}`;
+
+    const filename = `property-analysis-${sanitizedAddress}-${formattedDate}.pdf`;
 
     // Return streaming response with proper headers
     return new NextResponse(toWebStream(stream), {
