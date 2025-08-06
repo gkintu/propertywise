@@ -60,3 +60,40 @@ export const CalendarIcon = ({ size = 16, color = '#047857' }) => (
 export const InfoIcon = ({ size = 16, color = '#991B1B' }) => (
   <PDFIcon name="Info" size={size} color={color} />
 );
+
+// PDF-specific defect icons
+const MoistureWaterDamageIcon = ({ size = 16, color = '#000000' }) => (
+  <PDFIcon name="Droplets" size={size} color={color} />
+);
+const ElectricalFaultsIcon = ({ size = 16, color = '#000000' }) => (
+  <PDFIcon name="Zap" size={size} color={color} />
+);
+const LegalDeficienciesIcon = ({ size = 16, color = '#000000' }) => (
+  <PDFIcon name="Scale" size={size} color={color} />
+);
+const RotFungusPestsIcon = ({ size = 16, color = '#000000' }) => (
+  <PDFIcon name="Bug" size={size} color={color} />
+);
+const DrainageLeaksIcon = ({ size = 16, color = '#000000' }) => (
+  <PDFIcon name="Wrench" size={size} color={color} />
+);
+const EnvironmentalHazardsIcon = ({ size = 16, color = '#000000' }) => (
+  <PDFIcon name="Beaker" size={size} color={color} />
+);
+const SharedDebtIcon = ({ size = 16, color = '#000000' }) => (
+  <PDFIcon name="DollarSign" size={size} color={color} />
+);
+const RoofStructuralIssuesIcon = ({ size = 16, color = '#000000' }) => (
+  <PDFIcon name="Home" size={size} color={color} />
+);
+
+export const pdfDefectIcons = {
+  shared_debt: SharedDebtIcon,
+  legal_deficiencies: LegalDeficienciesIcon,
+  moisture_water_damage: MoistureWaterDamageIcon,
+  rot_fungus_pests: RotFungusPestsIcon,
+  electrical_faults: ElectricalFaultsIcon,
+  drainage_leaks: DrainageLeaksIcon,
+  roof_structural_issues: RoofStructuralIssuesIcon,
+  environmental_hazards: EnvironmentalHazardsIcon,
+};

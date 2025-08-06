@@ -13,6 +13,7 @@ import {
   FileTextIcon,
   Maximize2Icon,
   CalendarIcon,
+  pdfDefectIcons,
 } from './icons';
 
 /**
@@ -232,10 +233,11 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     marginTop: 4,
   },
 
-  // Hidden defects section (purple theme)
+  // Hidden defects section
   hiddenDefectsCard: {
+    // Match the card container background (Strong Selling Points container)
     backgroundColor: isDarkMode ? '#1F2937' : '#FFFFFF',
-    border: `1 solid ${isDarkMode ? '#7C3AED' : '#A855F7'}`,
+    border: `1 solid ${isDarkMode ? '#4B5563' : '#E5E7EB'}`,
     borderRadius: 8,
     padding: 20,
     marginBottom: 20,
@@ -325,7 +327,6 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: isDarkMode ? '#C4B5FD' : '#7C2D12',
-    marginBottom: 8,
   },
 
   hiddenDefectsDescription: {
@@ -336,7 +337,7 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
   },
 
   hiddenDefectItem: {
-    backgroundColor: isDarkMode ? '#374151' : '#F9FAFB',
+    backgroundColor: isDarkMode ? '#111827' : '#F9FAFB',
     border: `1 solid ${isDarkMode ? '#4B5563' : '#E5E7EB'}`,
     borderRadius: 6,
     padding: 12,
@@ -385,6 +386,26 @@ const createStyles = (isDarkMode: boolean) => StyleSheet.create({
     color: isDarkMode ? '#D1D5DB' : '#374151',
     lineHeight: 1.3,
     marginBottom: 2,
+  },
+
+  riskIndicator: {
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
+  
+  briefExplanationBox: {
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 8,
+    marginBottom: 8,
+  },
+
+  briefExplanationText: {
+    fontSize: 10,
+    lineHeight: 1.4,
   },
 
   // Bottom line alert (yellow theme)
@@ -779,55 +800,84 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
                 // Safe data extraction with fallbacks
                 const category = defect?.category || 'unknown';
                 const riskLevel = defect?.riskLevel || 'medium';
-                const consequences = defect?.consequences || 'No consequences specified';
-                const preventiveMeasures = defect?.preventiveMeasures || 'No preventive measures specified';
-                
-                // Safely handle signsToLookFor array
-                const signsToLookFor = Array.isArray(defect?.signsToLookFor) 
-                  ? defect.signsToLookFor // No longer limiting signs
-                  : [];
+                const briefExplanation = defect?.briefExplanation || 'No explanation available.';
+                const consequences = defect?.consequences || 'No consequences specified.';
+                const preventiveMeasures = defect?.preventiveMeasures || 'No preventive measures specified.';
+                const actionRequired = defect?.actionRequired;
+
+                const Icon = pdfDefectIcons[category];
+
+                const riskStyles = {
+                  low: {
+                    backgroundColor: isDarkMode ? '#166534' : '#D1FAE5',
+                    color: isDarkMode ? '#A7F3D0' : '#065F46',
+                  },
+      
+                  medium: {
+                    backgroundColor: isDarkMode ? '#854d0e' : '#FEF3C7',
+                    color: isDarkMode ? '#FBBF24' : '#92400E',
+                  },
+      
+                  high: {
+                    backgroundColor: isDarkMode ? '#991B1B' : '#FEE2E2',
+                    color: isDarkMode ? '#FCA5A5' : '#991B1B',
+                  },
+                };
+
+                const briefExplanationStyle = {
+                  borderColor: isDarkMode ? '#ca8a04' : '#FEF08A',
+                  backgroundColor: isDarkMode ? '#451a0333' : '#FEFCE8',
+                  color: isDarkMode ? '#ffc657' : '#b3621d',
+                };
                 
                 return (
                   <View key={`defect-${idx}`} style={styles.hiddenDefectItem} wrap={false}>
                     <View style={styles.hiddenDefectHeader}>
+                      {Icon && <Icon size={14} color={isDarkMode ? '#F9FAFB' : '#111827'} />}
                       <Text style={styles.hiddenDefectCategory}>
                         {(t && t(`hiddenDefects.categories.${category}.title`)) || category}
                       </Text>
-                      <Text style={styles.hiddenDefectRisk}>
+                      <Text style={[styles.riskIndicator, riskStyles[riskLevel]]}>
                         {(t && t(`hiddenDefects.riskLevels.${riskLevel}`)) || riskLevel}
                       </Text>
                     </View>
                     
-                    <Text style={styles.hiddenDefectLabel}>
-                      {(t && t('hiddenDefects.signsToLookFor')) || 'Signs to look for'}:
-                    </Text>
-                    <View style={{ marginBottom: 8 }}>
-                      {signsToLookFor.length > 0 ? (
-                        signsToLookFor.map((sign, signIdx) => (
-                          <Text key={`sign-${signIdx}`} style={styles.hiddenDefectListItem}>
-                            • {sign?.substring(0, 100) || 'No description'}
-                          </Text>
-                        ))
-                      ) : (
-                        <Text style={styles.hiddenDefectText}>
-                          {(t && t('hiddenDefects.noSignsAvailable')) || 'No signs specified'}
+                    <View style={{ paddingLeft: 22, gap: 8 }}>
+                      <View style={[styles.briefExplanationBox, { borderColor: briefExplanationStyle.borderColor, backgroundColor: briefExplanationStyle.backgroundColor, }]}>
+                        <Text style={[styles.briefExplanationText, { color: briefExplanationStyle.color, }]}>
+                          {briefExplanation}
                         </Text>
+                      </View>
+                      
+                      <View>
+                        <Text style={styles.hiddenDefectLabel}>
+                          {(t && t('hiddenDefects.consequences')) || 'Consequences'}:
+                        </Text>
+                        <Text style={styles.hiddenDefectText}>
+                          {consequences.substring(0, 200)}
+                        </Text>
+                      </View>
+                      
+                      <View>
+                        <Text style={styles.hiddenDefectLabel}>
+                          {(t && t('hiddenDefects.preventiveMeasures')) || 'Preventive measures'}:
+                        </Text>
+                        <Text style={styles.hiddenDefectText}>
+                          {preventiveMeasures.substring(0, 200)}
+                        </Text>
+                      </View>
+
+                      {actionRequired && (
+                        <View>
+                          <Text style={styles.hiddenDefectLabel}>
+                            {(t && t('hiddenDefects.actionRequired')) || 'Action Required'}:
+                          </Text>
+                          <Text style={styles.hiddenDefectText}>
+                            {actionRequired.substring(0, 200)}
+                          </Text>
+                        </View>
                       )}
                     </View>
-                    
-                    <Text style={styles.hiddenDefectLabel}>
-                      {(t && t('hiddenDefects.consequences')) || 'Consequences'}:
-                    </Text>
-                    <Text style={styles.hiddenDefectText}>
-                      {consequences.substring(0, 200)}
-                    </Text>
-                    
-                    <Text style={styles.hiddenDefectLabel}>
-                      {(t && t('hiddenDefects.preventiveMeasures')) || 'Preventive measures'}:
-                    </Text>
-                    <Text style={styles.hiddenDefectText}>
-                      {preventiveMeasures.substring(0, 200)}
-                    </Text>
                   </View>
                 );
               })}
