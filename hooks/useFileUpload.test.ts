@@ -208,8 +208,6 @@ describe('useFileUpload', () => {
         jest.advanceTimersByTime(1000)
       })
       
-      const validFile = createMockFile('document.pdf', 1024 * 1024, 'application/pdf')
-
       const mockEvent = {
         preventDefault: jest.fn(),
         stopPropagation: jest.fn(),
@@ -239,8 +237,6 @@ describe('useFileUpload', () => {
         jest.advanceTimersByTime(1000)
       })
       
-      const invalidFile = createMockFile('document.txt', 1024, 'text/plain')
-
       const mockEvent = {
         preventDefault: jest.fn(),
         stopPropagation: jest.fn(),
@@ -265,8 +261,6 @@ describe('useFileUpload', () => {
         jest.advanceTimersByTime(1000)
       })
       
-      const largeFile = createMockFile('large.pdf', 51 * 1024 * 1024, 'application/pdf')
-
       const mockEvent = {
         preventDefault: jest.fn(),
         stopPropagation: jest.fn(),
@@ -291,9 +285,6 @@ describe('useFileUpload', () => {
         jest.advanceTimersByTime(1000)
       })
       
-      const file1 = createMockFile('doc1.pdf')
-      const file2 = createMockFile('doc2.pdf')
-
       const mockEvent = {
         preventDefault: jest.fn(),
         stopPropagation: jest.fn(),
@@ -314,14 +305,13 @@ describe('useFileUpload', () => {
   describe('file input selection', () => {
     it('should handle valid file selection', async () => {
       const { result } = renderHook(() => useFileUpload())
+      const validFile = createMockFile('selected.pdf')
       
       // Fast-forward past the cleanup timeout
       act(() => {
         jest.advanceTimersByTime(1000)
       })
       
-      const validFile = createMockFile('selected.pdf')
-
       const mockEvent = {
         target: {
           files: [validFile],
@@ -349,8 +339,6 @@ describe('useFileUpload', () => {
         jest.advanceTimersByTime(1000)
       })
       
-      const invalidFile = createMockFile('invalid.txt', 1024, 'text/plain')
-
       const mockTarget = {
         files: [invalidFile],
         value: 'some-value'

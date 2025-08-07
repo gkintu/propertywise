@@ -1,11 +1,22 @@
 /**
  * @jest-environment jsdom
  */
-import React from 'react'
+import React, { use } from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import AnalysisResultPage from './page'
 import { PropertyAnalysis } from '@/lib/types'
+
+// Mock the use hook
+jest.mock('react', () => ({
+  ...jest.requireActual('react'),
+  use: (promise) => {
+    if (promise instanceof Promise) {
+      return { locale: 'en' };
+    }
+    return promise;
+  },
+}));
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -164,7 +175,7 @@ describe('AnalysisResultPage Integration Tests', () => {
     })
 
     it('should render the analysis result page with all sections', () => {
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       // Check for the main title that appears in the header
       expect(screen.getByText('123 Test Street, Oslo')).toBeInTheDocument()
@@ -182,7 +193,7 @@ describe('AnalysisResultPage Integration Tests', () => {
     })
 
     it('should display property details correctly', () => {
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       // Check if property address is displayed in the header
       expect(screen.getByText('123 Test Street, Oslo')).toBeInTheDocument()
@@ -195,7 +206,7 @@ describe('AnalysisResultPage Integration Tests', () => {
     })
 
     it('should display strong points as a list', () => {
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       expect(screen.getByText((content) => content.includes('Great location near public transport'))).toBeInTheDocument()
       expect(screen.getByText((content) => content.includes('Recently renovated kitchen'))).toBeInTheDocument()
@@ -203,7 +214,7 @@ describe('AnalysisResultPage Integration Tests', () => {
     })
 
     it('should display concerns and bottom line', () => {
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       expect(screen.getByText((content) => content.includes('Old electrical system needs updating'))).toBeInTheDocument()
       expect(screen.getByText((content) => content.includes('Some moisture issues in bathroom'))).toBeInTheDocument()
@@ -212,7 +223,7 @@ describe('AnalysisResultPage Integration Tests', () => {
     })
 
     it('should remove sections that do not exist in current schema', () => {
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       // These sections should exist with the correct translated titles
       expect(screen.getByText('Key Findings')).toBeInTheDocument()
@@ -225,7 +236,7 @@ describe('AnalysisResultPage Integration Tests', () => {
   describe('Error Handling', () => {
     it('should display error state when no analysis result is found', () => {
       // localStorage is already cleared in beforeEach
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       expect(screen.getByText('Analysis Failed')).toBeInTheDocument()
       expect(screen.getByText('Go Back Home')).toBeInTheDocument()
@@ -233,7 +244,7 @@ describe('AnalysisResultPage Integration Tests', () => {
 
     it('should display error state when analysis result is invalid JSON', () => {
       localStorage.setItem('analysisResult', 'invalid json')
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       expect(screen.getByText('Analysis Failed')).toBeInTheDocument()
     })
@@ -241,7 +252,7 @@ describe('AnalysisResultPage Integration Tests', () => {
     it('should handle error from localStorage', () => {
       localStorage.setItem('analysisError', 'API_ERROR')
       localStorage.setItem('analysisErrorType', 'network_error')
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       expect(screen.getByText('Analysis Failed')).toBeInTheDocument()
     })
@@ -253,7 +264,7 @@ describe('AnalysisResultPage Integration Tests', () => {
     })
 
     it('should navigate back to home when back button is clicked', () => {
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       const backButton = screen.getByRole('button', { name: /back/i })
       fireEvent.click(backButton)
@@ -262,7 +273,7 @@ describe('AnalysisResultPage Integration Tests', () => {
     })
 
     it('should show upload section when analyze another button is clicked', () => {
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       // The button shows an upload section instead of navigating
       const analyzeAnotherButton = screen.getByRole('button', { name: /analyze another document/i })
@@ -279,7 +290,7 @@ describe('AnalysisResultPage Integration Tests', () => {
     })
 
     it('should handle PDF download when download button is clicked', async () => {
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       const downloadButton = screen.getByRole('button', { name: /download pdf/i })
       
@@ -299,14 +310,14 @@ describe('AnalysisResultPage Integration Tests', () => {
     })
 
     it('should have proper heading structure', () => {
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       // Check for proper heading hierarchy
       expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
     })
 
     it('should have accessible buttons with proper labels', () => {
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /download pdf/i })).toBeInTheDocument()
@@ -333,7 +344,7 @@ describe('AnalysisResultPage Integration Tests', () => {
       }
 
       localStorage.setItem('analysisResult', JSON.stringify(incompleteAnalysis))
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       // Use getAllByText since "123 Test Street" appears in multiple places
       expect(screen.getAllByText((content, element) => {
@@ -354,7 +365,7 @@ describe('AnalysisResultPage Integration Tests', () => {
       }
 
       localStorage.setItem('analysisResult', JSON.stringify(analysisWithEmptyArrays))
-      render(<AnalysisResultPage />)
+      render(<AnalysisResultPage params={Promise.resolve({ locale: 'en' })} />)
 
       // Should render sections even with empty arrays
       expect(screen.getByText('Strong Selling Points')).toBeInTheDocument()
