@@ -882,17 +882,17 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
                 const riskStyles = {
                   low: {
                     backgroundColor: isDarkMode ? "#166534" : "#D1FAE5",
-                    color: isDarkMode ? "#A7F3D0" : "#065F46",
+                    color: isDarkMode ? "#D1FAE0" : "#14A37F",
                   },
 
                   medium: {
                     backgroundColor: isDarkMode ? "#854d0e" : "#FEF3C7",
-                    color: isDarkMode ? "#FBBF24" : "#92400E",
+                    color: isDarkMode ? "#FDE27A" : "#D4703A",
                   },
 
                   high: {
                     backgroundColor: isDarkMode ? "#991B1B" : "#FEE2E2",
-                    color: isDarkMode ? "#FCA5A5" : "#991B1B",
+                    color: isDarkMode ? "#FED2D2" : "#D54242",
                   },
                 };
 
