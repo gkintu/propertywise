@@ -35,3 +35,20 @@ Object.assign(global, {
     static revokeObjectURL = mockRevokeObjectURL;
   },
 });
+
+// Mock the 'sonner' toast API globally for tests
+jest.mock('sonner', () => {
+  const toastId = 'pdf-generation';
+  return {
+    Toaster: () => null,
+    toast: {
+      loading: jest.fn(() => toastId),
+      success: jest.fn(),
+      error: jest.fn(),
+      dismiss: jest.fn(),
+    },
+  };
+});
+
+// Ensure @react-pdf/renderer uses manual mock
+jest.mock('@react-pdf/renderer');

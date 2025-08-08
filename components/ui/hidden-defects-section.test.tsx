@@ -3,6 +3,37 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { HiddenDefectsSection } from './hidden-defects-section';
 import { HiddenDefect } from '@/lib/types';
 
+// Prevent @react-pdf icon imports from loading heavy/ESM deps during this test
+jest.mock('@/components/pdf/icons', () => ({
+  __esModule: true,
+  PDFIcon: () => null,
+  CheckCircleIcon: () => null,
+  AlertTriangleIcon: () => null,
+  HomeIcon: () => null,
+  ClockIcon: () => null,
+  MapPinIcon: () => null,
+  BedIcon: () => null,
+  BathIcon: () => null,
+  CarIcon: () => null,
+  FileTextIcon: () => null,
+  EyeIcon: () => null,
+  TrendingUpIcon: () => null,
+  Maximize2Icon: () => null,
+  CalendarIcon: () => null,
+  InfoIcon: () => null,
+  pdfDefectIcons: {},
+  defectIcons: {
+    moisture_water_damage: () => null,
+    electrical_faults: () => null,
+    roof_structural_issues: () => null,
+    drainage_leaks: () => null,
+    rot_fungus_pests: () => null,
+    legal_deficiencies: () => null,
+    environmental_hazards: () => null,
+    shared_debt: () => null,
+  },
+}))
+
 // Mock the useTranslations hook
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => {

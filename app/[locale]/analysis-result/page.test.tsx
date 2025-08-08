@@ -74,8 +74,10 @@ jest.mock('next-intl', () => ({
 // Mock sonner toast
 jest.mock('sonner', () => ({
   toast: {
+    loading: jest.fn(() => 'pdf-generation'),
     error: jest.fn(),
     success: jest.fn(),
+    dismiss: jest.fn(),
   }
 }))
 

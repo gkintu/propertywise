@@ -25,7 +25,6 @@ export interface Concern {
 export interface HiddenDefect {
   category: 'shared_debt' | 'legal_deficiencies' | 'moisture_water_damage' | 'rot_fungus_pests' | 'electrical_faults' | 'drainage_leaks' | 'roof_structural_issues' | 'environmental_hazards';
   riskLevel: 'low' | 'medium' | 'high';
-  briefExplanation: string;
   signsToLookFor: string[];
   consequences: string;
   preventiveMeasures: string;
