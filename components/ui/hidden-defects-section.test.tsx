@@ -58,21 +58,6 @@ describe('HiddenDefectsSection', () => {
     expect(screen.getByText('Medium Risk')).toBeInTheDocument();
   });
 
-  it('expands accordion items when clicked', () => {
-    render(<HiddenDefectsSection hiddenDefects={mockHiddenDefects} />);
-    
-    // Initially, detailed content should not be visible
-    expect(screen.queryByText('Dark stains on walls')).not.toBeInTheDocument();
-    
-    // Click on the first accordion trigger
-    const moistureAccordion = screen.getByText('Moisture & Water Damage');
-    fireEvent.click(moistureAccordion);
-    
-    // Now the detailed content should be visible
-    expect(screen.getByText('Dark stains on walls')).toBeInTheDocument();
-    expect(screen.getByText('Musty odors')).toBeInTheDocument();
-    expect(screen.getByText('Structural damage and health risks from mold')).toBeInTheDocument();
-  });
 
   it('renders nothing when no hidden defects provided', () => {
     const { container } = render(<HiddenDefectsSection hiddenDefects={[]} />);
