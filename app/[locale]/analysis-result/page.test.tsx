@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import React, { use } from 'react'
+import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import AnalysisResultPage from './page'

@@ -56,6 +56,17 @@
         "checkingRisks": "Checking for Hidden Risks",
         "finalizing": "Finalizing analysis…",
         "analysisComplete": "Analysis Complete"
+      },
+      "connecting": "Connecting...",
+      "initializing": "Initializing...",
+      "establishingConnection": "Establishing connection to analysis service",
+      "connectingToAnalysisService": "Connecting to analysis service...",
+      "errors": {
+        "connectionTimeout": "Connection timeout - please try again",
+        "connectionRetrying": "Connection lost, retrying...",
+        "connectionFailed": "Connection failed after multiple attempts",
+        "connectionError": "Connection error",
+        "invalidEventData": "Invalid event data received"
       }
     },
     "recentAnalysis": {

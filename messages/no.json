@@ -56,6 +56,17 @@
         "checkingRisks": "Sjekker skjulte risikoer",
         "finalizing": "Fullfører analyse…",
         "analysisComplete": "Analyse fullført"
+      },
+      "connecting": "Kobler til...",
+      "initializing": "Initialiserer...",
+      "establishingConnection": "Oppretter tilkobling til analysetjeneste",
+      "connectingToAnalysisService": "Kobler til analysetjeneste...",
+      "errors": {
+        "connectionTimeout": "Tilkoblingstimeout - vennligst prøv igjen",
+        "connectionRetrying": "Tilkobling tapt, prøver på nytt...",
+        "connectionFailed": "Tilkobling mislyktes etter flere forsøk",
+        "connectionError": "Tilkoblingsfeil",
+        "invalidEventData": "Ugyldig hendelsesdata mottatt"
       }
     },
     "recentAnalysis": {

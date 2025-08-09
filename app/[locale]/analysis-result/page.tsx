@@ -30,7 +30,6 @@ import { TranslationFunction } from "@/lib/i18n-types";
 import FileUploadSection, { FileUploadSectionHandle } from "@/components/upload/FileUploadSection";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { PropertyListingBadge } from "@/components/ui/property-listing-badge";
-import AnalysisProgressBar from "@/components/upload/AnalysisProgressBar";
 import { HiddenDefectsSection } from "@/components/ui/hidden-defects-section";
 
 // Helper function to extract JSON from text that might be wrapped in markdown or have extra formatting
@@ -455,9 +454,27 @@ export default function AnalysisResultPage({ params }: { params: Promise<{ local
               {t("loading.loadingText")}
             </p>
             
-            {/* Reuse the same progress bar from FileUploadSection */}
+            {/* Loading animation */}
             <div className="mt-6">
-              <AnalysisProgressBar complete={false} />
+              <div className="flex flex-col items-center justify-center w-full">
+                <div className="w-full max-w-md">
+                  <div className="p-6">
+                    <div className="space-y-6">
+                      <div className="text-center mb-4">
+                        <p className="text-lg font-medium text-gray-900 dark:text-white">
+                          Loading analysis results...
+                        </p>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                        <div className="text-right text-sm text-gray-500 dark:text-gray-400">
+                          Please wait...
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
