@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Progress } from "@/components/ui/progress";
+import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useServerSentEvents, type ProgressEvent } from "@/hooks/useServerSentEvents";
 
@@ -99,12 +99,8 @@ export default function AnalysisProgressBar({
               )}
             </div>
             <div className="space-y-4">
-              <Progress
-                value={progress}
-                className="h-3 bg-yellow-100 dark:bg-yellow-900 [&>div]:bg-yellow-500 [&>div]:dark:bg-yellow-400 [&>div]:transition-all [&>div]:duration-300"
-              />
-              <div className="text-right text-sm text-gray-500 dark:text-gray-400">
-                {Math.round(progress)}%
+              <div className="flex justify-center">
+                <Loader2 className="w-8 h-8 text-yellow-600 dark:text-[#FBBF24] animate-spin" />
               </div>
               {isConnecting && (
                 <div className="text-center text-xs text-gray-400">
