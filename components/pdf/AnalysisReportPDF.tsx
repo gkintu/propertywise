@@ -256,10 +256,13 @@ const createStyles = (isDarkMode: boolean) =>
     },
     propertyDetailsGrid: {
       flexDirection: "row",
-      gap: 16,
+      gap: 24,
     },
     propertyDetailItem: {
       flex: 1,
+    },
+    propertyDetailItemPrice: {
+      flex: 1.3,
     },
     propertyDetailHeader: {
       flexDirection: "row",
@@ -738,7 +741,7 @@ export const AnalysisReportPDF: React.FC<AnalysisReportPDFProps> = ({
               </View>
 
               {/* Price */}
-              <View style={styles.propertyDetailItem}>
+              <View style={[styles.propertyDetailItem, styles.propertyDetailItemPrice]}>
                 <View style={styles.propertyDetailHeader}>
                   <View style={styles.propertyDetailIconWrapper}>
                     <View
