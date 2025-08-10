@@ -134,8 +134,20 @@ const FileUploadSection = forwardRef<
 
     // Modern success handling
     interface AnalysisResult {
+      // New combined response format
+      classification?: {
+        documentType: 'property_report' | 'not_property_report';
+        confidence: 'high' | 'medium' | 'low';
+        reasoning: string;
+      };
+      propertyDetails?: unknown;
+      strongPoints?: unknown;
+      concerns?: unknown;
+      hiddenDefects?: unknown;
+      bottomLine?: string;
+      summary?: string;
+      // Legacy support for older response format
       analysis?: unknown;
-      summary?: unknown;
       [key: string]: unknown;
     }
     const handleAnalysisSuccess = useCallback((data: AnalysisResult) => {
@@ -241,7 +253,7 @@ const FileUploadSection = forwardRef<
 
         const data: AnalysisResult = await response.json();
 
-        if (data && (data.analysis || data.summary)) {
+        if (data && (data.analysis || data.summary || data.propertyDetails || data.classification)) {
           handleAnalysisSuccess(data);
         } else {
           throw new Error("No analysis data received from server");

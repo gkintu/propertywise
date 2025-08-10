@@ -208,77 +208,29 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // STEP 1: Document Classification
-    const documentClassificationSchema = {
-      type: "object",
-      properties: {
-        documentType: {
-          type: "string",
-          enum: ["property_report", "not_property_report"],
-        },
-        confidence: { type: "string", enum: ["high", "medium", "low"] },
-        reasoning: { type: "string" },
-      },
-      required: ["documentType", "confidence", "reasoning"],
-    };
-
-    const classificationPrompt =
-      validatedLanguage === "no"
-        ? `Du er en AI-assistent som spesialiserer seg på å klassifisere dokumenter. Analyser det vedlagte PDF-dokumentet og bestem om det er en eiendomsrapport/boligrapport eller ikke. Klassifiser dokumentet som "property_report" bare hvis det tydelig er en norsk eiendomsrapport. Ellers, klassifiser det som "not_property_report". Svar på norsk i reasoning-feltet.`
-        : `You are an AI assistant specialized in document classification. Analyze the attached PDF document and determine if it is a property report or not. Classify the document as "property_report" only if it is clearly a property report. Otherwise, classify it as "not_property_report". Respond in English in the reasoning field.`;
-
-    try {
-      const classificationResponse = await genai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: [{ text: classificationPrompt }, pdfPart],
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: documentClassificationSchema,
-        },
-      });
-
-      const responseText = classificationResponse.text;
-      if (!responseText) {
-        return NextResponse.json(
-          {
-            error: "Failed to classify document - no response from AI",
-            errorType: "classification_failed",
-          },
-          { status: 500 }
-        );
-      }
-
-      const classificationResult = JSON.parse(responseText);
-      if (classificationResult.documentType === "not_property_report") {
-        const errorMessage =
-          validatedLanguage === "no"
-            ? "Dette ser ikke ut til å være en eiendomsrapport. Vennligst last opp riktig dokument."
-            : "This does not appear to be a property report. Please upload the correct document.";
-        return NextResponse.json(
-          {
-            error: errorMessage,
-            errorType: "invalid_document_type",
-            classification: classificationResult,
-          },
-          { status: 400 }
-        );
-      }
-    } catch (classificationError) {
-      console.error("Error in document classification:", classificationError);
-      console.log(
-        "Classification failed, proceeding with property analysis as fallback",
-      );
-    }
-
-    // STEP 2: Property Analysis
+    // Combined Classification and Analysis - Single Request ⚡
     const languageInstruction =
       validatedLanguage === "no"
         ? "Respond in Norwegian (Bokmål). All text fields including titles, descriptions, and the summary should be in Norwegian."
         : "Respond in English. All text fields should be in English.";
 
-    const propertyAnalysisSchema = {
+    const combinedAnalysisSchema = {
       type: "object",
       properties: {
+        // Classification results
+        classification: {
+          type: "object",
+          properties: {
+            documentType: {
+              type: "string",
+              enum: ["property_report", "not_property_report"],
+            },
+            confidence: { type: "string", enum: ["high", "medium", "low"] },
+            reasoning: { type: "string" },
+          },
+          required: ["documentType", "confidence", "reasoning"],
+        },
+        // Property analysis results (only populated if documentType is "property_report")
         propertyDetails: {
           type: "object",
           properties: {
@@ -372,21 +324,18 @@ export async function POST(request: NextRequest) {
         bottomLine: { type: "string" },
         summary: { type: "string" },
       },
-      required: [
-        "propertyDetails",
-        "strongPoints",
-        "concerns",
-        "hiddenDefects",
-        "bottomLine",
-        "summary",
-      ],
+      required: ["classification"],
     };
 
-    const systemPrompt = `You are an AI assistant specialized in analyzing property reports. Given the attached PDF property document, extract key information and provide structured analysis.
+    const systemPrompt = `You are an AI assistant that first classifies documents and then analyzes them if they are property reports.
 
 ${languageInstruction}
 
-Focus on actionable insights for a potential buyer. If you cannot extract structured data from the document, provide a brief summary in the summary field.
+STEP 1 - Document Classification:
+First, analyze the attached PDF document and determine if it is a property report or not. Classify the document as "property_report" only if it is clearly a property report. Otherwise, classify it as "not_property_report".
+
+STEP 2 - Property Analysis (ONLY if classified as "property_report"):
+If the document is classified as a property report, then extract key information and provide structured analysis focusing on actionable insights for a potential buyer.
 
 For the hiddenDefects section, analyze the document for potential hidden issues that buyers should be aware of. ONLY include categories where you find actual risks, concerns, or relevant information in the document. Do not include categories just because they exist in the schema - only include them if there are genuine findings to report.
 
@@ -401,32 +350,50 @@ Available categories to assess (only include if relevant findings exist):
 - environmental_hazards: Asbestos, lead, PCBs, or other toxic materials
 
 For each identified defect category that has actual findings, provide:
-- briefExplanation: A short summary of what was specifically found in the document (e.g., "Page 17 mentions expected increase in maintenance costs", "Document shows moisture damage in basement area")
+- briefExplanation: A short summary of what was specifically found in the document
 - riskLevel: low/medium/high based on document findings
 - consequences: Brief description of potential impact (financial, health, structural)
 - preventiveMeasures: What buyers should do before purchase (inspection, expert consultation, etc.)
 - actionRequired: Specific recommended actions if defect is suspected/confirmed
 
-If no hidden defects are found or mentioned in the document, return an empty array for hiddenDefects.`;
+If the document is NOT a property report, only provide the classification object and leave all other fields empty or with minimal placeholders.`;
 
     const response = await genai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [{ text: systemPrompt }, pdfPart],
       config: {
         responseMimeType: "application/json",
-        responseSchema: propertyAnalysisSchema,
+        responseSchema: combinedAnalysisSchema,
       },
     });
 
-    const aiSummary = response.text;
-    if (!aiSummary) {
+    const aiResponse = response.text;
+    if (!aiResponse) {
       return NextResponse.json(
-        { error: "AI failed to generate a summary." },
+        { error: "AI failed to generate a response." },
         { status: 500 }
       );
     }
 
-    const parsedAnalysis = JSON.parse(aiSummary);
+    const parsedAnalysis = JSON.parse(aiResponse);
+    
+    // Check classification result
+    if (parsedAnalysis.classification?.documentType === "not_property_report") {
+      const errorMessage =
+        validatedLanguage === "no"
+          ? "Dette ser ikke ut til å være en eiendomsrapport. Vennligst last opp riktig dokument."
+          : "This does not appear to be a property report. Please upload the correct document.";
+      return NextResponse.json(
+        {
+          error: errorMessage,
+          errorType: "invalid_document_type",
+          classification: parsedAnalysis.classification,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate property analysis results
     if (
       !parsedAnalysis.propertyDetails ||
       !parsedAnalysis.propertyDetails.address

@@ -7,8 +7,20 @@ import { useServerSentEvents, type ProgressEvent } from "@/hooks/useServerSentEv
 import { useLoadingDots } from "@/hooks/useLoadingDots";
 
 interface AnalysisResult {
+  // New combined response format
+  classification?: {
+    documentType: 'property_report' | 'not_property_report';
+    confidence: 'high' | 'medium' | 'low';
+    reasoning: string;
+  };
+  propertyDetails?: unknown;
+  strongPoints?: unknown;
+  concerns?: unknown;
+  hiddenDefects?: unknown;
+  bottomLine?: string;
+  summary?: string;
+  // Legacy support for older response format
   analysis?: unknown;
-  summary?: unknown;
   [key: string]: unknown;
 }
 

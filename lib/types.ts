@@ -31,6 +31,12 @@ export interface HiddenDefect {
   actionRequired?: string;
 }
 
+export interface DocumentClassification {
+  documentType: 'property_report' | 'not_property_report';
+  confidence: 'high' | 'medium' | 'low';
+  reasoning: string;
+}
+
 export interface PropertyAnalysis {
   propertyDetails: PropertyDetails;
   strongPoints: (StrongPoint | string)[];
@@ -38,6 +44,16 @@ export interface PropertyAnalysis {
   hiddenDefects: HiddenDefect[];
   bottomLine: string;
   summary: string;
+}
+
+export interface CombinedAnalysisResponse {
+  classification: DocumentClassification;
+  propertyDetails?: PropertyDetails;
+  strongPoints?: (StrongPoint | string)[];
+  concerns?: (Concern | string)[];
+  hiddenDefects?: HiddenDefect[];
+  bottomLine?: string;
+  summary?: string;
 }
 
 export interface AnalysisResponse {
