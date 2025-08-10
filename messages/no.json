@@ -34,6 +34,7 @@
       "uploadedFile": "Opplastet fil",
       "analyzing": "Analyserer...",
       "analyzeButton": "Analyser Dokument",
+      "analyzeButtonPatience": "Kan ta 2-3 minutter vær tålmodig :)",
       "validation": {
         "multipleFilesDrop": "Vennligst slipp bare én PDF-fil om gangen.",
         "multipleFilesSelect": "Vennligst velg bare én PDF-fil om gangen.",
@@ -156,6 +157,7 @@
       "areasOfConcern": "Bekymringsområder",
       "bottomLine": "Konklusjon:",
       "analyzeAnotherButton": "Analyser et annet dokument",
+      "analyzeAnotherPatience": "Kan ta 2-3 minutter vær tålmodig :)",
       "goBackHomeButton": "Gå tilbake hjem",
       "downloadPdfButton": "Last ned PDF",
       "pdfGeneratedSuccess": "PDF generert!",
@@ -233,6 +235,7 @@
       "tipMessage": "For en mer detaljert analyse med spesifikke sterke punkter og bekymringsområder, prøv å laste opp dokumentet ditt igjen. Vår AI vil forsøke å gi en mer strukturert analyse.",
       "goBackHomeButton": "Gå tilbake hjem",
       "analyzeAnotherButton": "Analyser et annet dokument",
+      "analyzeAnotherPatience": "kan ta 2-3 minutter vær tålmodig :)",
       "downloadPdfButton": "Last ned PDF",
       "pdfNotAvailableMessage": "PDF-nedlasting er ikke tilgjengelig for sammendragsformat. Vennligst analyser dokumentet ditt igjen for en strukturert rapport.",
       "debugTitle": "🚧 Feilsøkingsdata (Fjern før distribusjon)",

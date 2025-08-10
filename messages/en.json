@@ -34,6 +34,7 @@
       "uploadedFile": "Uploaded File",
       "analyzing": "Analyzing...",
       "analyzeButton": "Analyze Document",
+      "analyzeButtonPatience": "Can take 2-3 minutes be patient :)",
       "validation": {
         "multipleFilesDrop": "Please drop only one PDF file at a time.",
         "multipleFilesSelect": "Please select only one PDF file at a time.",
@@ -156,6 +157,7 @@
       "areasOfConcern": "Areas of Concern",
       "bottomLine": "Bottom Line:",
       "analyzeAnotherButton": "Analyze Another Document",
+      "analyzeAnotherPatience": "Can take 2-3 minutes be patient :)",
       "goBackHomeButton": "Go Back Home",
       "downloadPdfButton": "Download PDF",
       "pdfGeneratedSuccess": "PDF generated successfully!",
@@ -233,6 +235,7 @@
       "tipMessage": "For a more detailed analysis with specific strong points and areas of concern, try uploading your document again. Our AI will attempt to provide a more structured analysis.",
       "goBackHomeButton": "Go Back Home",
       "analyzeAnotherButton": "Analyze Another Document",
+      "analyzeAnotherPatience": "can take 2-3 minutes be patient :)",
       "downloadPdfButton": "Download PDF",
       "pdfNotAvailableMessage": "PDF download is not available for summary format. Please analyze your document again for a structured report.",
       "debugTitle": "🚧 Debug Data (Remove before deployment)",

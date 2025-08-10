@@ -434,21 +434,24 @@ const FileUploadSection = forwardRef<
                     }}
                   />
                 ) : (
-                  <Button
-                    ref={analyzeButtonRef}
-                    className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8 font-medium relative flex items-center justify-center disabled:opacity-50"
-                    onClick={handleAnalyzeDocuments}
-                    disabled={!hasFiles || isPending}
-                  >
-                    {isPending ? (
-                      "Processing..."
-                    ) : (
-                      <>
-                        {t("upload.analyzeButton")}
-                        <Search className="ml-2 w-5 h-5" />
-                      </>
-                    )}
-                  </Button>
+                  <div className="flex items-center justify-center gap-4">
+                    <Button
+                      ref={analyzeButtonRef}
+                      className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8 font-medium relative flex items-center justify-center disabled:opacity-50"
+                      onClick={handleAnalyzeDocuments}
+                      disabled={!hasFiles || isPending}
+                    >
+                      {isPending ? (
+                        "Processing..."
+                      ) : (
+                        <>
+                          {t("upload.analyzeButton")}
+                          <Search className="ml-2 w-5 h-5" />
+                        </>
+                      )}
+                    </Button>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{t("upload.analyzeButtonPatience")}</span>
+                  </div>
                 )}
               </div>
             </div>
