@@ -134,12 +134,32 @@ const FileUploadSection = forwardRef<
 
     // Modern success handling
     interface AnalysisResult {
+      // New combined response format
+      classification?: {
+        documentType: 'property_report' | 'not_property_report';
+        confidence: 'high' | 'medium' | 'low';
+        reasoning: string;
+      };
+      propertyDetails?: unknown;
+      strongPoints?: unknown;
+      concerns?: unknown;
+      hiddenDefects?: unknown;
+      bottomLine?: string;
+      summary?: string;
+      // Legacy support for older response format
       analysis?: unknown;
-      summary?: unknown;
       [key: string]: unknown;
     }
     const handleAnalysisSuccess = useCallback((data: AnalysisResult) => {
       console.log("🎉 Analysis successful, storing data:", data);
+      
+      // Mark blob as processed if we have uploaded files with blob URLs
+      if (uploadedFiles.length > 0) {
+        const fileWithBlobUrl = uploadedFiles[0] as File & { blobUrl?: string };
+        if (fileWithBlobUrl.blobUrl) {
+          markBlobAsProcessed(fileWithBlobUrl.blobUrl);
+        }
+      }
       
       // Add timestamp to force re-reading of data on analysis result page
       const dataWithTimestamp = {
@@ -168,7 +188,7 @@ const FileUploadSection = forwardRef<
         navigateToResults();
         onAnalysisComplete?.();
       }, 500);
-    }, [t, navigateToResults, onAnalysisComplete]);
+    }, [t, navigateToResults, onAnalysisComplete, uploadedFiles]);
 
     // Main analysis handler with modern async patterns
     const handleAnalyzeDocuments = useCallback(async () => {
@@ -197,32 +217,25 @@ const FileUploadSection = forwardRef<
       setAnalysisState(AnalysisState.ANALYZING);
       onAnalysisStart?.();
 
+      // Check if we have a blob URL for SSE-based analysis
+      if (fileWithBlobUrl.blobUrl) {
+        // SSE-based analysis will be handled by AnalysisProgressBar component
+        // The progress bar will handle the API call and update us via callbacks
+        console.log("🚀 Starting SSE-based analysis with blob URL:", fileWithBlobUrl.blobUrl);
+        return;
+      }
+
+      // Fallback to legacy direct upload method for files without blob URLs
       try {
-        let response: Response;
+        console.log("⚠️ Falling back to legacy direct upload method");
+        const formData = new FormData();
+        formData.append("file", fileToAnalyze);
+        formData.append("language", locale);
 
-        if (fileWithBlobUrl.blobUrl) {
-          // Use blob URL for analysis (new method)
-          response = await fetch("/api/analyze-pdf", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              blobUrl: fileWithBlobUrl.blobUrl,
-              language: locale,
-            }),
-          });
-        } else {
-          // Fall back to direct file upload (legacy method)
-          const formData = new FormData();
-          formData.append("file", fileToAnalyze);
-          formData.append("language", locale);
-
-          response = await fetch("/api/analyze-pdf", {
-            method: "POST",
-            body: formData,
-          });
-        }
+        const response = await fetch("/api/analyze-pdf", {
+          method: "POST",
+          body: formData,
+        });
         
         if (!response.ok) {
           const errorText = await response.text();
@@ -240,12 +253,7 @@ const FileUploadSection = forwardRef<
 
         const data: AnalysisResult = await response.json();
 
-        if (data && (data.analysis || data.summary)) {
-          // Mark blob as processed if we have a blob URL
-          if (fileWithBlobUrl.blobUrl) {
-            markBlobAsProcessed(fileWithBlobUrl.blobUrl);
-          }
-          
+        if (data && (data.analysis || data.summary || data.propertyDetails || data.classification)) {
           handleAnalysisSuccess(data);
         } else {
           throw new Error("No analysis data received from server");
@@ -416,7 +424,15 @@ const FileUploadSection = forwardRef<
               </Card>
               <div className="mt-6 text-center">
                 {(isAnalyzing || isCompleted) ? (
-                  <AnalysisProgressBar complete={isCompleted} />
+                  <AnalysisProgressBar 
+                    blobUrl={isAnalyzing ? (uploadedFiles[0] as File & { blobUrl?: string })?.blobUrl : undefined}
+                    language={locale as "en" | "no"}
+                    onComplete={handleAnalysisSuccess}
+                    onError={(error) => {
+                      console.error('Analysis error from progress bar:', error);
+                      handleAnalysisError(new Error(error));
+                    }}
+                  />
                 ) : (
                   <Button
                     ref={analyzeButtonRef}

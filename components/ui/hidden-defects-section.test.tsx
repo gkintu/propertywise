@@ -1,0 +1,109 @@
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { HiddenDefectsSection } from './hidden-defects-section';
+import { HiddenDefect } from '@/lib/types';
+
+// Prevent @react-pdf icon imports from loading heavy/ESM deps during this test
+jest.mock('@/components/pdf/icons', () => ({
+  __esModule: true,
+  PDFIcon: () => null,
+  CheckCircleIcon: () => null,
+  AlertTriangleIcon: () => null,
+  HomeIcon: () => null,
+  ClockIcon: () => null,
+  MapPinIcon: () => null,
+  BedIcon: () => null,
+  BathIcon: () => null,
+  CarIcon: () => null,
+  FileTextIcon: () => null,
+  EyeIcon: () => null,
+  TrendingUpIcon: () => null,
+  Maximize2Icon: () => null,
+  CalendarIcon: () => null,
+  InfoIcon: () => null,
+  pdfDefectIcons: {},
+  defectIcons: {
+    moisture_water_damage: () => null,
+    electrical_faults: () => null,
+    roof_structural_issues: () => null,
+    drainage_leaks: () => null,
+    rot_fungus_pests: () => null,
+    legal_deficiencies: () => null,
+    environmental_hazards: () => null,
+    shared_debt: () => null,
+  },
+}))
+
+// Mock the useTranslations hook
+jest.mock('next-intl', () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      'hiddenDefects.title': 'Hidden Property Defects',
+      'hiddenDefects.description': 'Potential issues that may not be immediately visible',
+      'hiddenDefects.consequences': 'Potential Consequences', 
+      'hiddenDefects.preventiveMeasures': 'What to Do Before Purchase',
+      'hiddenDefects.actionRequired': 'Recommended Action',
+      'hiddenDefects.riskLevels.low': 'Low Risk',
+      'hiddenDefects.riskLevels.medium': 'Medium Risk',
+      'hiddenDefects.riskLevels.high': 'High Risk',
+      'hiddenDefects.categories.moisture_water_damage.title': 'Moisture & Water Damage',
+      'hiddenDefects.categories.electrical_faults.title': 'Electrical Faults',
+      'hiddenDefects.categories.roof_structural_issues.title': 'Roof & Structural Issues',
+    };
+    return translations[key] || key;
+  }
+}));
+
+describe('HiddenDefectsSection', () => {
+  const mockHiddenDefects: HiddenDefect[] = [
+    {
+      category: 'moisture_water_damage',
+      riskLevel: 'high',
+      briefExplanation: 'Dark stains on walls indicate potential moisture damage',
+      consequences: 'Structural damage and health risks from mold',
+      preventiveMeasures: 'Request moisture inspection and check for proper ventilation',
+      actionRequired: 'Have professional moisture assessment before purchase'
+    },
+    {
+      category: 'electrical_faults',
+      riskLevel: 'medium',
+      briefExplanation: 'Flickering lights suggest electrical system issues',
+      consequences: 'Safety hazards and expensive repairs',
+      preventiveMeasures: 'Request electrical inspection'
+    }
+  ];
+
+  it('renders hidden defects section with all defects', () => {
+    render(<HiddenDefectsSection hiddenDefects={mockHiddenDefects} />);
+    
+    expect(screen.getByText('Hidden Property Defects')).toBeInTheDocument();
+    expect(screen.getByText('Moisture & Water Damage')).toBeInTheDocument();
+    expect(screen.getByText('Electrical Faults')).toBeInTheDocument();
+  });
+
+  it('displays risk levels correctly', () => {
+    render(<HiddenDefectsSection hiddenDefects={mockHiddenDefects} />);
+    
+    expect(screen.getByText('High Risk')).toBeInTheDocument();
+    expect(screen.getByText('Medium Risk')).toBeInTheDocument();
+  });
+
+
+  it('renders nothing when no hidden defects provided', () => {
+    const { container } = render(<HiddenDefectsSection hiddenDefects={[]} />);
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('handles missing actionRequired field gracefully', () => {
+    const defectWithoutAction = mockHiddenDefects[1]; // electrical_faults doesn't have actionRequired
+    render(<HiddenDefectsSection hiddenDefects={[defectWithoutAction]} />);
+    
+    const electricalAccordion = screen.getByText('Electrical Faults');
+    fireEvent.click(electricalAccordion);
+    
+    expect(screen.getByText('Safety hazards and expensive repairs')).toBeInTheDocument();
+    expect(screen.getByText('Request electrical inspection')).toBeInTheDocument();
+    // actionRequired section should not be present
+    expect(screen.queryByText('Recommended Action')).not.toBeInTheDocument();
+  });
+});

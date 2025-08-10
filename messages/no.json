@@ -56,6 +56,42 @@
         "checkingRisks": "Sjekker skjulte risikoer",
         "finalizing": "Fullfører analyse…",
         "analysisComplete": "Analyse fullført"
+      },
+      "connecting": "Kobler til...",
+      "initializing": "Initialiserer...",
+      "processing": "Behandler",
+      "aiAnalyzing": "AI analyserer dokumentinnhold...",
+      "processingEllipsis": "Behandler...",
+      "validatingDocument": "Validerer dokument...",
+      "preparingToFetch": "Forbereder nedlasting av dokument...",
+      "downloadingDocument": "Laster ned dokument...",
+      "processingContent": "Behandler dokumentinnhold...",
+      "convertingFormat": "Konverterer dokumentformat...",
+      "startingAnalysis": "Starter dokumentanalyse...",
+      "analyzingDocumentType": "Analyserer dokumenttype...",
+      "validatingDocumentType": "Validerer dokumenttype...",
+      "documentTypeVerified": "Dokumenttype bekreftet",
+      "proceedingWithAnalysis": "Fortsetter med analyse",
+      "preparingAnalysisEngine": "Forbereder analysemotor...",
+      "extractingPropertyDetails": "Henter eiendomsdetaljer...",
+      "analyzingPropertyFeatures": "Analyserer eiendomsegenskaper...",
+      "evaluatingRisks": "Evaluerer potensielle risikoer...",
+      "sendingAnalysisRequest": "Sender analyseforespørsel...",
+      "processingResults": "Behandler analyseresultater...",
+      "parsingResults": "Tolker analyseresultater...",
+      "preparingFinalResults": "Forbereder sluttresultater...",
+      "finalizingAnalysis": "Fullfører analyse...",
+      "analysisCompletedSuccessfully": "Analyse fullført",
+      "retryingDocumentFetch": "Forsøker nedlasting på nytt...",
+      "establishingConnection": "Oppretter tilkobling til analysetjeneste",
+      "connectingToAnalysisService": "Kobler til analysetjeneste...",
+      "connectionLost": "Tilkobling tapt - forsøker å koble til på nytt...",
+      "errors": {
+        "connectionTimeout": "Tilkoblingstimeout - vennligst prøv igjen",
+        "connectionRetrying": "Tilkobling tapt, prøver på nytt...",
+        "connectionFailed": "Tilkobling mislyktes etter flere forsøk",
+        "connectionError": "Tilkoblingsfeil",
+        "invalidEventData": "Ugyldig hendelsesdata mottatt"
       }
     },
     "recentAnalysis": {
@@ -104,10 +140,15 @@
     },
     "analysis": {
       "propertyAnalysisTitle": "Eiendomsanalyse",
+      "sizeLabel": "Størrelse",
+      "yearBuiltLabel": "Byggeår",
+      "priceLabel": "Pris",
       "analysisSummaryTitle": "Analysesammendrag",
       "reportGeneratedOn": "Rapport generert {date}",
-      "marketPosition": "Markedsposisjon:",
-      "roomPropertyPriced": "-roms {propertyType} priset til {price} NOK",
+      "marketPosition": "Eiendomstype:",
+      "askingPrice": "Prisantydning",
+      "totalArea": "Bruksareal",
+      "roomPropertyPriced": "-roms {propertyType} priset til {price} {currency}",
       "totalSize": "{size} kvm totalt",
       "built": "Bygget {year}",
       "keyFindingsTitle": "Nøkkelfunn",
@@ -118,13 +159,67 @@
       "goBackHomeButton": "Gå tilbake hjem",
       "downloadPdfButton": "Last ned PDF",
       "pdfGeneratedSuccess": "PDF generert!",
+      "generatingPdf": "Genererer PDF...",
+      "pdfDownloadSuccess": "PDF lastet ned!",
       "pdfGenerationError": "Kunne ikke generere PDF. Prøv igjen.",
       "debugTitle": "🚧 Feilsøkingsdata (Fjern før distribusjon)",
       "rawAnalysisData": "Rådata for analyse:",
+      "propertyTypes": {
+        "apartment": "Leilighet",
+        "house": "Hus",
+        "condo": "Leilighet"
+      },
+      "ageLabels": {
+        "new": "Ny",
+        "yearsOld": "{years} år gammel"
+      },
+      "noStrongPointsAvailable": "Ingen sterke punkter tilgjengelig",
+      "noConcernsAvailable": "Ingen bekymringer tilgjengelig",
       "progressStages": {
         "extractingDetails": "Henter eiendomsdetaljer",
         "analyzingPrice": "Analyserer pris og marked",
         "checkingRisks": "Sjekker skjulte risikoer"
+      }
+    },
+    "hiddenDefects": {
+      "title": "Skjulte eiendomsmangler",
+      "description": "Potensielle problemer som kanskje ikke er umiddelbart synlige, men som kan påvirke kjøpsbeslutningen din.",
+      "signsToLookFor": "Tegn å se etter",
+      "consequences": "Potensielle konsekvenser",
+      "preventiveMeasures": "Hva du bør gjøre før kjøp",
+      "actionRequired": "Anbefalt handling",
+      "helpMeAssess": "Hjelp meg vurdere",
+      "noSignsAvailable": "Ingen tegn spesifisert",
+      "riskLevels": {
+        "low": "Lav risiko",
+        "medium": "Middels risiko", 
+        "high": "Høy risiko"
+      },
+      "categories": {
+        "shared_debt": {
+          "title": "Fellesgjeld"
+        },
+        "legal_deficiencies": {
+          "title": "Lovlighetsmangler"
+        },
+        "moisture_water_damage": {
+          "title": "Fukt- og vannskader"
+        },
+        "rot_fungus_pests": {
+          "title": "Råte, sopp og skadedyr"
+        },
+        "electrical_faults": {
+          "title": "Elektriske feil"
+        },
+        "drainage_leaks": {
+          "title": "Drenering og lekkasjer"
+        },
+        "roof_structural_issues": {
+          "title": "Tak og konstruksjonsproblemer"
+        },
+        "environmental_hazards": {
+          "title": "Miljøgifter"
+        }
       }
     },
     "summary": {

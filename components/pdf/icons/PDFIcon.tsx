@@ -1,5 +1,5 @@
 import React from 'react';
-import { Svg, Path, Circle, Rect, G } from '@react-pdf/renderer';
+import { Svg, Path, Circle, Rect, G, Polygon } from '@react-pdf/renderer';
 
 export type IconName = 
   | 'CheckCircle'
@@ -20,7 +20,16 @@ export type IconName =
   | 'Error'
   | 'FileText'
   | 'Eye'
-  | 'TrendingUp';
+  | 'TrendingUp'
+  | 'Maximize2'
+  | 'Calendar'
+  | 'Droplets'
+  | 'Zap'
+  | 'Scale'
+  | 'Bug'
+  | 'Wrench'
+  | 'Beaker'
+  | 'DollarSign';
 
 interface PDFIconProps {
   name: IconName;
@@ -29,9 +38,10 @@ interface PDFIconProps {
 }
 
 // Icon path data extracted from Lucide React icons
-const iconPaths: Record<IconName, { paths: string[]; viewBox?: string; strokeWidth?: number; circles?: Array<{cx: string, cy: string, r: string}>; rects?: Array<{x: string, y: string, width: string, height: string}> }> = {
+const iconPaths: Record<IconName, { paths: string[]; viewBox?: string; strokeWidth?: number; circles?: Array<{cx: string, cy: string, r: string}>; rects?: Array<{x: string, y: string, width: string, height: string, rx?: string}>; polygons?: Array<{points: string}> }> = {
   CheckCircle: {
-    paths: ['m9 12 2 2 4-4', 'M21.801 10A10 10 0 1 1 17 3.335'],
+    paths: ['m9 12 2 2 4-4'],
+    circles: [{ cx: '12', cy: '12', r: '10' }],
     viewBox: '0 0 24 24'
   },
   AlertTriangle: {
@@ -101,21 +111,60 @@ const iconPaths: Record<IconName, { paths: string[]; viewBox?: string; strokeWid
     viewBox: '0 0 24 24'
   },
   TrendingUp: {
-    paths: ['M22 7 13.5 15.5 8.5 10.5 2 17', 'M16 7h6v6'],
+    paths: ['m22 7-8.5 8.5-5-5L2 17', 'm16 7h6v6'],
     viewBox: '0 0 24 24'
   },
   FileText: {
     paths: [
-      'M4 3.5A1.5 1.5 0 0 1 5.5 2h7.38c.4 0 .78.16 1.06.44l5.62 5.62c.28.28.44.66.44 1.06V20.5A1.5 1.5 0 0 1 18.5 22h-13A1.5 1.5 0 0 1 4 20.5v-17z',
-      'M13 2v6a2 2 0 0 0 2 2h6',
-      'M8 13h8M8 17h6'
+      'M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z',
+      'm15 2 5 5',
+      'M10 9h4',
+      'M10 13h6',
+      'M10 17h6'
     ],
-    strokeWidth: 1.5,
     viewBox: '0 0 24 24'
   },
   Eye: {
     paths: ['M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z'],
     circles: [{ cx: '12', cy: '12', r: '3' }],
+    viewBox: '0 0 24 24'
+  },
+  Maximize2: {
+    paths: ['M15 3h6v6', 'M9 21H3v-6', 'M21 3l-7 7', 'M3 21l7-7'],
+    viewBox: '0 0 24 24'
+  },
+  Calendar: {
+    paths: ['M8 2v4', 'M16 2v4', 'M3 10h18'],
+    rects: [{ x: '3', y: '4', width: '18', height: '18', rx: '2' }],
+    viewBox: '0 0 24 24'
+  },
+  Droplets: {
+    paths: ['M17 14.5c0-2.5-2-4.5-5-4.5s-5 2-5 4.5c0 2.5 2 4.5 5 4.5s5-2 5-4.5z', 'M12 22a7 7 0 0 0 7-7c0-2.2-1-4-3-5.5s-3.5-2-5.5-3.5a7 7 0 0 0-7 7c0 2.2 1 4 3 5.5s3.5 2 5.5 3.5z'],
+    viewBox: '0 0 24 24'
+  },
+  Zap: {
+    paths: [],
+    polygons: [{ points: '13 2 3 14 12 14 11 22 21 10 12 10 13 2' }],
+    viewBox: '0 0 24 24'
+  },
+  Scale: {
+    paths: ['m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z', 'm2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z', 'M7 21h10', 'M12 3v18', 'M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2'],
+    viewBox: '0 0 24 24'
+  },
+  Bug: {
+    paths: ['m8 2 1.88 1.88', 'M14.12 3.88 16 2', 'M9 7.13v-1a3.003 3.003 0 1 1 6 0v1', 'M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6', 'M12 20v-9', 'M6.53 9C4.6 8.8 3 7.1 3 5', 'M6 13H2', 'M3 21c0-2.1 1.7-3.9 3.8-4', 'M20.97 5c0 2.1-1.6 3.8-3.5 4', 'M22 13h-4', 'M17.2 17c2.1.1 3.8 1.9 3.8 4'],
+    viewBox: '0 0 24 24'
+  },
+  Wrench: {
+    paths: ['M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z'],
+    viewBox: '0 0 24 24'
+  },
+  Beaker: {
+    paths: ['M4.5 3h15', 'M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3', 'M6 14h12'],
+    viewBox: '0 0 24 24'
+  },
+  DollarSign: {
+    paths: ['M12 2v20', 'M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'],
     viewBox: '0 0 24 24'
   }
 };
@@ -140,7 +189,7 @@ export const PDFIcon: React.FC<PDFIconProps> = ({
     );
   }
 
-  const { paths, circles, rects, strokeWidth = 2, viewBox = '0 0 24 24' } = iconData;
+  const { paths, circles, rects, polygons, strokeWidth = 2, viewBox = '0 0 24 24' } = iconData;
 
   return (
     <Svg 
@@ -164,6 +213,13 @@ export const PDFIcon: React.FC<PDFIconProps> = ({
             y={rect.y} 
             width={rect.width} 
             height={rect.height}
+            rx={rect.rx}
+          />
+        ))}
+        {polygons?.map((polygon, index) => (
+          <Polygon
+            key={`polygon-${index}`}
+            points={polygon.points}
           />
         ))}
         {paths.map((path, index) => (

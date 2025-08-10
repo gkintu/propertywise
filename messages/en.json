@@ -56,6 +56,42 @@
         "checkingRisks": "Checking for Hidden Risks",
         "finalizing": "Finalizing analysis…",
         "analysisComplete": "Analysis Complete"
+      },
+      "connecting": "Connecting...",
+      "initializing": "Initializing...",
+      "processing": "Processing",
+      "aiAnalyzing": "AI analyzing document contents...",
+      "processingEllipsis": "Processing...",
+      "validatingDocument": "Validating document...",
+      "preparingToFetch": "Preparing to fetch document...",
+      "downloadingDocument": "Downloading document...",
+      "processingContent": "Processing document content...",
+      "convertingFormat": "Converting document format...",
+      "startingAnalysis": "Starting document analysis...",
+      "analyzingDocumentType": "Analyzing document type...",
+      "validatingDocumentType": "Validating document type...",
+      "documentTypeVerified": "Document type verified",
+      "proceedingWithAnalysis": "Proceeding with analysis",
+      "preparingAnalysisEngine": "Preparing analysis engine...",
+      "extractingPropertyDetails": "Extracting property details...",
+      "analyzingPropertyFeatures": "Analyzing property features...",
+      "evaluatingRisks": "Evaluating potential risks...",
+      "sendingAnalysisRequest": "Sending analysis request...",
+      "processingResults": "Processing analysis results...",
+      "parsingResults": "Parsing analysis results...",
+      "preparingFinalResults": "Preparing final results...",
+      "finalizingAnalysis": "Finalizing analysis...",
+      "analysisCompletedSuccessfully": "Analysis completed successfully",
+      "retryingDocumentFetch": "Retrying document fetch...",
+      "establishingConnection": "Establishing connection to analysis service",
+      "connectingToAnalysisService": "Connecting to analysis service...",
+      "connectionLost": "Connection lost - attempting to reconnect...",
+      "errors": {
+        "connectionTimeout": "Connection timeout - please try again",
+        "connectionRetrying": "Connection lost, retrying...",
+        "connectionFailed": "Connection failed after multiple attempts",
+        "connectionError": "Connection error",
+        "invalidEventData": "Invalid event data received"
       }
     },
     "recentAnalysis": {
@@ -104,10 +140,15 @@
     },
     "analysis": {
       "propertyAnalysisTitle": "Property Analysis",
+      "sizeLabel": "Size",
+      "yearBuiltLabel": "Year Built",
+      "priceLabel": "Price",
       "analysisSummaryTitle": "Analysis Summary",
       "reportGeneratedOn": "Report generated on {date}",
-      "marketPosition": "Market Position:",
-      "roomPropertyPriced": "-room {propertyType} priced at {price} NOK",
+      "marketPosition": "Property Type:",
+      "askingPrice": "Asking price",
+      "totalArea": "Usable area",
+      "roomPropertyPriced": "-room {propertyType} priced at {price} {currency}",
       "totalSize": "{size} sqm total",
       "built": "Built {year}",
       "keyFindingsTitle": "Key Findings",
@@ -118,13 +159,67 @@
       "goBackHomeButton": "Go Back Home",
       "downloadPdfButton": "Download PDF",
       "pdfGeneratedSuccess": "PDF generated successfully!",
+      "generatingPdf": "Generating PDF...",
+      "pdfDownloadSuccess": "PDF downloaded successfully!",
       "pdfGenerationError": "Failed to generate PDF. Please try again.",
       "debugTitle": "🚧 Debug Data (Remove before deployment)",
       "rawAnalysisData": "Raw Analysis Data:",
+      "propertyTypes": {
+        "apartment": "Apartment",
+        "house": "House", 
+        "condo": "Condo"
+      },
+      "ageLabels": {
+        "new": "New",
+        "yearsOld": "{years} years old"
+      },
+      "noStrongPointsAvailable": "No strong points available",
+      "noConcernsAvailable": "No concerns available",
       "progressStages": {
         "extractingDetails": "Extracting Property Details",
         "analyzingPrice": "Analyzing Price & Market Data",
         "checkingRisks": "Checking for Hidden Risks"
+      }
+    },
+    "hiddenDefects": {
+      "title": "Hidden Property Defects",
+      "description": "Potential issues that may not be immediately visible but could affect your purchase decision.",
+      "signsToLookFor": "Signs to Look For",
+      "consequences": "Potential Consequences",
+      "preventiveMeasures": "What to Do Before Purchase",
+      "actionRequired": "Recommended Action",
+      "helpMeAssess": "Help Me Assess",
+      "noSignsAvailable": "No signs specified",
+      "riskLevels": {
+        "low": "Low Risk",
+        "medium": "Medium Risk",
+        "high": "High Risk"
+      },
+      "categories": {
+        "shared_debt": {
+          "title": "Shared Debt (Fellesgjeld)"
+        },
+        "legal_deficiencies": {
+          "title": "Legal Deficiencies"
+        },
+        "moisture_water_damage": {
+          "title": "Moisture & Water Damage"
+        },
+        "rot_fungus_pests": {
+          "title": "Rot, Fungus & Pests"
+        },
+        "electrical_faults": {
+          "title": "Electrical Faults"
+        },
+        "drainage_leaks": {
+          "title": "Drainage & Leaks"
+        },
+        "roof_structural_issues": {
+          "title": "Roof & Structural Issues"
+        },
+        "environmental_hazards": {
+          "title": "Environmental Hazards"
+        }
       }
     },
     "summary": {

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, use } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -21,15 +22,15 @@ import {
   Info,
   Download,
   Upload,
+  Maximize2,
+  Calendar,
 } from "lucide-react";
-import { pdf } from "@react-pdf/renderer";
 import { PropertyAnalysis } from "@/lib/types";
 import { TranslationFunction } from "@/lib/i18n-types";
-import { AnalysisReportPDF } from "@/components/pdf/AnalysisReportPDF";
 import FileUploadSection, { FileUploadSectionHandle } from "@/components/upload/FileUploadSection";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { PropertyListingBadge } from "@/components/ui/property-listing-badge";
-import AnalysisProgressBar from "@/components/upload/AnalysisProgressBar";
+import { HiddenDefectsSection } from "@/components/ui/hidden-defects-section";
 
 // Helper function to extract JSON from text that might be wrapped in markdown or have extra formatting
 function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
@@ -78,49 +79,159 @@ function tryExtractJsonFromText(text: string): PropertyAnalysis | null {
   return null;
 }
 
-// PDF download function using react-pdf/renderer
+// Server-side PDF download function - migrated from client-side to API route
 async function downloadAsPDF(
   analysisData: PropertyAnalysis,
   t: TranslationFunction,
-  isDarkMode: boolean = false
+  isDarkMode: boolean = false,
+  locale: string = 'en'
 ) {
   try {
-    // Generate PDF using react-pdf/renderer
-    const blob = await pdf(
-      <AnalysisReportPDF analysisData={analysisData} t={t} isDarkMode={isDarkMode} />
-    ).toBlob();
+    console.log("🔄 Starting server-side PDF generation...");
+    
+    // Validate required data before sending to server
+    if (!analysisData || !analysisData.propertyDetails) {
+      console.error("Invalid analysis data for PDF generation");
+      toast.error(t("analysis.pdfGenerationError") || "Error generating PDF: Invalid data");
+      return;
+    }
 
-    // Create download link
+    // Comprehensive data sanitization before sending to server
+    const sanitizedData: PropertyAnalysis = {
+      propertyDetails: {
+        address: analysisData.propertyDetails?.address?.substring(0, 200) || 'Property Address',
+        bedrooms: Number(analysisData.propertyDetails?.bedrooms) || 0,
+        price: Number(analysisData.propertyDetails?.price) || 0,
+        currency: analysisData.propertyDetails?.currency || 'NOK',
+        size: Number(analysisData.propertyDetails?.size) || 0,
+        yearBuilt: Number(analysisData.propertyDetails?.yearBuilt) || new Date().getFullYear(),
+        propertyType: analysisData.propertyDetails?.propertyType?.substring(0, 50) || 'property',
+      },
+      strongPoints: Array.isArray(analysisData.strongPoints) 
+        ? analysisData.strongPoints.map((point, idx) => {
+            if (typeof point === 'string') {
+              return point.substring(0, 300);
+            }
+            return {
+              title: point?.title?.substring(0, 100) || `Strong Point ${idx + 1}`,
+              description: point?.description?.substring(0, 200) || '',
+              category: ('category' in point ? point.category : 'other') as 'kitchen' | 'location' | 'fees' | 'outdoor' | 'storage' | 'condition' | 'other'
+            };
+          }) 
+        : [],
+      concerns: Array.isArray(analysisData.concerns) 
+        ? analysisData.concerns.map((concern, idx) => {
+            if (typeof concern === 'string') {
+              return concern.substring(0, 300);
+            }
+            return {
+              title: concern?.title?.substring(0, 100) || `Concern ${idx + 1}`,
+              description: concern?.description?.substring(0, 200) || '',
+              severity: ('severity' in concern ? concern.severity : 'medium') as 'low' | 'medium' | 'high',
+              estimatedCost: concern?.estimatedCost?.substring(0, 50) || '',
+              category: ('category' in concern ? concern.category : 'other') as 'electrical' | 'structural' | 'safety' | 'pest' | 'maintenance' | 'age' | 'other'
+            };
+          })
+        : [],
+      hiddenDefects: Array.isArray(analysisData.hiddenDefects) 
+        ? analysisData.hiddenDefects.map(defect => ({
+            category: defect?.category || 'other' as 'shared_debt' | 'legal_deficiencies' | 'moisture_water_damage' | 'rot_fungus_pests' | 'electrical_faults' | 'drainage_leaks' | 'roof_structural_issues' | 'environmental_hazards',
+            riskLevel: defect?.riskLevel || 'medium' as 'low' | 'medium' | 'high',
+            briefExplanation: defect?.briefExplanation?.substring(0, 200) || '',
+            consequences: defect?.consequences?.substring(0, 200) || '',
+            preventiveMeasures: defect?.preventiveMeasures?.substring(0, 200) || '',
+            actionRequired: defect?.actionRequired?.substring(0, 150) || ''
+          }))
+        : [],
+      bottomLine: analysisData.bottomLine?.substring(0, 500) || '',
+      summary: analysisData.summary?.substring(0, 1000) || ''
+    };
+
+    // Show loading state
+    toast.loading(t("analysis.generatingPdf") || "Generating PDF...", { id: 'pdf-generation' });
+
+    // Call server-side PDF generation API
+    const response = await fetch('/api/generate-pdf', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        analysisData: sanitizedData,
+        theme: isDarkMode ? 'dark' : 'light',
+        locale: locale
+      })
+    });
+
+    // Handle server response
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Server error' }));
+      console.error('Server-side PDF generation failed:', errorData);
+      toast.error(
+        t("analysis.pdfGenerationError") || "Error generating PDF", 
+        { id: 'pdf-generation' }
+      );
+      return;
+    }
+
+    // Check content type
+    const contentType = response.headers.get('content-type');
+    if (contentType !== 'application/pdf') {
+      console.error('Invalid response content type:', contentType);
+      toast.error(
+        t("analysis.pdfGenerationError") || "Error generating PDF: Invalid response", 
+        { id: 'pdf-generation' }
+      );
+      return;
+    }
+
+    // Convert response to blob and trigger download
+    const blob = await response.blob();
+    if (blob.size === 0) {
+      console.error('Generated PDF is empty');
+      toast.error(
+        t("analysis.pdfGenerationError") || "Error generating PDF: Empty file", 
+        { id: 'pdf-generation' }
+      );
+      return;
+    }
+
+    // Create download link and trigger download
     const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = url;
-
-    // Generate filename from property address
-    const propertyAddress =
-      analysisData?.propertyDetails?.address
-        ?.replace(/[^a-zA-Z0-9\s]/g, "")
-        ?.trim() || "Property";
-
-    const filename = `${propertyAddress}_Analysis_Report.pdf`;
+    
+    // Extract filename from Content-Disposition header or use default
+    const contentDisposition = response.headers.get('content-disposition');
+    const filename = contentDisposition 
+      ? contentDisposition.split('filename=')[1]?.replace(/"/g, '') || `property-analysis-${Date.now()}.pdf`
+      : `property-analysis-${Date.now()}.pdf`;
+    
     link.download = filename;
-
-    // Trigger download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-
-    // Clean up the URL object
     URL.revokeObjectURL(url);
 
-    console.log("PDF generated successfully:", filename);
-    toast.success(t("analysis.pdfGeneratedSuccess"));
+    // Success notification
+    toast.success(
+      t("analysis.pdfDownloadSuccess") || "PDF downloaded successfully!", 
+      { id: 'pdf-generation' }
+    );
+
+    console.log(`✅ Server-side PDF generated successfully: ${filename} (${blob.size} bytes)`);
+
   } catch (error) {
-    console.error("Error generating PDF:", error);
-    toast.error(t("analysis.pdfGenerationError"));
+    console.error("PDF generation error:", error);
+    toast.error(
+      t("analysis.pdfGenerationError") || "Error generating PDF", 
+      { id: 'pdf-generation' }
+    );
   }
 }
 
-export default function AnalysisResultPage() {
+export default function AnalysisResultPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = use(params);
   const isDev = process.env.NODE_ENV === "development";
   const t = useTranslations("AnalysisResult");
   const { theme } = useTheme();
@@ -340,9 +451,27 @@ export default function AnalysisResultPage() {
               {t("loading.loadingText")}
             </p>
             
-            {/* Reuse the same progress bar from FileUploadSection */}
+            {/* Loading animation */}
             <div className="mt-6">
-              <AnalysisProgressBar complete={false} />
+              <div className="flex flex-col items-center justify-center w-full">
+                <div className="w-full max-w-md">
+                  <div className="p-6">
+                    <div className="space-y-6">
+                      <div className="text-center mb-4">
+                        <p className="text-lg font-medium text-gray-900 dark:text-white">
+                          Loading analysis results...
+                        </p>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
+                        <div className="text-right text-sm text-gray-500 dark:text-gray-400">
+                          Please wait...
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -509,32 +638,78 @@ export default function AnalysisResultPage() {
           )}
 
           {analysisData?.propertyDetails && (
-            <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/50 rounded-lg p-4 mb-8">
-              <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
-                {t("analysis.marketPosition")}
-              </p>
-              <div className="flex flex-wrap items-center gap-4 text-sm text-blue-800 dark:text-blue-200">
-                <span className="font-medium">
-                  {analysisData.propertyDetails.bedrooms}
-                  {t("analysis.roomPropertyPriced", {
-                    propertyType: analysisData.propertyDetails.propertyType,
-                    price: analysisData.propertyDetails.price.toLocaleString(),
-                  })}
-                </span>
-                <span>•</span>
-                <span className="font-medium">
-                  {t("analysis.totalSize", {
-                    size: analysisData.propertyDetails.size,
-                  })}
-                </span>
-                <span>•</span>
-                <span className="font-medium">
-                  {t("analysis.built", {
-                    year: analysisData.propertyDetails.yearBuilt,
-                  })}
-                </span>
-              </div>
-            </div>
+            <Card className="bg-white/85 dark:bg-[#111827]/85 backdrop-blur-sm border-gray-200 dark:border-slate-700 shadow-2xl mb-8">
+              <CardContent className="p-8">
+                <div className="space-y-6">
+                  {/* Property Details */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    {/* Property Type */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1 bg-blue-100 dark:bg-blue-500/20 rounded-lg">
+                          <HomeIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t("analysis.marketPosition")}</span>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {t(`analysis.propertyTypes.${analysisData.propertyDetails.propertyType}`) || analysisData.propertyDetails.propertyType}
+                      </div>
+                      <Badge variant="secondary" className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/30">
+                        {analysisData.propertyDetails.bedrooms}-room apartment
+                      </Badge>
+                    </div>
+
+                    {/* Price */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-emerald-500 dark:bg-emerald-400 rounded-full"></div>
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t("analysis.priceLabel")}</span>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {analysisData.propertyDetails.price.toLocaleString()}
+                        <span className="text-lg font-normal text-gray-500 dark:text-slate-400 ml-2">
+                          {analysisData.propertyDetails.currency || 'NOK'}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-slate-400">{t("analysis.askingPrice")}</p>
+                    </div>
+
+                    {/* Size */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Maximize2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t("analysis.sizeLabel")}</span>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {analysisData.propertyDetails.size}
+                        <span className="text-lg font-normal text-gray-500 dark:text-slate-400 ml-2">sqm</span>
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-slate-400">{t("analysis.totalArea")}</p>
+                    </div>
+
+                    {/* Year Built */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-slate-300">{t("analysis.yearBuiltLabel")}</span>
+                      </div>
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {analysisData.propertyDetails.yearBuilt}
+                      </div>
+                      <Badge variant="secondary" className="bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-500/30">
+                        {(() => {
+                          const age = new Date().getFullYear() - analysisData.propertyDetails.yearBuilt;
+                          return age <= 0 ? t("analysis.ageLabels.new") : t("analysis.ageLabels.yearsOld", { years: age });
+                        })()}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Additional Info Bar */}
+                  {/* Additional Info Bar removed as requested */}
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           <Card className="mb-6 border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1F2937]">
@@ -623,6 +798,11 @@ export default function AnalysisResultPage() {
             </CardContent>
           </Card>
 
+          {/* Hidden Defects Section */}
+          {analysisData?.hiddenDefects && analysisData.hiddenDefects.length > 0 && (
+            <HiddenDefectsSection hiddenDefects={analysisData.hiddenDefects} />
+          )}
+
           {analysisData?.bottomLine && (
             <Alert className="mb-6 border-yellow-200 dark:border-yellow-800/50 bg-yellow-50 dark:bg-yellow-950/20">
               <AlertTriangle className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
@@ -669,7 +849,7 @@ export default function AnalysisResultPage() {
               size="lg"
               variant="outline"
               className="px-8 border-yellow-200 dark:border-[#CA8A04] text-yellow-700 dark:text-[#FBBF24] hover:bg-yellow-50 dark:hover:bg-[#374151]"
-              onClick={() => analysisData && downloadAsPDF(analysisData, t, theme === 'dark')}
+              onClick={() => analysisData && downloadAsPDF(analysisData, t, theme === 'dark', locale)}
             >
               <Download className="w-4 h-4 mr-2" />
               {t("analysis.downloadPdfButton")}

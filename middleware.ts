@@ -40,8 +40,12 @@ export default async function middleware(request: NextRequest) {
 
   // Handle API routes separately - don't apply i18n routing to them
   if (request.nextUrl.pathname.startsWith("/api/")) {
-    // Apply rate limiting only if Redis is configured
-    if (request.nextUrl.pathname.startsWith("/api/analyze-pdf") && ratelimit) {
+    // Apply rate limiting to PDF-related endpoints if Redis is configured
+    if (
+      (request.nextUrl.pathname.startsWith("/api/analyze-pdf") || 
+       request.nextUrl.pathname.startsWith("/api/generate-pdf")) && 
+      ratelimit
+    ) {
       try {
         const ip = (request.headers.get("x-forwarded-for") ?? "127.0.0.1").split(",")[0];
         const { success } = await ratelimit.limit(

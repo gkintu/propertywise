@@ -1,3 +1,5 @@
+# Ignore temp-images directory for temporary image files
+temp-images/
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
@@ -44,3 +46,5 @@ next-env.d.ts
 
 GEMINI.md
 /.github
+.roo/rules/rules-roo.md
+CLAUDE.md

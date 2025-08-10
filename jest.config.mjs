@@ -11,6 +11,14 @@ const config = {
   // Add more setup options before each test is run
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testEnvironment: 'jest-environment-jsdom',
+  transformIgnorePatterns: [
+    '/node_modules/(?!@react-pdf/renderer)/'
+  ],
+  // Ignore an accidental duplicate TS manual mock file path
+  modulePathIgnorePatterns: [
+  '<rootDir>/__mocks__/@react-pdf/renderer\\.ts$',
+  '<rootDir>/__mocks__/sonner\\.js$'
+  ],
   
   // Module name mapping for path aliases
   moduleNameMapper: {
