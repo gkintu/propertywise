@@ -84,7 +84,7 @@ export default function AnalysisProgressBar({
   
   // Replace static "Processing..." with animated version
   let displayMessage = message || (isConnecting ? t("upload.establishingConnection") : "");
-  if (displayMessage && displayMessage.toLowerCase().includes("processing")) {
+  if (displayMessage && (displayMessage.toLowerCase().includes("processing") || displayMessage.toLowerCase().includes("behandler"))) {
     displayMessage = animatedProcessingText;
   }
 

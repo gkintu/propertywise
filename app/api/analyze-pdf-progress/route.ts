@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
               type: 'heartbeat',
               progress: currentProgress,
               stage: currentStage,
-              message: 'Processing...'
+              message: languageParam === 'no' ? 'Behandler' : 'Processing'
             })));
           }, 3000); // Every 3 seconds
         };
@@ -93,6 +93,7 @@ export async function GET(request: NextRequest) {
         
         try {
           startHeartbeat();
+          
           // Get translations for the specified language
           const t = await getTranslations({ locale: languageParam, namespace: 'HomePage.upload' });
 
@@ -152,7 +153,7 @@ export async function GET(request: NextRequest) {
             return;
           }
           
-          sendProgressWithHeartbeat({ type: 'progress', progress: 15, stage: t('progressStages.extractingDetails'), message: 'Validating document...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 15, stage: t('progressStages.extractingDetails'), message: t('validatingDocument') });
 
           const { blobUrl: validatedBlobUrl, language: validatedLanguage } = validationResult.data;
           blobUrlToDelete = validatedBlobUrl;
@@ -170,14 +171,14 @@ export async function GET(request: NextRequest) {
             return;
           }
           
-          sendProgressWithHeartbeat({ type: 'progress', progress: 18, stage: t('progressStages.extractingDetails'), message: 'Preparing to fetch document...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 18, stage: t('progressStages.extractingDetails'), message: t('preparingToFetch') });
 
           // Fetch the PDF from the blob URL with retry logic
           let blobResponse: Response | undefined;
           let retryCount = 0;
           const maxRetries = 5;
           
-          sendProgressWithHeartbeat({ type: 'progress', progress: 20, stage: t('progressStages.extractingDetails'), message: 'Downloading document...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 20, stage: t('progressStages.extractingDetails'), message: t('downloadingDocument') });
           
           while (retryCount <= maxRetries) {
             blobResponse = await fetch(validatedBlobUrl);
@@ -192,7 +193,7 @@ export async function GET(request: NextRequest) {
                 type: 'progress', 
                 progress: 20 + (retryCount * 2), 
                 stage: t('progressStages.extractingDetails'), 
-                message: `Retrying document fetch... (${retryCount + 1}/${maxRetries})` 
+                message: `${t('retryingDocumentFetch')} (${retryCount + 1}/${maxRetries})` 
               });
               await new Promise(resolve => setTimeout(resolve, retryDelay));
               retryCount++;
@@ -221,10 +222,10 @@ export async function GET(request: NextRequest) {
             return;
           }
           
-          sendProgressWithHeartbeat({ type: 'progress', progress: 30, stage: t('progressStages.extractingDetails'), message: 'Processing document content...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 30, stage: t('progressStages.extractingDetails'), message: t('processingContent') });
 
           const fileBuffer = Buffer.from(await blobResponse.arrayBuffer());
-          sendProgressWithHeartbeat({ type: 'progress', progress: 32, stage: t('progressStages.extractingDetails'), message: 'Converting document format...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 32, stage: t('progressStages.extractingDetails'), message: t('convertingFormat') });
           
           const pdfPart = {
             inlineData: {
@@ -233,7 +234,7 @@ export async function GET(request: NextRequest) {
             },
           };
           
-          sendProgressWithHeartbeat({ type: 'progress', progress: 35, stage: t('progressStages.extractingDetails'), message: 'Starting document analysis...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 35, stage: t('progressStages.extractingDetails'), message: t('startingAnalysis') });
 
           // STEP 1: Document Classification
           const documentClassificationSchema = {
@@ -254,7 +255,7 @@ export async function GET(request: NextRequest) {
             : `You are an AI assistant specialized in document classification. Analyze the attached PDF document and determine if it is a property report or not. Classify the document as "property_report" only if it is clearly a property report. Otherwise, classify it as "not_property_report". Respond in English in the reasoning field.`;
 
           try {
-            sendProgressWithHeartbeat({ type: 'progress', progress: 38, stage: t('progressStages.extractingDetails'), message: 'Analyzing document type...' });
+            sendProgressWithHeartbeat({ type: 'progress', progress: 38, stage: t('progressStages.extractingDetails'), message: t('analyzingDocumentType') });
             
             const classificationResponse = await genai.models.generateContent({
               model: "gemini-2.5-flash",
@@ -278,7 +279,7 @@ export async function GET(request: NextRequest) {
               return;
             }
             
-            sendProgressWithHeartbeat({ type: 'progress', progress: 42, stage: t('progressStages.extractingDetails'), message: 'Validating document type...' });
+            sendProgressWithHeartbeat({ type: 'progress', progress: 42, stage: t('progressStages.extractingDetails'), message: t('validatingDocumentType') });
 
             const classificationResult = JSON.parse(responseText);
             if (classificationResult.documentType === "not_property_report") {
@@ -301,7 +302,7 @@ export async function GET(request: NextRequest) {
               type: 'stage',
               progress: 45,
               stage: t('progressStages.analyzingPrice'),
-              message: 'Document type verified'
+              message: t('documentTypeVerified')
             });
 
           } catch (classificationError) {
@@ -311,26 +312,26 @@ export async function GET(request: NextRequest) {
               type: 'stage',
               progress: 45,
               stage: t('progressStages.analyzingPrice'),
-              message: 'Proceeding with analysis'
+              message: t('proceedingWithAnalysis')
             });
           }
 
           // Gradual progress during property analysis setup
-          sendProgressWithHeartbeat({ type: 'progress', progress: 50, stage: t('progressStages.analyzingPrice'), message: 'Preparing analysis engine...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 50, stage: t('progressStages.analyzingPrice'), message: t('preparingAnalysisEngine') });
           await new Promise(resolve => setTimeout(resolve, 200));
           
-          sendProgressWithHeartbeat({ type: 'progress', progress: 55, stage: t('progressStages.analyzingPrice'), message: 'Extracting property details...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 55, stage: t('progressStages.analyzingPrice'), message: t('extractingPropertyDetails') });
           await new Promise(resolve => setTimeout(resolve, 200));
           
           sendProgressWithHeartbeat({
             type: 'stage',
             progress: 60,
             stage: t('progressStages.checkingRisks'),
-            message: 'Analyzing property features...'
+            message: t('analyzingPropertyFeatures')
           });
           
           await new Promise(resolve => setTimeout(resolve, 200));
-          sendProgressWithHeartbeat({ type: 'progress', progress: 65, stage: t('progressStages.checkingRisks'), message: 'Evaluating potential risks...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 65, stage: t('progressStages.checkingRisks'), message: t('evaluatingRisks') });
 
           // STEP 2: Property Analysis  
           const languageInstruction = validatedLanguage === "no"
@@ -474,7 +475,7 @@ If no hidden defects are found or mentioned in the document, return an empty arr
             type: 'progress',
             progress: 72,
             stage: t('progressStages.checkingRisks'),
-            message: 'Sending analysis request...'
+            message: t('sendingAnalysisRequest')
           });
           
           // Progress during AI analysis
@@ -484,7 +485,7 @@ If no hidden defects are found or mentioned in the document, return an empty arr
                 type: 'progress',
                 progress: currentProgress + 2,
                 stage: t('progressStages.checkingRisks'),
-                message: 'AI analyzing document contents...'
+                message: t('aiAnalyzing')
               });
             }
           }, 1500);
@@ -504,7 +505,7 @@ If no hidden defects are found or mentioned in the document, return an empty arr
             type: 'stage',
             progress: 85,
             stage: t('progressStages.finalizing'),
-            message: 'Processing analysis results...'
+            message: t('processingResults')
           });
 
           // Skip this progress update to avoid too many stages
@@ -522,7 +523,7 @@ If no hidden defects are found or mentioned in the document, return an empty arr
             return;
           }
           
-          sendProgressWithHeartbeat({ type: 'progress', progress: 90, stage: t('progressStages.finalizing'), message: 'Parsing analysis results...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 90, stage: t('progressStages.finalizing'), message: t('parsingResults') });
 
           const parsedAnalysis = JSON.parse(aiSummary);
           if (!parsedAnalysis.propertyDetails || !parsedAnalysis.propertyDetails.address) {
@@ -541,10 +542,10 @@ If no hidden defects are found or mentioned in the document, return an empty arr
             return;
           }
 
-          sendProgressWithHeartbeat({ type: 'progress', progress: 95, stage: t('progressStages.finalizing'), message: 'Preparing final results...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 95, stage: t('progressStages.finalizing'), message: t('preparingFinalResults') });
           await new Promise(resolve => setTimeout(resolve, 300));
           
-          sendProgressWithHeartbeat({ type: 'progress', progress: 98, stage: t('progressStages.finalizing'), message: 'Finalizing analysis...' });
+          sendProgressWithHeartbeat({ type: 'progress', progress: 98, stage: t('progressStages.finalizing'), message: t('finalizingAnalysis') });
           await new Promise(resolve => setTimeout(resolve, 200));
           
           stopHeartbeat();
@@ -552,7 +553,7 @@ If no hidden defects are found or mentioned in the document, return an empty arr
             type: 'complete',
             progress: 100,
             stage: t('progressStages.analysisComplete'),
-            message: 'Analysis completed successfully',
+            message: t('analysisCompletedSuccessfully'),
             data: parsedAnalysis
           });
 
