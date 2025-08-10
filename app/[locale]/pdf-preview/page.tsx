@@ -104,13 +104,6 @@ const sampleAnalysisData: PropertyAnalysis = {
       category: "moisture_water_damage" as const,
       riskLevel: "medium" as const,
       briefExplanation: "New construction may have moisture issues from rushed drying or construction moisture",
-      signsToLookFor: [
-        "Condensation on windows",
-        "Musty odors in basement areas",
-        "Water stains on walls or ceilings",
-        "Peeling paint or wallpaper",
-        "Visible mold growth in corners"
-      ],
       consequences: "Mold growth, structural damage, health issues, expensive remediation requiring specialized contractors",
       preventiveMeasures: "Professional moisture assessment, proper ventilation inspection, humidity monitoring systems",
       actionRequired: "Hire certified building inspector for comprehensive moisture evaluation before purchase"
@@ -119,13 +112,6 @@ const sampleAnalysisData: PropertyAnalysis = {
       category: "electrical_faults" as const,
       riskLevel: "low" as const,
       briefExplanation: "New electrical systems may have installation defects or code violations that aren't immediately apparent",
-      signsToLookFor: [
-        "Flickering lights or dimming",
-        "Warm electrical outlets or switches",
-        "Circuit breakers tripping frequently",
-        "Burning smell near electrical panels",
-        "Sparks when plugging in appliances"
-      ],
       consequences: "Fire hazard, electrical shock risk, costly rewiring, potential insurance issues, safety violations",
       preventiveMeasures: "Professional electrical inspection, code compliance verification, load testing of circuits",
       actionRequired: "Schedule certified electrician inspection before purchase to verify all installations meet current codes"
@@ -134,13 +120,6 @@ const sampleAnalysisData: PropertyAnalysis = {
       category: "roof_structural_issues" as const,
       riskLevel: "high" as const,
       briefExplanation: "Foundation settling or structural defects may not be visible but could affect long-term stability",
-      signsToLookFor: [
-        "Cracks in foundation walls",
-        "Doors and windows that stick",
-        "Uneven floors or visible sagging",
-        "Gaps between walls and ceilings",
-        "Exterior brick or stone separation"
-      ],
       consequences: "Major structural repairs, foundation replacement, safety hazards, significant property value loss",
       preventiveMeasures: "Professional structural engineer assessment, soil composition analysis, foundation inspection",
       actionRequired: "Hire licensed structural engineer for comprehensive evaluation of foundation and load-bearing elements"
@@ -161,7 +140,6 @@ const mockT = (key: string, params?: Record<string, string | number>) => {
     'analysis.reportGeneratedOn': `Report generated on ${params?.date || new Date().toLocaleDateString()}`,
     'hiddenDefects.title': 'Hidden Defects',
     'hiddenDefects.description': 'Potential hidden defects to consider during inspection',
-    'hiddenDefects.signsToLookFor': 'Signs to look for',
     'hiddenDefects.consequences': 'Consequences',
     'hiddenDefects.preventiveMeasures': 'Preventive measures',
     'hiddenDefects.noSignsAvailable': 'No signs specified',

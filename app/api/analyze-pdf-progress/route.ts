@@ -21,11 +21,13 @@ const genai = new GoogleGenAI({
 });
 
 interface ProgressEvent {
-  type: 'progress' | 'stage' | 'complete' | 'error';
+  type: 'progress' | 'stage' | 'complete' | 'error' | 'heartbeat';
   progress: number;
   stage: string;
   message?: string;
   data?: unknown;
+  timestamp?: number;
+  estimatedTimeRemaining?: number;
 }
 
 function createProgressEvent(event: ProgressEvent): string {
@@ -48,7 +50,49 @@ export async function GET(request: NextRequest) {
       };
 
       const processAnalysis = async () => {
+        const startTime = Date.now();
+        let heartbeatInterval: NodeJS.Timeout | undefined;
+        let currentProgress = 0;
+        let currentStage = '';
+        
+        // Enhanced progress sender with heartbeat
+        const sendProgressWithHeartbeat = (event: ProgressEvent) => {
+          event.timestamp = Date.now();
+          currentProgress = event.progress;
+          currentStage = event.stage;
+          
+          // Calculate estimated time remaining based on progress velocity
+          if (event.progress > 0 && event.progress < 100) {
+            const elapsed = Date.now() - startTime;
+            const rate = event.progress / elapsed;
+            const remaining = (100 - event.progress) / rate;
+            event.estimatedTimeRemaining = Math.round(remaining / 1000); // in seconds
+          }
+          
+          controller.enqueue(encoder.encode(createProgressEvent(event)));
+        };
+        
+        // Start heartbeat to prevent connection timeout
+        const startHeartbeat = () => {
+          heartbeatInterval = setInterval(() => {
+            controller.enqueue(encoder.encode(createProgressEvent({
+              type: 'heartbeat',
+              progress: currentProgress,
+              stage: currentStage,
+              message: 'Processing...'
+            })));
+          }, 3000); // Every 3 seconds
+        };
+        
+        const stopHeartbeat = () => {
+          if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+            heartbeatInterval = undefined;
+          }
+        };
+        
         try {
+          startHeartbeat();
           // Get translations for the specified language
           const t = await getTranslations({ locale: languageParam, namespace: 'HomePage.upload' });
 
@@ -64,16 +108,24 @@ export async function GET(request: NextRequest) {
             return;
           }
 
-          sendProgress({
+          sendProgressWithHeartbeat({
             type: 'stage',
-            progress: 10,
+            progress: 5,
             stage: t('progressStages.extractingDetails'),
             message: ''
           });
+          
+          // Gradual progress increase during setup
+          await new Promise(resolve => setTimeout(resolve, 100));
+          sendProgressWithHeartbeat({ type: 'progress', progress: 8, stage: t('progressStages.extractingDetails'), message: '' });
+          
+          await new Promise(resolve => setTimeout(resolve, 100));
+          sendProgressWithHeartbeat({ type: 'progress', progress: 12, stage: t('progressStages.extractingDetails'), message: '' });
 
           // Validate required parameters
           if (!blobUrl) {
-            sendProgress({
+            stopHeartbeat();
+            sendProgressWithHeartbeat({
               type: 'error',
               progress: 0,
               stage: 'Validation Error',
@@ -89,7 +141,8 @@ export async function GET(request: NextRequest) {
           const validationResult = AnalyzePdfFromBlobSchema.safeParse(validationData);
 
           if (!validationResult.success) {
-            sendProgress({
+            stopHeartbeat();
+            sendProgressWithHeartbeat({
               type: 'error',
               progress: 0,
               stage: 'Validation Error',
@@ -98,26 +151,33 @@ export async function GET(request: NextRequest) {
             controller.close();
             return;
           }
+          
+          sendProgressWithHeartbeat({ type: 'progress', progress: 15, stage: t('progressStages.extractingDetails'), message: 'Validating document...' });
 
           const { blobUrl: validatedBlobUrl, language: validatedLanguage } = validationResult.data;
           blobUrlToDelete = validatedBlobUrl;
 
           // Validate blob URL format
           if (!validatedBlobUrl.includes('blob.vercel-storage.com')) {
-            sendProgress({
+            stopHeartbeat();
+            sendProgressWithHeartbeat({
               type: 'error',
-              progress: 10,
+              progress: 15,
               stage: 'Invalid Blob URL',
               message: 'Invalid blob URL format'
             });
             controller.close();
             return;
           }
+          
+          sendProgressWithHeartbeat({ type: 'progress', progress: 18, stage: t('progressStages.extractingDetails'), message: 'Preparing to fetch document...' });
 
           // Fetch the PDF from the blob URL with retry logic
           let blobResponse: Response | undefined;
           let retryCount = 0;
           const maxRetries = 5;
+          
+          sendProgressWithHeartbeat({ type: 'progress', progress: 20, stage: t('progressStages.extractingDetails'), message: 'Downloading document...' });
           
           while (retryCount <= maxRetries) {
             blobResponse = await fetch(validatedBlobUrl);
@@ -128,12 +188,19 @@ export async function GET(request: NextRequest) {
             
             if (blobResponse.status === 404 && retryCount < maxRetries) {
               const retryDelay = 500 * Math.pow(2, retryCount);
+              sendProgressWithHeartbeat({ 
+                type: 'progress', 
+                progress: 20 + (retryCount * 2), 
+                stage: t('progressStages.extractingDetails'), 
+                message: `Retrying document fetch... (${retryCount + 1}/${maxRetries})` 
+              });
               await new Promise(resolve => setTimeout(resolve, retryDelay));
               retryCount++;
             } else {
-              sendProgress({
+              stopHeartbeat();
+              sendProgressWithHeartbeat({
                 type: 'error',
-                progress: 10,
+                progress: 20,
                 stage: 'Document Fetch Error',
                 message: `Failed to fetch PDF: ${blobResponse.statusText}`
               });
@@ -143,23 +210,30 @@ export async function GET(request: NextRequest) {
           }
 
           if (!blobResponse || !blobResponse.ok) {
-            sendProgress({
+            stopHeartbeat();
+            sendProgressWithHeartbeat({
               type: 'error',
-              progress: 10,
+              progress: 25,
               stage: 'Document Fetch Error',
               message: 'Failed to fetch PDF after all retries'
             });
             controller.close();
             return;
           }
+          
+          sendProgressWithHeartbeat({ type: 'progress', progress: 30, stage: t('progressStages.extractingDetails'), message: 'Processing document content...' });
 
           const fileBuffer = Buffer.from(await blobResponse.arrayBuffer());
+          sendProgressWithHeartbeat({ type: 'progress', progress: 32, stage: t('progressStages.extractingDetails'), message: 'Converting document format...' });
+          
           const pdfPart = {
             inlineData: {
               data: fileBuffer.toString("base64"),
               mimeType: "application/pdf",
             },
           };
+          
+          sendProgressWithHeartbeat({ type: 'progress', progress: 35, stage: t('progressStages.extractingDetails'), message: 'Starting document analysis...' });
 
           // STEP 1: Document Classification
           const documentClassificationSchema = {
@@ -180,6 +254,8 @@ export async function GET(request: NextRequest) {
             : `You are an AI assistant specialized in document classification. Analyze the attached PDF document and determine if it is a property report or not. Classify the document as "property_report" only if it is clearly a property report. Otherwise, classify it as "not_property_report". Respond in English in the reasoning field.`;
 
           try {
+            sendProgressWithHeartbeat({ type: 'progress', progress: 38, stage: t('progressStages.extractingDetails'), message: 'Analyzing document type...' });
+            
             const classificationResponse = await genai.models.generateContent({
               model: "gemini-2.5-flash",
               contents: [{ text: classificationPrompt }, pdfPart],
@@ -191,15 +267,18 @@ export async function GET(request: NextRequest) {
 
             const responseText = classificationResponse.text;
             if (!responseText) {
-              sendProgress({
+              stopHeartbeat();
+              sendProgressWithHeartbeat({
                 type: 'error',
-                progress: 30,
+                progress: 40,
                 stage: 'Classification Failed',
                 message: 'Failed to classify document - no response from AI'
               });
               controller.close();
               return;
             }
+            
+            sendProgressWithHeartbeat({ type: 'progress', progress: 42, stage: t('progressStages.extractingDetails'), message: 'Validating document type...' });
 
             const classificationResult = JSON.parse(responseText);
             if (classificationResult.documentType === "not_property_report") {
@@ -207,9 +286,10 @@ export async function GET(request: NextRequest) {
                 ? "Dette ser ikke ut til å være en eiendomsrapport. Vennligst last opp riktig dokument."
                 : "This does not appear to be a property report. Please upload the correct document.";
               
-              sendProgress({
+              stopHeartbeat();
+              sendProgressWithHeartbeat({
                 type: 'error',
-                progress: 35,
+                progress: 42,
                 stage: 'Invalid Document Type',
                 message: errorMessage
               });
@@ -217,29 +297,40 @@ export async function GET(request: NextRequest) {
               return;
             }
 
-            sendProgress({
+            sendProgressWithHeartbeat({
               type: 'stage',
-              progress: 40,
+              progress: 45,
               stage: t('progressStages.analyzingPrice'),
-              message: ''
+              message: 'Document type verified'
             });
 
           } catch (classificationError) {
             console.error("Error in document classification:", classificationError);
-            sendProgress({
+            // Continue with analysis even if classification fails
+            sendProgressWithHeartbeat({
               type: 'stage',
-              progress: 40,
+              progress: 45,
               stage: t('progressStages.analyzingPrice'),
-              message: ''
+              message: 'Proceeding with analysis'
             });
           }
 
-          sendProgress({
+          // Gradual progress during property analysis setup
+          sendProgressWithHeartbeat({ type: 'progress', progress: 50, stage: t('progressStages.analyzingPrice'), message: 'Preparing analysis engine...' });
+          await new Promise(resolve => setTimeout(resolve, 200));
+          
+          sendProgressWithHeartbeat({ type: 'progress', progress: 55, stage: t('progressStages.analyzingPrice'), message: 'Extracting property details...' });
+          await new Promise(resolve => setTimeout(resolve, 200));
+          
+          sendProgressWithHeartbeat({
             type: 'stage',
-            progress: 65,
+            progress: 60,
             stage: t('progressStages.checkingRisks'),
-            message: ''
+            message: 'Analyzing property features...'
           });
+          
+          await new Promise(resolve => setTimeout(resolve, 200));
+          sendProgressWithHeartbeat({ type: 'progress', progress: 65, stage: t('progressStages.checkingRisks'), message: 'Evaluating potential risks...' });
 
           // STEP 2: Property Analysis  
           const languageInstruction = validatedLanguage === "no"
@@ -379,13 +470,25 @@ For each identified defect category that has actual findings, provide:
 
 If no hidden defects are found or mentioned in the document, return an empty array for hiddenDefects.`;
 
-          sendProgress({
-            type: 'stage',
-            progress: 85,
-            stage: t('progressStages.finalizing'),
-            message: ''
+          sendProgressWithHeartbeat({
+            type: 'progress',
+            progress: 72,
+            stage: t('progressStages.checkingRisks'),
+            message: 'Sending analysis request...'
           });
-
+          
+          // Progress during AI analysis
+          const aiAnalysisInterval = setInterval(() => {
+            if (currentProgress < 82) {
+              sendProgressWithHeartbeat({
+                type: 'progress',
+                progress: currentProgress + 2,
+                stage: t('progressStages.checkingRisks'),
+                message: 'AI analyzing document contents...'
+              });
+            }
+          }, 1500);
+          
           const response = await genai.models.generateContent({
             model: "gemini-2.5-flash",
             contents: [{ text: systemPrompt }, pdfPart],
@@ -394,20 +497,32 @@ If no hidden defects are found or mentioned in the document, return an empty arr
               responseSchema: propertyAnalysisSchema,
             },
           });
+          
+          clearInterval(aiAnalysisInterval);
+          
+          sendProgressWithHeartbeat({
+            type: 'stage',
+            progress: 85,
+            stage: t('progressStages.finalizing'),
+            message: 'Processing analysis results...'
+          });
 
           // Skip this progress update to avoid too many stages
 
           const aiSummary = response.text;
           if (!aiSummary) {
-            sendProgress({
+            stopHeartbeat();
+            sendProgressWithHeartbeat({
               type: 'error',
-              progress: 95,
+              progress: 88,
               stage: 'Analysis Failed',
               message: 'AI failed to generate a summary'
             });
             controller.close();
             return;
           }
+          
+          sendProgressWithHeartbeat({ type: 'progress', progress: 90, stage: t('progressStages.finalizing'), message: 'Parsing analysis results...' });
 
           const parsedAnalysis = JSON.parse(aiSummary);
           if (!parsedAnalysis.propertyDetails || !parsedAnalysis.propertyDetails.address) {
@@ -415,9 +530,10 @@ If no hidden defects are found or mentioned in the document, return an empty arr
               ? "Kunne ikke finne eiendomsinformasjon i dokumentet. Vennligst sjekk at dokumentet inneholder eiendomsdetaljer."
               : "Could not find property information in the document. Please ensure the document contains property details.";
             
-            sendProgress({
+            stopHeartbeat();
+            sendProgressWithHeartbeat({
               type: 'error',
-              progress: 95,
+              progress: 92,
               stage: 'Insufficient Data',
               message: errorMessage
             });
@@ -425,11 +541,18 @@ If no hidden defects are found or mentioned in the document, return an empty arr
             return;
           }
 
-          sendProgress({
+          sendProgressWithHeartbeat({ type: 'progress', progress: 95, stage: t('progressStages.finalizing'), message: 'Preparing final results...' });
+          await new Promise(resolve => setTimeout(resolve, 300));
+          
+          sendProgressWithHeartbeat({ type: 'progress', progress: 98, stage: t('progressStages.finalizing'), message: 'Finalizing analysis...' });
+          await new Promise(resolve => setTimeout(resolve, 200));
+          
+          stopHeartbeat();
+          sendProgressWithHeartbeat({
             type: 'complete',
             progress: 100,
             stage: t('progressStages.analysisComplete'),
-            message: '',
+            message: 'Analysis completed successfully',
             data: parsedAnalysis
           });
 
@@ -438,15 +561,17 @@ If no hidden defects are found or mentioned in the document, return an empty arr
         } catch (error) {
           console.error("Error in /api/analyze-pdf-progress:", error);
           
+          stopHeartbeat();
           const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-          sendProgress({
+          sendProgressWithHeartbeat({
             type: 'error',
-            progress: 0,
+            progress: Math.max(currentProgress, 0),
             stage: 'Processing Error',
             message: `Failed to process file: ${errorMessage}`
           });
           controller.close();
         } finally {
+          stopHeartbeat();
           // Clean up blob if needed
           if (blobUrlToDelete && !isDemoFileBlob(blobUrlToDelete)) {
             try {

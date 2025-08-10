@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 export interface ProgressEvent {
-  type: 'progress' | 'stage' | 'complete' | 'error';
+  type: 'progress' | 'stage' | 'complete' | 'error' | 'heartbeat';
   progress: number;
   stage: string;
   message?: string;
   data?: any;
+  timestamp?: number;
+  estimatedTimeRemaining?: number;
 }
 
 export interface SSEConfig {

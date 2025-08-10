@@ -61,6 +61,7 @@
       "initializing": "Initializing...",
       "establishingConnection": "Establishing connection to analysis service",
       "connectingToAnalysisService": "Connecting to analysis service...",
+      "connectionLost": "Connection lost - attempting to reconnect...",
       "errors": {
         "connectionTimeout": "Connection timeout - please try again",
         "connectionRetrying": "Connection lost, retrying...",

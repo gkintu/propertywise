@@ -138,9 +138,6 @@ async function downloadAsPDF(
             category: defect?.category || 'other' as 'shared_debt' | 'legal_deficiencies' | 'moisture_water_damage' | 'rot_fungus_pests' | 'electrical_faults' | 'drainage_leaks' | 'roof_structural_issues' | 'environmental_hazards',
             riskLevel: defect?.riskLevel || 'medium' as 'low' | 'medium' | 'high',
             briefExplanation: defect?.briefExplanation?.substring(0, 200) || '',
-            signsToLookFor: Array.isArray(defect?.signsToLookFor) 
-              ? defect.signsToLookFor.map(sign => sign?.substring(0, 100) || '') 
-              : [],
             consequences: defect?.consequences?.substring(0, 200) || '',
             preventiveMeasures: defect?.preventiveMeasures?.substring(0, 200) || '',
             actionRequired: defect?.actionRequired?.substring(0, 150) || ''

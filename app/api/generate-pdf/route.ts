@@ -46,7 +46,6 @@ const requestSchema = z.object({
       category: z.enum(['shared_debt', 'legal_deficiencies', 'moisture_water_damage', 'rot_fungus_pests', 'electrical_faults', 'drainage_leaks', 'roof_structural_issues', 'environmental_hazards']),
       riskLevel: z.enum(['low', 'medium', 'high']),
       briefExplanation: z.string(),
-      signsToLookFor: z.array(z.string()),
       consequences: z.string(),
       preventiveMeasures: z.string(),
       actionRequired: z.string().optional(),

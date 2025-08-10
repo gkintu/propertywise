@@ -61,6 +61,7 @@
       "initializing": "Initialiserer...",
       "establishingConnection": "Oppretter tilkobling til analysetjeneste",
       "connectingToAnalysisService": "Kobler til analysetjeneste...",
+      "connectionLost": "Tilkobling tapt - forsøker å koble til på nytt...",
       "errors": {
         "connectionTimeout": "Tilkoblingstimeout - vennligst prøv igjen",
         "connectionRetrying": "Tilkobling tapt, prøver på nytt...",

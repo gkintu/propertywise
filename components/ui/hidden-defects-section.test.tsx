@@ -40,7 +40,6 @@ jest.mock('next-intl', () => ({
     const translations: Record<string, string> = {
       'hiddenDefects.title': 'Hidden Property Defects',
       'hiddenDefects.description': 'Potential issues that may not be immediately visible',
-      'hiddenDefects.signsToLookFor': 'Signs to Look For',
       'hiddenDefects.consequences': 'Potential Consequences', 
       'hiddenDefects.preventiveMeasures': 'What to Do Before Purchase',
       'hiddenDefects.actionRequired': 'Recommended Action',
@@ -60,7 +59,7 @@ describe('HiddenDefectsSection', () => {
     {
       category: 'moisture_water_damage',
       riskLevel: 'high',
-      signsToLookFor: ['Dark stains on walls', 'Musty odors', 'Peeling paint'],
+      briefExplanation: 'Dark stains on walls indicate potential moisture damage',
       consequences: 'Structural damage and health risks from mold',
       preventiveMeasures: 'Request moisture inspection and check for proper ventilation',
       actionRequired: 'Have professional moisture assessment before purchase'
@@ -68,7 +67,7 @@ describe('HiddenDefectsSection', () => {
     {
       category: 'electrical_faults',
       riskLevel: 'medium',
-      signsToLookFor: ['Flickering lights', 'Old wiring'],
+      briefExplanation: 'Flickering lights suggest electrical system issues',
       consequences: 'Safety hazards and expensive repairs',
       preventiveMeasures: 'Request electrical inspection'
     }
