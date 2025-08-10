@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useServerSentEvents, type ProgressEvent } from "@/hooks/useServerSentEvents";
+import { useLoadingDots } from "@/hooks/useLoadingDots";
 
 interface AnalysisResult {
   analysis?: unknown;
@@ -25,10 +26,9 @@ export default function AnalysisProgressBar({
   onError 
 }: AnalysisProgressBarProps) {
   const t = useTranslations("HomePage");
-  const [progress, setProgress] = useState(0);
   const [stage, setStage] = useState("");
   const [message, setMessage] = useState("");
-
+  
   // Configure SSE connection with query parameters
   const sseConfig = blobUrl ? {
     url: `/api/analyze-pdf-progress?blobUrl=${encodeURIComponent(blobUrl)}&language=${language}`,
@@ -41,6 +41,12 @@ export default function AnalysisProgressBar({
 
 
   const { isConnecting, error, lastEvent } = useServerSentEvents(sseConfig);
+  
+  // Determine the main stage title (no animation)
+  const mainStageTitle = stage || (isConnecting ? t("upload.connecting") : t("upload.initializing"));
+  
+  // Create animated "Processing..." text for replacement
+  const animatedProcessingText = useLoadingDots(t("upload.processing"), 600);
 
   // Handle progress events from SSE
   useEffect(() => {
@@ -48,7 +54,6 @@ export default function AnalysisProgressBar({
 
     const event: ProgressEvent = lastEvent;
     
-    setProgress(event.progress);
     setStage(event.stage);
     setMessage(event.message || "");
 
@@ -74,9 +79,14 @@ export default function AnalysisProgressBar({
   // SSE connection automatically starts analysis when connected
   // No additional POST request needed
 
-  // Fallback display when no SSE data yet
-  const displayStage = stage || (isConnecting ? t("upload.connecting") : t("upload.initializing"));
-  const displayMessage = message || (isConnecting ? t("upload.establishingConnection") : "");
+  // Use the main stage title (no animation) for display
+  const displayStage = mainStageTitle;
+  
+  // Replace static "Processing..." with animated version
+  let displayMessage = message || (isConnecting ? t("upload.establishingConnection") : "");
+  if (displayMessage && displayMessage.toLowerCase().includes("processing")) {
+    displayMessage = animatedProcessingText;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center w-full">

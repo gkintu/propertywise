@@ -59,6 +59,7 @@
       },
       "connecting": "Kobler til...",
       "initializing": "Initialiserer...",
+      "processing": "Behandler",
       "establishingConnection": "Oppretter tilkobling til analysetjeneste",
       "connectingToAnalysisService": "Kobler til analysetjeneste...",
       "connectionLost": "Tilkobling tapt - forsøker å koble til på nytt...",
