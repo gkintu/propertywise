@@ -11,6 +11,7 @@ import { useFileUpload, markBlobAsProcessed } from "@/hooks/useFileUpload";
 import { ShakeMotion, ShakeMotionHandle } from "@/components/motion";
 import { DemoFilesSection } from "./DemoFilesSection";
 import AnalysisProgressBar from "./AnalysisProgressBar";
+import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
 
 interface FileUploadSectionProps {
   onAnalysisStart?: () => void;
@@ -434,7 +435,7 @@ const FileUploadSection = forwardRef<
                     }}
                   />
                 ) : (
-                  <div className="flex items-center justify-center gap-4">
+                  <div className="flex flex-col items-center justify-center gap-0.5">
                     <Button
                       ref={analyzeButtonRef}
                       className="bg-yellow-500 hover:bg-[#FACC15] dark:hover:bg-[#f6c40c] text-white dark:text-[#111827] px-8 font-medium relative flex items-center justify-center disabled:opacity-50"
@@ -450,7 +451,16 @@ const FileUploadSection = forwardRef<
                         </>
                       )}
                     </Button>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">{t("upload.analyzeButtonPatience")}</span>
+                    <TypewriterEffectSmooth
+                      words={[
+                        {
+                          text: t("upload.analyzeButtonPatience"),
+                          className: "text-sm text-gray-500 dark:text-gray-400",
+                        },
+                      ]}
+                      className="flex space-x-1 my-0"
+
+                    />
                   </div>
                 )}
               </div>
